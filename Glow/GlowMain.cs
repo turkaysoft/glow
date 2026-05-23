@@ -8,6 +8,8 @@
 // GitHub: https://github.com/turkaysoft/glow
 // ======================================================================================================
 
+// TS Modules
+using Glow.glow_tools;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -21,6 +23,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Management;
 using System.Net;
+using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Reflection;
@@ -31,8 +34,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
-// TS Modules
-using Glow.glow_tools;
 using static Glow.TSModules;
 
 namespace Glow{
@@ -387,6 +388,17 @@ namespace Glow{
                 if (debug_status) TSErrorLog.LogException(ex, "RunSec");
             }
         }
+        private void SetDebugMenuState(bool enabled){
+            if (InvokeRequired){
+                Invoke(new Action(() =>{
+                    debugOnToolStripMenuItem.Enabled = enabled;
+                    debugOffToolStripMenuItem.Enabled = enabled;
+                }));
+                return;
+            }
+            debugOnToolStripMenuItem.Enabled = enabled;
+            debugOffToolStripMenuItem.Enabled = enabled;
+        }
         // TASK ALL PROCESS
         // ======================================================================================================
         private async Task GlowBootstrapper(){
@@ -459,12 +471,16 @@ namespace Glow{
                     TSLogger.Log("<--- ALL TASKS COMPLETED --->");
                     TSLogger.Log($"<--- Total Load Time: {btTime.Elapsed.TotalSeconds:F2} seconds --->");
                     TSLogger.Log("<--------------------------->");
+                    // FILE LOCK RELEASE
+                    TSLogger.Close();
                 }
+                // DEBUG MODE MENU ENABLE
+                SetDebugMenuState(true);
             }catch (Exception ex){ if (debug_status) { TSErrorLog.LogException(ex, "GlowBootstrapper()"); } }
         }
         // SOFTWARE LOAD
         // ======================================================================================================
-        private void Glow_Load(object sender, EventArgs e){ 
+        private void Glow_Load(object sender, EventArgs e){
             Text = TS_VersionEngine.TS_SofwareVersion(0);
             // LAUNCH PROCESS 
             // ====================================
@@ -767,6 +783,7 @@ namespace Glow{
                     get_power_mode.StartInfo.FileName = "powercfg";
                     get_power_mode.StartInfo.Arguments = "/L";
                     get_power_mode.StartInfo.RedirectStandardOutput = true;
+                    get_power_mode.StartInfo.StandardOutputEncoding = Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage);
                     get_power_mode.StartInfo.UseShellExecute = false;
                     get_power_mode.StartInfo.CreateNoWindow = true;
                     get_power_mode.Start();
@@ -8416,10 +8433,10 @@ namespace Glow{
             }
         }
         private void DebugOnToolStripMenuItem_Click(object sender, EventArgs e){
-            if (!debug_status){ debug_status = true; Debug_mode_settings("1"); Select_debug_mode_active(sender); }
+            if (!debug_status){ debug_status = true; TSLogger.Enable(true, Program.glow_console_debug_mode); Debug_mode_settings("1"); Select_debug_mode_active(sender); }
         }
         private void DebugOffToolStripMenuItem_Click(object sender, EventArgs e){
-            if (debug_status){ debug_status = false; Debug_mode_settings("0"); Select_debug_mode_active(sender); }
+            if (debug_status){ debug_status = false; TSLogger.Enable(false, Program.glow_console_debug_mode); Debug_mode_settings("0"); Select_debug_mode_active(sender); }
         }
         private void Debug_mode_settings(string get_debug_value){
             try{
@@ -8434,32 +8451,66 @@ namespace Glow{
         private void CheckForUpdatesToolStripMenuItem_Click(object sender, EventArgs e){
             Task.Run(() => Software_update_check(1));
         }
-        public void Software_update_check(int _check_update_ui){
+        public async void Software_update_check(int _check_update_ui){
             try{
                 TSGetLangs software_lang = new TSGetLangs(lang_path);
                 SetUpdateMenuEnabled(false);
-                if (!IsNetworkCheck()){
+                if (!await IsNetworkAvailable()){
                     if (_check_update_ui == 1){
                         TS_MessageBoxEngine.TS_MessageBox(this, 2, string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_not_connection"), "\n\n"), string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_title"), Application.ProductName));
                     }
                     return;
                 }
-                using (WebClient getLastVersion = new WebClient()){
-                    string client_version_raw = TS_VersionParser.ParseUINormalize(Application.ProductVersion);
-                    string last_version_raw = TS_VersionParser.ParseUINormalize(getLastVersion.DownloadString(TS_LinkSystem.github_link_lv).Split('=')[1].Trim());
-                    Version client_ver = Version.Parse(client_version_raw);
-                    Version last_ver = Version.Parse(last_version_raw);
-                    if (client_ver < last_ver){
-                        DialogResult info_update = TS_MessageBoxEngine.TS_MessageBox(this, 5, string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_available"), Application.ProductName, "\n\n", client_version_raw, "\n", last_version_raw, "\n\n"), string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_title"), Application.ProductName));
-                        if (info_update == DialogResult.Yes)
-                            Process.Start(new ProcessStartInfo(TS_LinkSystem.github_link_lr) { UseShellExecute = true });
-                    }else if (_check_update_ui == 1){
-                        string update_msg = client_ver == last_ver ? string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_not_available"), Application.ProductName, "\n", client_version_raw) : string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_newer"), "\n\n", $"v{client_version_raw}");
-                        TS_MessageBoxEngine.TS_MessageBox(this, 1, update_msg, string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_title"), Application.ProductName));
+                using (HttpClientHandler handler = new HttpClientHandler()){
+                    handler.UseProxy = false;
+                    using (HttpClient httpClient = new HttpClient(handler)){
+                        httpClient.Timeout = TimeSpan.FromSeconds(15);
+                        httpClient.DefaultRequestHeaders.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue{ NoCache = true, NoStore = true, MustRevalidate = true };
+                        httpClient.DefaultRequestHeaders.Pragma.ParseAdd("no-cache");
+                        string versionUrl = TS_LinkSystem.github_link_lv;
+                        versionUrl += (versionUrl.Contains("?") ? "&" : "?") + "_ts=" + DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                        string response = await httpClient.GetStringAsync(versionUrl);
+                        string firstLine = response.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None)[0];
+                        string client_version_raw = TS_VersionParser.ParseUINormalize(Application.ProductVersion);
+                        string last_version_raw = TS_VersionParser.ParseUINormalize(firstLine.Split(new[] { '=' }, 2)[1].Trim());
+                        Version client_ver = Version.Parse(client_version_raw);
+                        Version last_ver = Version.Parse(last_version_raw);
+                        if (client_ver < last_ver){
+                            DialogResult info_update = TS_MessageBoxEngine.TS_MessageBox(this, 5, string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_available"), Application.ProductName, "\n\n", client_version_raw, "\n", last_version_raw, "\n\n"), string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_title"), Application.ProductName));
+                            if (info_update == DialogResult.Yes){
+                                try{
+                                    string updaterPath = Path.Combine(Application.StartupPath, Program.updater_exe_name);
+                                    if (File.Exists(updaterPath)){
+                                        string procName = Path.GetFileNameWithoutExtension(updaterPath);
+                                        bool isRunning = Process.GetProcessesByName(procName).Length > 0;
+                                        if (!isRunning){
+                                            Process.Start(new ProcessStartInfo(updaterPath) { UseShellExecute = true, Arguments = $"-app={Application.ProductName}" });
+                                        }else{
+                                            TS_MessageBoxEngine.TS_MessageBox(this, 1, software_lang.TSReadLangs("SoftwareUpdate", "su_ts_updater_c_running"), string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_title"), Application.ProductName));
+                                        }
+                                        Application.Exit();
+                                        return;
+                                    }else{
+                                        TS_MessageBoxEngine.TS_MessageBox(this, 2, string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_ts_updater_not_available"), Program.updater_exe_name), string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_title"), Application.ProductName));
+                                        Process.Start(new ProcessStartInfo(TS_LinkSystem.github_link_lr) { UseShellExecute = true });
+                                        Application.Exit();
+                                        return;
+                                    }
+                                }catch (Exception ex){
+                                    if (debug_status)
+                                        TSErrorLog.LogException(ex, $"{Program.updater_exe_name} launch block.");
+                                }
+                            }
+                        }else if (_check_update_ui == 1){
+                            string update_msg = client_ver == last_ver ? string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_not_available"), Application.ProductName, "\n", client_version_raw) : string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_newer"), "\n\n", $"v{client_version_raw}");
+                            TS_MessageBoxEngine.TS_MessageBox(this, 1, update_msg, string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_title"), Application.ProductName));
+                        }
                     }
                 }
             }catch (Exception ex){
-                if (debug_status) { TSErrorLog.LogException(ex, "Software_update_check()"); }
+                if (debug_status){
+                    TSErrorLog.LogException(ex, "Software_update_check()");
+                }
                 TSGetLangs software_lang = new TSGetLangs(lang_path);
                 TS_MessageBoxEngine.TS_MessageBox(this, 3, string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_error"), "\n\n", ex.Message), string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_title"), Application.ProductName));
             }finally{

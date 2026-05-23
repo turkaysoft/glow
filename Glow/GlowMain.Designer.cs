@@ -1450,18 +1450,20 @@
             // debugOnToolStripMenuItem
             // 
             this.debugOnToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+            this.debugOnToolStripMenuItem.Enabled = false;
             this.debugOnToolStripMenuItem.Name = "debugOnToolStripMenuItem";
             this.debugOnToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F8;
-            this.debugOnToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+            this.debugOnToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.debugOnToolStripMenuItem.Text = "DebugOn";
             this.debugOnToolStripMenuItem.Click += new System.EventHandler(this.DebugOnToolStripMenuItem_Click);
             // 
             // debugOffToolStripMenuItem
             // 
             this.debugOffToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+            this.debugOffToolStripMenuItem.Enabled = false;
             this.debugOffToolStripMenuItem.Name = "debugOffToolStripMenuItem";
             this.debugOffToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F9;
-            this.debugOffToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+            this.debugOffToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.debugOffToolStripMenuItem.Text = "DebugOff";
             this.debugOffToolStripMenuItem.Click += new System.EventHandler(this.DebugOffToolStripMenuItem_Click);
             // 
@@ -1469,7 +1471,7 @@
             // 
             this.debugFolderToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.debugFolderToolStripMenuItem.Name = "debugFolderToolStripMenuItem";
-            this.debugFolderToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+            this.debugFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.debugFolderToolStripMenuItem.Text = "DebugFolder";
             this.debugFolderToolStripMenuItem.Click += new System.EventHandler(this.DebugFolderToolStripMenuItem_Click);
             // 
@@ -1477,7 +1479,7 @@
             // 
             this.debugZIPToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.debugZIPToolStripMenuItem.Name = "debugZIPToolStripMenuItem";
-            this.debugZIPToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+            this.debugZIPToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.debugZIPToolStripMenuItem.Text = "DebugZIP";
             this.debugZIPToolStripMenuItem.Click += new System.EventHandler(this.DebugZIPToolStripMenuItem_Click);
             // 
@@ -1485,7 +1487,7 @@
             // 
             this.debugDeleteToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.debugDeleteToolStripMenuItem.Name = "debugDeleteToolStripMenuItem";
-            this.debugDeleteToolStripMenuItem.Size = new System.Drawing.Size(145, 22);
+            this.debugDeleteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.debugDeleteToolStripMenuItem.Text = "DebugDelete";
             this.debugDeleteToolStripMenuItem.Click += new System.EventHandler(this.DebugDeleteToolStripMenuItem_Click);
             // 
@@ -1690,9 +1692,9 @@
             // 
             this.OS.AutoScroll = true;
             this.OS.Controls.Add(this.OS_TLP);
-            this.OS.Location = new System.Drawing.Point(4, 25);
+            this.OS.Location = new System.Drawing.Point(4, 22);
             this.OS.Name = "OS";
-            this.OS.Size = new System.Drawing.Size(819, 558);
+            this.OS.Size = new System.Drawing.Size(819, 561);
             this.OS.TabIndex = 0;
             this.OS.Text = "OS";
             this.OS.UseVisualStyleBackColor = true;
@@ -3094,9 +3096,9 @@
             // 
             this.MB.AutoScroll = true;
             this.MB.Controls.Add(this.MB_TLP);
-            this.MB.Location = new System.Drawing.Point(4, 25);
+            this.MB.Location = new System.Drawing.Point(4, 22);
             this.MB.Name = "MB";
-            this.MB.Size = new System.Drawing.Size(819, 558);
+            this.MB.Size = new System.Drawing.Size(819, 561);
             this.MB.TabIndex = 1;
             this.MB.Text = "MB";
             this.MB.UseVisualStyleBackColor = true;
@@ -3958,9 +3960,9 @@
             // 
             this.CPU.AutoScroll = true;
             this.CPU.Controls.Add(this.CPU_TLP);
-            this.CPU.Location = new System.Drawing.Point(4, 25);
+            this.CPU.Location = new System.Drawing.Point(4, 22);
             this.CPU.Name = "CPU";
-            this.CPU.Size = new System.Drawing.Size(819, 558);
+            this.CPU.Size = new System.Drawing.Size(819, 561);
             this.CPU.TabIndex = 2;
             this.CPU.Text = "CPU";
             this.CPU.UseVisualStyleBackColor = true;
@@ -4610,9 +4612,9 @@
             // 
             this.RAM.AutoScroll = true;
             this.RAM.Controls.Add(this.RAM_TLP);
-            this.RAM.Location = new System.Drawing.Point(4, 25);
+            this.RAM.Location = new System.Drawing.Point(4, 22);
             this.RAM.Name = "RAM";
-            this.RAM.Size = new System.Drawing.Size(819, 558);
+            this.RAM.Size = new System.Drawing.Size(819, 561);
             this.RAM.TabIndex = 3;
             this.RAM.Text = "RAM";
             this.RAM.UseVisualStyleBackColor = true;
@@ -5284,9 +5286,9 @@
             // 
             this.GPU.AutoScroll = true;
             this.GPU.Controls.Add(this.GPU_TLP);
-            this.GPU.Location = new System.Drawing.Point(4, 25);
+            this.GPU.Location = new System.Drawing.Point(4, 22);
             this.GPU.Name = "GPU";
-            this.GPU.Size = new System.Drawing.Size(819, 558);
+            this.GPU.Size = new System.Drawing.Size(819, 561);
             this.GPU.TabIndex = 4;
             this.GPU.Text = "GPU";
             this.GPU.UseVisualStyleBackColor = true;
@@ -6255,9 +6257,9 @@
             // 
             this.DISK.AutoScroll = true;
             this.DISK.Controls.Add(this.DISK_TLP);
-            this.DISK.Location = new System.Drawing.Point(4, 25);
+            this.DISK.Location = new System.Drawing.Point(4, 22);
             this.DISK.Name = "DISK";
-            this.DISK.Size = new System.Drawing.Size(819, 558);
+            this.DISK.Size = new System.Drawing.Size(819, 561);
             this.DISK.TabIndex = 5;
             this.DISK.Text = "DISK";
             this.DISK.UseVisualStyleBackColor = true;
@@ -7416,9 +7418,9 @@
             // 
             this.NETWORK.AutoScroll = true;
             this.NETWORK.Controls.Add(this.NET_TLP);
-            this.NETWORK.Location = new System.Drawing.Point(4, 25);
+            this.NETWORK.Location = new System.Drawing.Point(4, 22);
             this.NETWORK.Name = "NETWORK";
-            this.NETWORK.Size = new System.Drawing.Size(819, 558);
+            this.NETWORK.Size = new System.Drawing.Size(819, 561);
             this.NETWORK.TabIndex = 6;
             this.NETWORK.Text = "NETWORK";
             this.NETWORK.UseVisualStyleBackColor = true;
@@ -8402,9 +8404,9 @@
             // 
             this.USB.AutoScroll = true;
             this.USB.Controls.Add(this.USB_TLP);
-            this.USB.Location = new System.Drawing.Point(4, 25);
+            this.USB.Location = new System.Drawing.Point(4, 22);
             this.USB.Name = "USB";
-            this.USB.Size = new System.Drawing.Size(819, 558);
+            this.USB.Size = new System.Drawing.Size(819, 561);
             this.USB.TabIndex = 13;
             this.USB.Text = "USB";
             this.USB.UseVisualStyleBackColor = true;
@@ -8910,9 +8912,9 @@
             // SOUND
             // 
             this.SOUND.Controls.Add(this.SOUND_TLP);
-            this.SOUND.Location = new System.Drawing.Point(4, 25);
+            this.SOUND.Location = new System.Drawing.Point(4, 22);
             this.SOUND.Name = "SOUND";
-            this.SOUND.Size = new System.Drawing.Size(819, 558);
+            this.SOUND.Size = new System.Drawing.Size(819, 561);
             this.SOUND.TabIndex = 14;
             this.SOUND.Text = "SOUND";
             this.SOUND.UseVisualStyleBackColor = true;
@@ -9191,9 +9193,9 @@
             // 
             this.BATTERY.AutoScroll = true;
             this.BATTERY.Controls.Add(this.BATTERY_TLP);
-            this.BATTERY.Location = new System.Drawing.Point(4, 25);
+            this.BATTERY.Location = new System.Drawing.Point(4, 22);
             this.BATTERY.Name = "BATTERY";
-            this.BATTERY.Size = new System.Drawing.Size(819, 558);
+            this.BATTERY.Size = new System.Drawing.Size(819, 561);
             this.BATTERY.TabIndex = 7;
             this.BATTERY.Text = "BATTERY";
             this.BATTERY.UseVisualStyleBackColor = true;
@@ -9650,9 +9652,9 @@
             // DRIVERS
             // 
             this.DRIVERS.Controls.Add(this.OSD_TLP);
-            this.DRIVERS.Location = new System.Drawing.Point(4, 25);
+            this.DRIVERS.Location = new System.Drawing.Point(4, 22);
             this.DRIVERS.Name = "DRIVERS";
-            this.DRIVERS.Size = new System.Drawing.Size(819, 558);
+            this.DRIVERS.Size = new System.Drawing.Size(819, 561);
             this.DRIVERS.TabIndex = 8;
             this.DRIVERS.Text = "DRIVERS";
             this.DRIVERS.UseVisualStyleBackColor = true;
@@ -9668,7 +9670,7 @@
             this.OSD_TLP.Padding = new System.Windows.Forms.Padding(3);
             this.OSD_TLP.RowCount = 1;
             this.OSD_TLP.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.OSD_TLP.Size = new System.Drawing.Size(819, 558);
+            this.OSD_TLP.Size = new System.Drawing.Size(819, 561);
             this.OSD_TLP.TabIndex = 0;
             // 
             // osd_panel_1
@@ -9850,9 +9852,9 @@
             // SERVICES
             // 
             this.SERVICES.Controls.Add(this.SERVICE_TLP);
-            this.SERVICES.Location = new System.Drawing.Point(4, 25);
+            this.SERVICES.Location = new System.Drawing.Point(4, 22);
             this.SERVICES.Name = "SERVICES";
-            this.SERVICES.Size = new System.Drawing.Size(819, 558);
+            this.SERVICES.Size = new System.Drawing.Size(819, 561);
             this.SERVICES.TabIndex = 12;
             this.SERVICES.Text = "SERVICES";
             this.SERVICES.UseVisualStyleBackColor = true;
@@ -9868,7 +9870,7 @@
             this.SERVICE_TLP.Padding = new System.Windows.Forms.Padding(3);
             this.SERVICE_TLP.RowCount = 1;
             this.SERVICE_TLP.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.SERVICE_TLP.Size = new System.Drawing.Size(819, 558);
+            this.SERVICE_TLP.Size = new System.Drawing.Size(819, 561);
             this.SERVICE_TLP.TabIndex = 0;
             // 
             // service_panel_1
@@ -10050,9 +10052,9 @@
             // INSTAPPS
             // 
             this.INSTAPPS.Controls.Add(this.INSTAPPS_TLP);
-            this.INSTAPPS.Location = new System.Drawing.Point(4, 25);
+            this.INSTAPPS.Location = new System.Drawing.Point(4, 22);
             this.INSTAPPS.Name = "INSTAPPS";
-            this.INSTAPPS.Size = new System.Drawing.Size(819, 558);
+            this.INSTAPPS.Size = new System.Drawing.Size(819, 561);
             this.INSTAPPS.TabIndex = 16;
             this.INSTAPPS.Text = "INSTAPPS";
             this.INSTAPPS.UseVisualStyleBackColor = true;
@@ -10068,7 +10070,7 @@
             this.INSTAPPS_TLP.Padding = new System.Windows.Forms.Padding(3);
             this.INSTAPPS_TLP.RowCount = 1;
             this.INSTAPPS_TLP.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.INSTAPPS_TLP.Size = new System.Drawing.Size(819, 558);
+            this.INSTAPPS_TLP.Size = new System.Drawing.Size(819, 561);
             this.INSTAPPS_TLP.TabIndex = 0;
             // 
             // instapps_panel_1
@@ -10251,9 +10253,9 @@
             // EXPORT
             // 
             this.EXPORT.Controls.Add(this.EXPORT_TLP);
-            this.EXPORT.Location = new System.Drawing.Point(4, 25);
+            this.EXPORT.Location = new System.Drawing.Point(4, 22);
             this.EXPORT.Name = "EXPORT";
-            this.EXPORT.Size = new System.Drawing.Size(819, 558);
+            this.EXPORT.Size = new System.Drawing.Size(819, 561);
             this.EXPORT.TabIndex = 15;
             this.EXPORT.Text = "EXPORT";
             this.EXPORT.UseVisualStyleBackColor = true;

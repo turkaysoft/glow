@@ -156,7 +156,7 @@ namespace Glow.glow_tools{
             DNS_TestStartBtn.Enabled = false;
             DNS_TestExportBtn.Enabled = false;
             // Check network connection
-            if (!IsNetworkCheck()){
+            if (!await IsNetworkAvailable()){
                 DNS_PerfectResultLabel.Text = software_lang.TSReadLangs("DNSTestTool", "dtt_no_net");
                 TS_MessageBoxEngine.TS_MessageBox(this, 2, software_lang.TSReadLangs("DNSTestTool", "dtt_no_net_no_test"));
                 DNS_TestExportBtn.Enabled = true;

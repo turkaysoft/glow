@@ -1,19 +1,22 @@
-﻿using System;
-using System.IO;
-using System.Net;
-using System.Linq;
-using System.Text;
-using System.Drawing;
-using Microsoft.Win32;
-using System.Threading;
-using System.Diagnostics;
-using System.Globalization;
-using System.Windows.Forms;
-using System.Drawing.Imaging;
-using System.Drawing.Drawing2D;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
+using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Glow{
     internal class TSModules{
@@ -114,7 +117,7 @@ namespace Glow{
                 m_form.Activate();
             }
         }
-        // TS LOGGER
+        // TS LOGGER - IMPROVED VERSION
         // ======================================================================================================
         public static class TSLogger{
             private static readonly object _lock = new object();
@@ -123,28 +126,17 @@ namespace Glow{
             private static string _currentLogFile;
             private static readonly string _logDir;
             private static StreamWriter _writer;
-            /// <summary>
-            /// Full path to the log directory (independent of enabled state).
-            /// </summary>
             public static string LogDirectory => _logDir;
-            /// <summary>
-            /// Full path to the current session log file (null if not initialized / disabled).
-            /// </summary>
             public static string CurrentLogFile{
                 get { lock (_lock) { return _currentLogFile; } }
             }
             static TSLogger(){
                 _logDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "g_logs");
-                // Deterministic cleanup on shutdown
                 try{
                     AppDomain.CurrentDomain.ProcessExit += (_, __) => CloseWriter_NoThrow();
                     AppDomain.CurrentDomain.DomainUnload += (_, __) => CloseWriter_NoThrow();
                 }catch { }
             }
-            /// <summary>
-            /// Enables/disables logging and (re)initializes the session log file.
-            /// Each Enable(true, ...) call creates a NEW log file for that run.
-            /// </summary>
             public static void Enable(bool fileEnabled, bool consoleEnabled){
                 lock (_lock){
                     _fileEnabled = fileEnabled;
@@ -157,17 +149,22 @@ namespace Glow{
                     InitializeInternal_NoThrow();
                 }
             }
+            public static void Close(){
+                lock (_lock){
+                    CloseWriter_NoThrow();
+                }
+            }
             public static void Log(string message){
                 lock (_lock){
-                    if (!_fileEnabled && !_consoleEnabled) return;
+                    if (!_fileEnabled && !_consoleEnabled)
+                        return;
+
                     Write_NoLock(message);
                 }
             }
-            /// <summary>
-            /// Optional overload. Prefer TSErrorLog for formatted exceptions.
-            /// </summary>
             public static void Log(Exception ex){
-                if (ex == null) return;
+                if (ex == null)
+                    return;
                 Log(ex.ToString());
             }
             private static void InitializeInternal_NoThrow(){
@@ -175,121 +172,158 @@ namespace Glow{
                     if (!Directory.Exists(_logDir)){
                         Directory.CreateDirectory(_logDir);
                     }
-                    //
                     string stamp = DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
                     string baseName = $"Glow_{Dns.GetHostName()}_{stamp}";
                     string path;
-                    //
                     for (int i = 0; i < 1000; i++){
                         string suffix = (i == 0) ? "" : "_" + i.ToString();
                         path = Path.Combine(_logDir, baseName + suffix + ".log");
+                        FileStream fs = null;
                         try{
-                            var fs = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+                            fs = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
                             _currentLogFile = path;
                             _writer = new StreamWriter(fs, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false)){
                                 AutoFlush = true
                             };
                             return;
                         }catch (IOException){
+                            fs?.Dispose();
                             continue;
                         }
                     }
                     _writer = null;
                     _currentLogFile = null;
                     _fileEnabled = false;
-                    if (_consoleEnabled)
+                    if (_consoleEnabled){
                         Console.WriteLine("[DEBUG] " + DateTime.Now.ToString("dd.MM.yyyy - HH:mm:ss") + " - TSLogger: Failed to create log file (attempted 1000 names). File logging disabled.");
+                    }
                 }catch{
                     _writer = null;
                     _currentLogFile = null;
                     _fileEnabled = false;
-                    if (_consoleEnabled)
+                    if (_consoleEnabled){
                         Console.WriteLine("[DEBUG] " + DateTime.Now.ToString("dd.MM.yyyy - HH:mm:ss") + " - TSLogger: Exception during log initialization. File logging disabled.");
+                    }
                 }
             }
             private static void CloseWriter_NoThrow(){
-                try { _writer?.Dispose(); } catch { }
+                try{
+                    if (_writer != null){
+                        _writer.Flush();
+                        _writer.Dispose();
+                    }
+                }catch (ObjectDisposedException){ }catch{ }
                 _writer = null;
             }
             private static void Write_NoLock(string text){
-                if (text == null) text = "";
+                if (text == null)
+                    text = "";
                 string[] lines = SplitLines(text);
-                if (lines.Length == 0) return;
-                string prefix = DateTime.Now.ToString("dd.MM.yyyy - HH:mm:ss") + " - ";
-                // Console
+                if (lines.Length == 0)
+                    return;
+                string prefix = $"{DateTime.Now:dd.MM.yyyy - HH:mm:ss} - ";
                 if (_consoleEnabled){
-                    for (int i = 0; i < lines.Length; i++)
+                    for (int i = 0; i < lines.Length; i++){
                         Console.WriteLine("[DEBUG] " + prefix + lines[i]);
+                    }
                 }
-                // File
-                if (_fileEnabled && _writer != null)
-                {
-                    for (int i = 0; i < lines.Length; i++)
-                        _writer.WriteLine(prefix + lines[i]);
+                if (_fileEnabled){
+                    if (_writer == null){
+                        InitializeInternal_NoThrow();
+                    }
+                    if (_writer != null){
+                        try{
+                            for (int i = 0; i < lines.Length; i++){
+                                _writer.WriteLine(prefix + lines[i]);
+                            }
+                        }catch (ObjectDisposedException){
+                            _writer = null;
+                        }catch (IOException){
+                            _writer = null;
+                        }
+                    }
                 }
             }
             private static string[] SplitLines(string text){
-                // Preserve empty lines inside the message (important for stack traces / formatted logs).
-                // But if the message is entirely empty (or only line breaks), keep prior behavior: write nothing.
-                if (string.IsNullOrEmpty(text)) return Array.Empty<string>();
-                // Normalize CRLF/CR to LF then split (keep empty entries).
+                if (string.IsNullOrEmpty(text))
+                    return Array.Empty<string>();
                 string normalized = text.Replace("\r\n", "\n").Replace("\r", "\n");
                 string[] parts = normalized.Split(new[] { '\n' }, StringSplitOptions.None);
-                // If it's only empty lines, skip (matches previous "RemoveEmptyEntries => 0")
-                bool anyNonEmpty = false;
                 for (int i = 0; i < parts.Length; i++){
-                    if (parts[i].Length != 0) { anyNonEmpty = true; break; }
+                    if (parts[i].Length > 0)
+                        return parts;
                 }
-                return anyNonEmpty ? parts : Array.Empty<string>();
+                return Array.Empty<string>();
             }
         }
-        // TS ERROR LOGGER
+        // TS ERROR LOGGER - IMPROVED VERSION
         // ======================================================================================================
         public static class TSErrorLog{
-            /// <summary>
-            /// Call this from all catch blocks.
-            /// context: A short description such as “SID_GPU()”, “Theme apply”, “Startup”.
-            /// </summary>
             public static void LogException(Exception ex, string context = null){
-                if (ex == null) return;
-                //
+                if (ex == null)
+                    return;
+                string formattedLog = FormatException(ex, context);
+                TSLogger.Log(formattedLog);
+            }
+            private static string FormatException(Exception ex, string context, int depth = 0){
+                if (ex == null)
+                    return "";
+                const int maxDepth = 5;
+                const int indentSize = 2;
+                if (depth > maxDepth)
+                    return $"{new string(' ', depth * indentSize)}[Max depth reached]\n";
+                string indent = new string(' ', depth * indentSize);
                 string header = new string('-', 50);
-                string time = DateTime.Now.ToString("dd.MM.yyyy - HH:mm:ss");
+                string time = $"{DateTime.Now:dd.MM.yyyy - HH:mm:ss}";
                 string type = ex.GetType().FullName;
                 string msg = ex.Message ?? "";
                 string source = ex.Source ?? "";
-                string target = ex.TargetSite != null ? ex.TargetSite.ToString() : "";
+                string target = ex.TargetSite?.ToString() ?? "";
                 int tid = Thread.CurrentThread.ManagedThreadId;
-                //
-                string firstFrameInfo = "";
+                string firstFrameInfo = ExtractFirstFrameInfo(ex);
+                var sb = new StringBuilder();
+                sb.AppendLine(indent + header);
+                sb.AppendLine(indent + "EXCEPTION");
+                sb.AppendLine(indent + $"Time       : {time}");
+                if (!string.IsNullOrWhiteSpace(context))
+                    sb.AppendLine(indent + $"Context    : {context}");
+                sb.AppendLine(indent + $"Type       : {type}");
+                sb.AppendLine(indent + $"Message    : {msg}");
+                if (!string.IsNullOrEmpty(source))
+                    sb.AppendLine(indent + $"Source     : {source}");
+                if (!string.IsNullOrEmpty(target))
+                    sb.AppendLine(indent + $"TargetSite : {target}");
+                sb.AppendLine(indent + $"ThreadId   : {tid}");
+                if (!string.IsNullOrEmpty(firstFrameInfo))
+                    sb.Append(indent + firstFrameInfo);
+                sb.AppendLine(indent + "StackTrace :");
+                sb.AppendLine(indent + (ex.StackTrace ?? ""));
+                if (ex is AggregateException aggEx && aggEx.InnerExceptions.Count > 0){
+                    sb.AppendLine(indent + $"AggregateException ({aggEx.InnerExceptions.Count} inner exceptions):");
+                    for (int i = 0; i < aggEx.InnerExceptions.Count; i++){
+                        sb.AppendLine(indent + $"[{i}]:");
+                        sb.Append(FormatException(aggEx.InnerExceptions[i], null, depth + 1));
+                    }
+                }else if (ex.InnerException != null){
+                    sb.AppendLine(indent + "InnerException:");
+                    sb.Append(FormatException(ex.InnerException, null, depth + 1));
+                }
+                sb.AppendLine(indent + header);
+                return sb.ToString();
+            }
+            private static string ExtractFirstFrameInfo(Exception ex){
                 try{
                     var st = new StackTrace(ex, true);
-                    var f0 = st.FrameCount > 0 ? st.GetFrame(0) : null;
-                    if (f0 != null){
-                        string file = f0.GetFileName();
-                        int line = f0.GetFileLineNumber();
-                        if (!string.IsNullOrEmpty(file) && line > 0)
-                            firstFrameInfo = $"Location   : {file}:{line}\n";
+                    var frame = st.FrameCount > 0 ? st.GetFrame(0) : null;
+                    if (frame != null){
+                        string file = frame.GetFileName();
+                        int line = frame.GetFileLineNumber();
+                        if (!string.IsNullOrEmpty(file) && line > 0){
+                            return $"Location   : {file}:{line}\n";
+                        }
                     }
                 }catch { }
-                //
-                string body =
-                    header + "\n" +
-                    "EXCEPTION\n" +
-                    $"Time       : {time}\n" +
-                    (string.IsNullOrWhiteSpace(context) ? "" : $"Context    : {context}\n") +
-                    $"Type       : {type}\n" +
-                    $"Message    : {msg}\n" +
-                    (string.IsNullOrEmpty(source) ? "" : $"Source     : {source}\n") +
-                    (string.IsNullOrEmpty(target) ? "" : $"TargetSite : {target}\n") +
-                    $"ThreadId   : {tid}\n" +
-                    firstFrameInfo +
-                    "StackTrace :\n" +
-                    (ex.StackTrace ?? "") + "\n" +
-                    (ex.InnerException != null ? $"InnerException:\n{ex.InnerException}\n" : "") +
-                    header;
-                //
-                TSLogger.Log(body);
+                return "";
             }
         }
         // TS SOFTWARE COPYRIGHT DATE
@@ -795,11 +829,11 @@ namespace Glow{
             // ====================================
             public static Color ColorMode(int theme, string key){
                 if (theme == 0){
-                    return DarkTheme.ContainsKey(key) ? DarkTheme[key] : Color.Transparent;
+                    return DarkTheme.ContainsKey(key) ? DarkTheme[key] : Color.Black;
                 }else if (theme == 1){
-                    return LightTheme.ContainsKey(key) ? LightTheme[key] : Color.Transparent;
+                    return LightTheme.ContainsKey(key) ? LightTheme[key] : Color.White;
                 }
-                return Color.Transparent;
+                return Color.White;
             }
         }
         // THEME MODE HELPER
@@ -1134,19 +1168,30 @@ namespace Glow{
         }
         // INTERNET CONNECTION STATUS
         // ======================================================================================================
-        public static bool IsNetworkCheck(){
+        public static async Task<bool> IsNetworkAvailable(){
+            if (!NetworkInterface.GetIsNetworkAvailable())
+                return false;
+            string[] urls ={
+                "https://www.gstatic.com/generate_204",
+                "https://www.cloudflare.com",
+                "https://www.google.com"
+            };
             try{
-                var request = (HttpWebRequest)WebRequest.Create("http://clients3.google.com/generate_204");
-                request.Method = "GET";
-                request.KeepAlive = false;
-                request.Proxy = null;
-                request.Timeout = 3000;
-                using (var response = (HttpWebResponse)request.GetResponse()){
-                    return (int)response.StatusCode == 204;
+                using (HttpClient client = new HttpClient()){
+                    client.Timeout = TimeSpan.FromSeconds(3);
+                    foreach (var url in urls){
+                        try{
+                            using (HttpResponseMessage response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead)){
+                                if (response.IsSuccessStatusCode)
+                                    return true;
+                            }
+                        }catch{ }
+                    }
                 }
             }catch{
                 return false;
             }
+            return false;
         }
         // WINDOWS WALLPAPER CHECK
         // ======================================================================================================
