@@ -29,6 +29,7 @@ You can support this project by making a donation to help ensure its sustainabil
 * **Portable:** No installation required. Just download it, extract all files from the ZIP, select the appropriate architecture, and run it.
 * **Saving Data:** The ability to save all features offered in the interface as a **Text Document**, **HTML Document** and **Markdown Document**, if desired.
 * **System Identity:** Unique device ID generation for hardware verification (Shortcut: `CTRL + G`).
+* **Built-in Update Mechanism:** It features a built-in smart update mechanism developed specifically by **Türkaysoft**.
 
 ---
 
