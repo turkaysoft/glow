@@ -33,8 +33,8 @@
             this.LabelDeveloper = new System.Windows.Forms.Label();
             this.LabelSoftware = new System.Windows.Forms.Label();
             this.LabelLoader = new System.Windows.Forms.Label();
-            this.PanelLoaderBG = new System.Windows.Forms.Panel();
-            this.PanelLoaderFE = new System.Windows.Forms.Panel();
+            this.PanelLoaderBG = new Glow.TSCustomPanel();
+            this.PanelLoaderFE = new Glow.TSCustomPanel();
             this.LabelCopyright = new System.Windows.Forms.Label();
             this.PanelImg = new System.Windows.Forms.Panel();
             this.ImageWelcome = new System.Windows.Forms.PictureBox();
@@ -118,20 +118,26 @@
             this.PanelLoaderBG.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.PanelLoaderBG.BackColor = System.Drawing.Color.Transparent;
+            this.PanelLoaderBG.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.PanelLoaderBG.BorderRadius = 3;
+            this.PanelLoaderBG.BorderSize = 0;
             this.PanelLoaderBG.Controls.Add(this.PanelLoaderFE);
             this.PanelLoaderBG.Location = new System.Drawing.Point(21, 372);
-            this.PanelLoaderBG.Margin = new System.Windows.Forms.Padding(3, 15, 3, 35);
+            this.PanelLoaderBG.Margin = new System.Windows.Forms.Padding(3, 15, 3, 32);
             this.PanelLoaderBG.Name = "PanelLoaderBG";
-            this.PanelLoaderBG.Size = new System.Drawing.Size(320, 3);
+            this.PanelLoaderBG.Size = new System.Drawing.Size(320, 6);
             this.PanelLoaderBG.TabIndex = 4;
             // 
             // PanelLoaderFE
             // 
             this.PanelLoaderFE.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(95)))), ((int)(((byte)(146)))));
+            this.PanelLoaderFE.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.PanelLoaderFE.BorderRadius = 3;
+            this.PanelLoaderFE.BorderSize = 0;
             this.PanelLoaderFE.Dock = System.Windows.Forms.DockStyle.Left;
             this.PanelLoaderFE.Location = new System.Drawing.Point(0, 0);
             this.PanelLoaderFE.Name = "PanelLoaderFE";
-            this.PanelLoaderFE.Size = new System.Drawing.Size(50, 3);
+            this.PanelLoaderFE.Size = new System.Drawing.Size(50, 6);
             this.PanelLoaderFE.TabIndex = 0;
             // 
             // LabelCopyright
@@ -201,8 +207,8 @@
         private System.Windows.Forms.Label LabelDeveloper;
         private System.Windows.Forms.Label LabelSoftware;
         private System.Windows.Forms.Label LabelLoader;
-        private System.Windows.Forms.Panel PanelLoaderBG;
-        private System.Windows.Forms.Panel PanelLoaderFE;
+        private TSCustomPanel PanelLoaderBG;
+        private TSCustomPanel PanelLoaderFE;
         private System.Windows.Forms.Label LabelCopyright;
         private System.Windows.Forms.Panel PanelImg;
         private System.Windows.Forms.PictureBox ImageWelcome;

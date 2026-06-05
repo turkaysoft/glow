@@ -93,16 +93,16 @@
             this.checkForUpdatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sFCandDISMAutoTool = new System.Windows.Forms.ToolStripMenuItem();
-            this.cacheCleaningTool = new System.Windows.Forms.ToolStripMenuItem();
             this.benchCPUTool = new System.Windows.Forms.ToolStripMenuItem();
             this.benchRAMTool = new System.Windows.Forms.ToolStripMenuItem();
             this.benchDiskTool = new System.Windows.Forms.ToolStripMenuItem();
+            this.cacheCleaningTool = new System.Windows.Forms.ToolStripMenuItem();
+            this.systemIdAnalysisTool = new System.Windows.Forms.ToolStripMenuItem();
             this.screenOverlayTool = new System.Windows.Forms.ToolStripMenuItem();
+            this.bluetoothFinderToolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dnsTestTool = new System.Windows.Forms.ToolStripMenuItem();
             this.networkFixTool = new System.Windows.Forms.ToolStripMenuItem();
             this.showWiFiPasswordTool = new System.Windows.Forms.ToolStripMenuItem();
-            this.bluetoothFinderToolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.systemIdAnalysisTool = new System.Windows.Forms.ToolStripMenuItem();
             this.monitorTestTool = new System.Windows.Forms.ToolStripMenuItem();
             this.monitorDeadPixelTestTool = new System.Windows.Forms.ToolStripMenuItem();
             this.monitorDynamicRangeTestTool = new System.Windows.Forms.ToolStripMenuItem();
@@ -556,6 +556,10 @@
             this.NET_LT_Device = new System.Windows.Forms.Label();
             this.NET_LT_Device_V = new System.Windows.Forms.Label();
             this.network_panel_3 = new System.Windows.Forms.Panel();
+            this.NET_P_ISP_V = new System.Windows.Forms.Label();
+            this.NET_P_IP_Adress = new System.Windows.Forms.Label();
+            this.NET_P_ISP = new System.Windows.Forms.Label();
+            this.NET_P_IP_Adress_V = new System.Windows.Forms.Label();
             this.NET_ScrollTop = new Glow.TSCustomButton();
             this.NET_DNS_v6_2_V = new System.Windows.Forms.Label();
             this.NET_DNS_v6_1 = new System.Windows.Forms.Label();
@@ -1241,6 +1245,7 @@
             // 
             // systemThemeToolStripMenuItem
             // 
+            this.systemThemeToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.systemThemeToolStripMenuItem.Name = "systemThemeToolStripMenuItem";
             this.systemThemeToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F3;
             this.systemThemeToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
@@ -1453,7 +1458,7 @@
             this.debugOnToolStripMenuItem.Enabled = false;
             this.debugOnToolStripMenuItem.Name = "debugOnToolStripMenuItem";
             this.debugOnToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F8;
-            this.debugOnToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.debugOnToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
             this.debugOnToolStripMenuItem.Text = "DebugOn";
             this.debugOnToolStripMenuItem.Click += new System.EventHandler(this.DebugOnToolStripMenuItem_Click);
             // 
@@ -1463,7 +1468,7 @@
             this.debugOffToolStripMenuItem.Enabled = false;
             this.debugOffToolStripMenuItem.Name = "debugOffToolStripMenuItem";
             this.debugOffToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F9;
-            this.debugOffToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.debugOffToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
             this.debugOffToolStripMenuItem.Text = "DebugOff";
             this.debugOffToolStripMenuItem.Click += new System.EventHandler(this.DebugOffToolStripMenuItem_Click);
             // 
@@ -1471,7 +1476,8 @@
             // 
             this.debugFolderToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.debugFolderToolStripMenuItem.Name = "debugFolderToolStripMenuItem";
-            this.debugFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.debugFolderToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F10;
+            this.debugFolderToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
             this.debugFolderToolStripMenuItem.Text = "DebugFolder";
             this.debugFolderToolStripMenuItem.Click += new System.EventHandler(this.DebugFolderToolStripMenuItem_Click);
             // 
@@ -1479,7 +1485,7 @@
             // 
             this.debugZIPToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.debugZIPToolStripMenuItem.Name = "debugZIPToolStripMenuItem";
-            this.debugZIPToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.debugZIPToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
             this.debugZIPToolStripMenuItem.Text = "DebugZIP";
             this.debugZIPToolStripMenuItem.Click += new System.EventHandler(this.DebugZIPToolStripMenuItem_Click);
             // 
@@ -1487,7 +1493,7 @@
             // 
             this.debugDeleteToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.debugDeleteToolStripMenuItem.Name = "debugDeleteToolStripMenuItem";
-            this.debugDeleteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.debugDeleteToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
             this.debugDeleteToolStripMenuItem.Text = "DebugDelete";
             this.debugDeleteToolStripMenuItem.Click += new System.EventHandler(this.DebugDeleteToolStripMenuItem_Click);
             // 
@@ -1504,16 +1510,16 @@
             // 
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.sFCandDISMAutoTool,
-            this.cacheCleaningTool,
             this.benchCPUTool,
             this.benchRAMTool,
             this.benchDiskTool,
+            this.cacheCleaningTool,
+            this.systemIdAnalysisTool,
             this.screenOverlayTool,
+            this.bluetoothFinderToolToolStripMenuItem,
             this.dnsTestTool,
             this.networkFixTool,
             this.showWiFiPasswordTool,
-            this.bluetoothFinderToolToolStripMenuItem,
-            this.systemIdAnalysisTool,
             this.monitorTestTool});
             this.toolsToolStripMenuItem.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
@@ -1523,90 +1529,94 @@
             // sFCandDISMAutoTool
             // 
             this.sFCandDISMAutoTool.Name = "sFCandDISMAutoTool";
-            this.sFCandDISMAutoTool.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Q)));
-            this.sFCandDISMAutoTool.Size = new System.Drawing.Size(241, 22);
-            this.sFCandDISMAutoTool.Text = "sFCandDISMAutoTool";
+            this.sFCandDISMAutoTool.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D1)));
+            this.sFCandDISMAutoTool.Size = new System.Drawing.Size(275, 22);
+            this.sFCandDISMAutoTool.Text = "DISMandSFCAutoTool";
             this.sFCandDISMAutoTool.Click += new System.EventHandler(this.SFCandDISMAutoTool_Click);
-            // 
-            // cacheCleaningTool
-            // 
-            this.cacheCleaningTool.Name = "cacheCleaningTool";
-            this.cacheCleaningTool.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.W)));
-            this.cacheCleaningTool.Size = new System.Drawing.Size(241, 22);
-            this.cacheCleaningTool.Text = "cacheCleaningTool";
-            this.cacheCleaningTool.Click += new System.EventHandler(this.CacheCleaningTool_Click);
             // 
             // benchCPUTool
             // 
             this.benchCPUTool.Name = "benchCPUTool";
-            this.benchCPUTool.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.E)));
-            this.benchCPUTool.Size = new System.Drawing.Size(241, 22);
+            this.benchCPUTool.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D2)));
+            this.benchCPUTool.Size = new System.Drawing.Size(275, 22);
             this.benchCPUTool.Text = "benchCPUTool";
             this.benchCPUTool.Click += new System.EventHandler(this.BenchCPUTool_Click);
             // 
             // benchRAMTool
             // 
             this.benchRAMTool.Name = "benchRAMTool";
-            this.benchRAMTool.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
-            this.benchRAMTool.Size = new System.Drawing.Size(241, 22);
+            this.benchRAMTool.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D3)));
+            this.benchRAMTool.Size = new System.Drawing.Size(275, 22);
             this.benchRAMTool.Text = "benchRAMTool";
             this.benchRAMTool.Click += new System.EventHandler(this.BenchRAMTool_Click);
             // 
             // benchDiskTool
             // 
             this.benchDiskTool.Name = "benchDiskTool";
-            this.benchDiskTool.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.T)));
-            this.benchDiskTool.Size = new System.Drawing.Size(241, 22);
+            this.benchDiskTool.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D4)));
+            this.benchDiskTool.Size = new System.Drawing.Size(275, 22);
             this.benchDiskTool.Text = "benchDiskTool";
             this.benchDiskTool.Click += new System.EventHandler(this.BenchDiskTool_Click);
+            // 
+            // cacheCleaningTool
+            // 
+            this.cacheCleaningTool.Name = "cacheCleaningTool";
+            this.cacheCleaningTool.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D5)));
+            this.cacheCleaningTool.Size = new System.Drawing.Size(275, 22);
+            this.cacheCleaningTool.Text = "cacheCleaningTool";
+            this.cacheCleaningTool.Click += new System.EventHandler(this.CacheCleaningTool_Click);
+            // 
+            // systemIdAnalysisTool
+            // 
+            this.systemIdAnalysisTool.Name = "systemIdAnalysisTool";
+            this.systemIdAnalysisTool.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D6)));
+            this.systemIdAnalysisTool.Size = new System.Drawing.Size(275, 22);
+            this.systemIdAnalysisTool.Text = "systemIdAnalysis";
+            this.systemIdAnalysisTool.Click += new System.EventHandler(this.SystemIdAnalysisTool_Click);
             // 
             // screenOverlayTool
             // 
             this.screenOverlayTool.Name = "screenOverlayTool";
-            this.screenOverlayTool.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y)));
-            this.screenOverlayTool.Size = new System.Drawing.Size(241, 22);
+            this.screenOverlayTool.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D7)));
+            this.screenOverlayTool.Size = new System.Drawing.Size(275, 22);
             this.screenOverlayTool.Text = "screenOverlayTool";
             this.screenOverlayTool.Click += new System.EventHandler(this.ScreenOverlayTool_Click);
+            // 
+            // bluetoothFinderToolToolStripMenuItem
+            // 
+            this.bluetoothFinderToolToolStripMenuItem.Name = "bluetoothFinderToolToolStripMenuItem";
+            this.bluetoothFinderToolToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.B)));
+            this.bluetoothFinderToolToolStripMenuItem.Size = new System.Drawing.Size(275, 22);
+            this.bluetoothFinderToolToolStripMenuItem.Text = "bluetoothFinderTool";
+            this.bluetoothFinderToolToolStripMenuItem.Click += new System.EventHandler(this.BluetoothFinderToolToolStripMenuItem_Click);
             // 
             // dnsTestTool
             // 
             this.dnsTestTool.Name = "dnsTestTool";
-            this.dnsTestTool.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.U)));
-            this.dnsTestTool.Size = new System.Drawing.Size(241, 22);
+            this.dnsTestTool.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.D)));
+            this.dnsTestTool.Size = new System.Drawing.Size(275, 22);
             this.dnsTestTool.Text = "dnsTestTool";
             this.dnsTestTool.Click += new System.EventHandler(this.DnsTestTool_Click);
             // 
             // networkFixTool
             // 
             this.networkFixTool.Name = "networkFixTool";
-            this.networkFixTool.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.I)));
-            this.networkFixTool.Size = new System.Drawing.Size(241, 22);
+            this.networkFixTool.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.N)));
+            this.networkFixTool.Size = new System.Drawing.Size(275, 22);
             this.networkFixTool.Text = "networkFixTool";
             this.networkFixTool.Click += new System.EventHandler(this.NetworkFixTool_Click);
             // 
             // showWiFiPasswordTool
             // 
             this.showWiFiPasswordTool.Name = "showWiFiPasswordTool";
-            this.showWiFiPasswordTool.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.showWiFiPasswordTool.Size = new System.Drawing.Size(241, 22);
+            this.showWiFiPasswordTool.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.W)));
+            this.showWiFiPasswordTool.Size = new System.Drawing.Size(275, 22);
             this.showWiFiPasswordTool.Text = "showWiFiPasswordTool";
             this.showWiFiPasswordTool.Click += new System.EventHandler(this.ShowWiFiPasswordTool_Click);
-            // 
-            // bluetoothFinderToolToolStripMenuItem
-            // 
-            this.bluetoothFinderToolToolStripMenuItem.Name = "bluetoothFinderToolToolStripMenuItem";
-            this.bluetoothFinderToolToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.B)));
-            this.bluetoothFinderToolToolStripMenuItem.Size = new System.Drawing.Size(241, 22);
-            this.bluetoothFinderToolToolStripMenuItem.Text = "bluetoothFinderTool";
-            this.bluetoothFinderToolToolStripMenuItem.Click += new System.EventHandler(this.BluetoothFinderToolToolStripMenuItem_Click);
-            // 
-            // systemIdAnalysisTool
-            // 
-            this.systemIdAnalysisTool.Name = "systemIdAnalysisTool";
-            this.systemIdAnalysisTool.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
-            this.systemIdAnalysisTool.Size = new System.Drawing.Size(241, 22);
-            this.systemIdAnalysisTool.Text = "systemIdAnalysis";
-            this.systemIdAnalysisTool.Click += new System.EventHandler(this.SystemIdAnalysisTool_Click);
             // 
             // monitorTestTool
             // 
@@ -1615,30 +1625,34 @@
             this.monitorDynamicRangeTestTool,
             this.monitorStuckPixelFixerTool});
             this.monitorTestTool.Name = "monitorTestTool";
-            this.monitorTestTool.Size = new System.Drawing.Size(241, 22);
+            this.monitorTestTool.Size = new System.Drawing.Size(275, 22);
             this.monitorTestTool.Text = "monitorTestTool";
             // 
             // monitorDeadPixelTestTool
             // 
             this.monitorDeadPixelTestTool.Name = "monitorDeadPixelTestTool";
-            this.monitorDeadPixelTestTool.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
-            this.monitorDeadPixelTestTool.Size = new System.Drawing.Size(282, 22);
+            this.monitorDeadPixelTestTool.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.M)));
+            this.monitorDeadPixelTestTool.Size = new System.Drawing.Size(317, 22);
             this.monitorDeadPixelTestTool.Text = "monitorDeadPixelTestTool";
             this.monitorDeadPixelTestTool.Click += new System.EventHandler(this.MonitorDeadPixelTestTool_Click);
             // 
             // monitorDynamicRangeTestTool
             // 
             this.monitorDynamicRangeTestTool.Name = "monitorDynamicRangeTestTool";
-            this.monitorDynamicRangeTestTool.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
-            this.monitorDynamicRangeTestTool.Size = new System.Drawing.Size(282, 22);
+            this.monitorDynamicRangeTestTool.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
+            | System.Windows.Forms.Keys.M)));
+            this.monitorDynamicRangeTestTool.Size = new System.Drawing.Size(317, 22);
             this.monitorDynamicRangeTestTool.Text = "monitorDynamicRangeTestTool";
             this.monitorDynamicRangeTestTool.Click += new System.EventHandler(this.MonitorDynamicRangeTestTool_Click);
             // 
             // monitorStuckPixelFixerTool
             // 
             this.monitorStuckPixelFixerTool.Name = "monitorStuckPixelFixerTool";
-            this.monitorStuckPixelFixerTool.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.monitorStuckPixelFixerTool.Size = new System.Drawing.Size(282, 22);
+            this.monitorStuckPixelFixerTool.ShortcutKeys = ((System.Windows.Forms.Keys)((((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
+            | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.M)));
+            this.monitorStuckPixelFixerTool.Size = new System.Drawing.Size(317, 22);
             this.monitorStuckPixelFixerTool.Text = "monitorStuckPixelFixerTool";
             this.monitorStuckPixelFixerTool.Click += new System.EventHandler(this.MonitorStuckPixelFixerToolToolStripMenuItem_Click);
             // 
@@ -7216,7 +7230,7 @@
             // 
             this.DISK_TLP_PB_4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
             this.DISK_TLP_PB_4.BorderColor = System.Drawing.Color.DodgerBlue;
-            this.DISK_TLP_PB_4.BorderRadius = 7;
+            this.DISK_TLP_PB_4.BorderRadius = 5;
             this.DISK_TLP_PB_4.BorderSize = 0;
             this.DISK_TLP_PB_4.Dock = System.Windows.Forms.DockStyle.Left;
             this.DISK_TLP_PB_4.Location = new System.Drawing.Point(5, 5);
@@ -7275,7 +7289,7 @@
             // 
             this.DISK_TLP_PB_3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
             this.DISK_TLP_PB_3.BorderColor = System.Drawing.Color.DodgerBlue;
-            this.DISK_TLP_PB_3.BorderRadius = 7;
+            this.DISK_TLP_PB_3.BorderRadius = 5;
             this.DISK_TLP_PB_3.BorderSize = 0;
             this.DISK_TLP_PB_3.Dock = System.Windows.Forms.DockStyle.Left;
             this.DISK_TLP_PB_3.Location = new System.Drawing.Point(5, 5);
@@ -7334,7 +7348,7 @@
             // 
             this.DISK_TLP_PB_2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
             this.DISK_TLP_PB_2.BorderColor = System.Drawing.Color.DodgerBlue;
-            this.DISK_TLP_PB_2.BorderRadius = 7;
+            this.DISK_TLP_PB_2.BorderRadius = 5;
             this.DISK_TLP_PB_2.BorderSize = 0;
             this.DISK_TLP_PB_2.Dock = System.Windows.Forms.DockStyle.Left;
             this.DISK_TLP_PB_2.Location = new System.Drawing.Point(5, 5);
@@ -7393,7 +7407,7 @@
             // 
             this.DISK_TLP_PB_1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
             this.DISK_TLP_PB_1.BorderColor = System.Drawing.Color.DodgerBlue;
-            this.DISK_TLP_PB_1.BorderRadius = 7;
+            this.DISK_TLP_PB_1.BorderRadius = 5;
             this.DISK_TLP_PB_1.BorderSize = 0;
             this.DISK_TLP_PB_1.Dock = System.Windows.Forms.DockStyle.Left;
             this.DISK_TLP_PB_1.Location = new System.Drawing.Point(5, 5);
@@ -7442,7 +7456,7 @@
             this.NET_TLP.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.NET_TLP.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.NET_TLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.NET_TLP.Size = new System.Drawing.Size(802, 1247);
+            this.NET_TLP.Size = new System.Drawing.Size(802, 1342);
             this.NET_TLP.TabIndex = 0;
             // 
             // network_panel_1
@@ -8253,6 +8267,10 @@
             // network_panel_3
             // 
             this.network_panel_3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(235)))), ((int)(((byte)(235)))));
+            this.network_panel_3.Controls.Add(this.NET_P_ISP_V);
+            this.network_panel_3.Controls.Add(this.NET_P_IP_Adress);
+            this.network_panel_3.Controls.Add(this.NET_P_ISP);
+            this.network_panel_3.Controls.Add(this.NET_P_IP_Adress_V);
             this.network_panel_3.Controls.Add(this.NET_ScrollTop);
             this.network_panel_3.Controls.Add(this.NET_DNS_v6_2_V);
             this.network_panel_3.Controls.Add(this.NET_DNS_v6_1);
@@ -8266,8 +8284,62 @@
             this.network_panel_3.Location = new System.Drawing.Point(5, 1058);
             this.network_panel_3.Margin = new System.Windows.Forms.Padding(2, 1, 3, 1);
             this.network_panel_3.Name = "network_panel_3";
-            this.network_panel_3.Size = new System.Drawing.Size(794, 185);
+            this.network_panel_3.Size = new System.Drawing.Size(794, 280);
             this.network_panel_3.TabIndex = 1;
+            // 
+            // NET_P_ISP_V
+            // 
+            this.NET_P_ISP_V.AutoSize = true;
+            this.NET_P_ISP_V.BackColor = System.Drawing.Color.Transparent;
+            this.NET_P_ISP_V.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
+            this.NET_P_ISP_V.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(95)))), ((int)(((byte)(146)))));
+            this.NET_P_ISP_V.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.NET_P_ISP_V.Location = new System.Drawing.Point(382, 58);
+            this.NET_P_ISP_V.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
+            this.NET_P_ISP_V.Name = "NET_P_ISP_V";
+            this.NET_P_ISP_V.Size = new System.Drawing.Size(37, 20);
+            this.NET_P_ISP_V.TabIndex = 3;
+            this.NET_P_ISP_V.Text = "N/A";
+            // 
+            // NET_P_IP_Adress
+            // 
+            this.NET_P_IP_Adress.AutoSize = true;
+            this.NET_P_IP_Adress.BackColor = System.Drawing.Color.Transparent;
+            this.NET_P_IP_Adress.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
+            this.NET_P_IP_Adress.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.NET_P_IP_Adress.Location = new System.Drawing.Point(10, 13);
+            this.NET_P_IP_Adress.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
+            this.NET_P_IP_Adress.Name = "NET_P_IP_Adress";
+            this.NET_P_IP_Adress.Size = new System.Drawing.Size(98, 20);
+            this.NET_P_IP_Adress.TabIndex = 0;
+            this.NET_P_IP_Adress.Text = "Dış IP Adresi:";
+            // 
+            // NET_P_ISP
+            // 
+            this.NET_P_ISP.AutoSize = true;
+            this.NET_P_ISP.BackColor = System.Drawing.Color.Transparent;
+            this.NET_P_ISP.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
+            this.NET_P_ISP.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.NET_P_ISP.Location = new System.Drawing.Point(10, 58);
+            this.NET_P_ISP.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
+            this.NET_P_ISP.Name = "NET_P_ISP";
+            this.NET_P_ISP.Size = new System.Drawing.Size(78, 20);
+            this.NET_P_ISP.TabIndex = 2;
+            this.NET_P_ISP.Text = "ISP Bilgisi:";
+            // 
+            // NET_P_IP_Adress_V
+            // 
+            this.NET_P_IP_Adress_V.AutoSize = true;
+            this.NET_P_IP_Adress_V.BackColor = System.Drawing.Color.Transparent;
+            this.NET_P_IP_Adress_V.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
+            this.NET_P_IP_Adress_V.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(95)))), ((int)(((byte)(146)))));
+            this.NET_P_IP_Adress_V.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.NET_P_IP_Adress_V.Location = new System.Drawing.Point(382, 13);
+            this.NET_P_IP_Adress_V.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
+            this.NET_P_IP_Adress_V.Name = "NET_P_IP_Adress_V";
+            this.NET_P_IP_Adress_V.Size = new System.Drawing.Size(37, 20);
+            this.NET_P_IP_Adress_V.TabIndex = 1;
+            this.NET_P_IP_Adress_V.Text = "N/A";
             // 
             // NET_ScrollTop
             // 
@@ -8283,11 +8355,11 @@
             this.NET_ScrollTop.Font = new System.Drawing.Font("Segoe UI Semibold", 10.5F, System.Drawing.FontStyle.Bold);
             this.NET_ScrollTop.ForeColor = System.Drawing.Color.White;
             this.NET_ScrollTop.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.NET_ScrollTop.Location = new System.Drawing.Point(764, 138);
+            this.NET_ScrollTop.Location = new System.Drawing.Point(764, 233);
             this.NET_ScrollTop.Name = "NET_ScrollTop";
             this.NET_ScrollTop.Padding = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.NET_ScrollTop.Size = new System.Drawing.Size(38, 38);
-            this.NET_ScrollTop.TabIndex = 8;
+            this.NET_ScrollTop.TabIndex = 14;
             this.NET_ScrollTop.TextColor = System.Drawing.Color.White;
             this.NET_ScrollTop.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.NET_ScrollTop.UseVisualStyleBackColor = false;
@@ -8299,11 +8371,11 @@
             this.NET_DNS_v6_2_V.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
             this.NET_DNS_v6_2_V.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(95)))), ((int)(((byte)(146)))));
             this.NET_DNS_v6_2_V.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.NET_DNS_v6_2_V.Location = new System.Drawing.Point(383, 148);
+            this.NET_DNS_v6_2_V.Location = new System.Drawing.Point(382, 238);
             this.NET_DNS_v6_2_V.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
             this.NET_DNS_v6_2_V.Name = "NET_DNS_v6_2_V";
             this.NET_DNS_v6_2_V.Size = new System.Drawing.Size(37, 20);
-            this.NET_DNS_v6_2_V.TabIndex = 7;
+            this.NET_DNS_v6_2_V.TabIndex = 11;
             this.NET_DNS_v6_2_V.Text = "N/A";
             // 
             // NET_DNS_v6_1
@@ -8312,12 +8384,12 @@
             this.NET_DNS_v6_1.BackColor = System.Drawing.Color.Transparent;
             this.NET_DNS_v6_1.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
             this.NET_DNS_v6_1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.NET_DNS_v6_1.Location = new System.Drawing.Point(10, 103);
+            this.NET_DNS_v6_1.Location = new System.Drawing.Point(10, 193);
             this.NET_DNS_v6_1.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
             this.NET_DNS_v6_1.Name = "NET_DNS_v6_1";
-            this.NET_DNS_v6_1.Size = new System.Drawing.Size(126, 20);
-            this.NET_DNS_v6_1.TabIndex = 4;
-            this.NET_DNS_v6_1.Text = "Kullanılan DNS 1:";
+            this.NET_DNS_v6_1.Size = new System.Drawing.Size(146, 20);
+            this.NET_DNS_v6_1.TabIndex = 8;
+            this.NET_DNS_v6_1.Text = "Kullanılan v6 DNS 1:";
             // 
             // NET_DNS_v6_2
             // 
@@ -8325,12 +8397,12 @@
             this.NET_DNS_v6_2.BackColor = System.Drawing.Color.Transparent;
             this.NET_DNS_v6_2.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
             this.NET_DNS_v6_2.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.NET_DNS_v6_2.Location = new System.Drawing.Point(10, 148);
+            this.NET_DNS_v6_2.Location = new System.Drawing.Point(10, 238);
             this.NET_DNS_v6_2.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
             this.NET_DNS_v6_2.Name = "NET_DNS_v6_2";
-            this.NET_DNS_v6_2.Size = new System.Drawing.Size(128, 20);
-            this.NET_DNS_v6_2.TabIndex = 6;
-            this.NET_DNS_v6_2.Text = "Kullanılan DNS 2:";
+            this.NET_DNS_v6_2.Size = new System.Drawing.Size(148, 20);
+            this.NET_DNS_v6_2.TabIndex = 10;
+            this.NET_DNS_v6_2.Text = "Kullanılan v6 DNS 2:";
             // 
             // NET_DNS_v6_1_V
             // 
@@ -8339,11 +8411,11 @@
             this.NET_DNS_v6_1_V.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
             this.NET_DNS_v6_1_V.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(95)))), ((int)(((byte)(146)))));
             this.NET_DNS_v6_1_V.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.NET_DNS_v6_1_V.Location = new System.Drawing.Point(383, 103);
+            this.NET_DNS_v6_1_V.Location = new System.Drawing.Point(382, 193);
             this.NET_DNS_v6_1_V.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
             this.NET_DNS_v6_1_V.Name = "NET_DNS_v6_1_V";
             this.NET_DNS_v6_1_V.Size = new System.Drawing.Size(37, 20);
-            this.NET_DNS_v6_1_V.TabIndex = 5;
+            this.NET_DNS_v6_1_V.TabIndex = 9;
             this.NET_DNS_v6_1_V.Text = "N/A";
             // 
             // NET_DNS_v4_2_V
@@ -8353,11 +8425,11 @@
             this.NET_DNS_v4_2_V.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
             this.NET_DNS_v4_2_V.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(95)))), ((int)(((byte)(146)))));
             this.NET_DNS_v4_2_V.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.NET_DNS_v4_2_V.Location = new System.Drawing.Point(382, 58);
+            this.NET_DNS_v4_2_V.Location = new System.Drawing.Point(382, 148);
             this.NET_DNS_v4_2_V.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
             this.NET_DNS_v4_2_V.Name = "NET_DNS_v4_2_V";
             this.NET_DNS_v4_2_V.Size = new System.Drawing.Size(37, 20);
-            this.NET_DNS_v4_2_V.TabIndex = 3;
+            this.NET_DNS_v4_2_V.TabIndex = 7;
             this.NET_DNS_v4_2_V.Text = "N/A";
             // 
             // NET_DNS_v4_1
@@ -8366,12 +8438,12 @@
             this.NET_DNS_v4_1.BackColor = System.Drawing.Color.Transparent;
             this.NET_DNS_v4_1.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
             this.NET_DNS_v4_1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.NET_DNS_v4_1.Location = new System.Drawing.Point(9, 13);
+            this.NET_DNS_v4_1.Location = new System.Drawing.Point(10, 103);
             this.NET_DNS_v4_1.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
             this.NET_DNS_v4_1.Name = "NET_DNS_v4_1";
-            this.NET_DNS_v4_1.Size = new System.Drawing.Size(126, 20);
-            this.NET_DNS_v4_1.TabIndex = 0;
-            this.NET_DNS_v4_1.Text = "Kullanılan DNS 1:";
+            this.NET_DNS_v4_1.Size = new System.Drawing.Size(147, 20);
+            this.NET_DNS_v4_1.TabIndex = 4;
+            this.NET_DNS_v4_1.Text = "Kullanılan v4 DNS 1:";
             // 
             // NET_DNS_v4_2
             // 
@@ -8379,12 +8451,12 @@
             this.NET_DNS_v4_2.BackColor = System.Drawing.Color.Transparent;
             this.NET_DNS_v4_2.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
             this.NET_DNS_v4_2.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.NET_DNS_v4_2.Location = new System.Drawing.Point(9, 58);
+            this.NET_DNS_v4_2.Location = new System.Drawing.Point(10, 148);
             this.NET_DNS_v4_2.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
             this.NET_DNS_v4_2.Name = "NET_DNS_v4_2";
-            this.NET_DNS_v4_2.Size = new System.Drawing.Size(128, 20);
-            this.NET_DNS_v4_2.TabIndex = 2;
-            this.NET_DNS_v4_2.Text = "Kullanılan DNS 2:";
+            this.NET_DNS_v4_2.Size = new System.Drawing.Size(149, 20);
+            this.NET_DNS_v4_2.TabIndex = 6;
+            this.NET_DNS_v4_2.Text = "Kullanılan v4 DNS 2:";
             // 
             // NET_DNS_v4_1_V
             // 
@@ -8393,11 +8465,11 @@
             this.NET_DNS_v4_1_V.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
             this.NET_DNS_v4_1_V.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(95)))), ((int)(((byte)(146)))));
             this.NET_DNS_v4_1_V.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.NET_DNS_v4_1_V.Location = new System.Drawing.Point(382, 13);
+            this.NET_DNS_v4_1_V.Location = new System.Drawing.Point(382, 103);
             this.NET_DNS_v4_1_V.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
             this.NET_DNS_v4_1_V.Name = "NET_DNS_v4_1_V";
             this.NET_DNS_v4_1_V.Size = new System.Drawing.Size(37, 20);
-            this.NET_DNS_v4_1_V.TabIndex = 1;
+            this.NET_DNS_v4_1_V.TabIndex = 5;
             this.NET_DNS_v4_1_V.Text = "N/A";
             // 
             // USB
@@ -11724,6 +11796,10 @@
         private TSCustomButton NET_ScrollTop;
         internal System.Windows.Forms.Label MB_TPMPPIAltVersion;
         internal System.Windows.Forms.Label MB_TPMPPIAltVersion_V;
+        internal System.Windows.Forms.Label NET_P_ISP_V;
+        internal System.Windows.Forms.Label NET_P_IP_Adress;
+        internal System.Windows.Forms.Label NET_P_ISP;
+        internal System.Windows.Forms.Label NET_P_IP_Adress_V;
     }
 }
 

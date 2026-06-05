@@ -48,7 +48,7 @@ namespace Glow{
             try{
                 LabelDeveloper.Text = Application.CompanyName;
                 LabelSoftware.Text = Application.ProductName;
-                LabelVersion.Text = TS_VersionEngine.TS_SofwareVersion(1);
+                LabelVersion.Text = TS_VersionEngine.TS_SoftwareVersion(1);
                 LabelCopyright.Text = TS_SoftwareCopyrightDate.ts_scd_preloader;
                 // GET PRELOAD SETTINGS
                 About_preloader();

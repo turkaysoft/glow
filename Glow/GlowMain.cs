@@ -8,8 +8,6 @@
 // GitHub: https://github.com/turkaysoft/glow
 // ======================================================================================================
 
-// TS Modules
-using Glow.glow_tools;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -24,6 +22,7 @@ using System.Linq;
 using System.Management;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Reflection;
@@ -32,8 +31,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 using System.Windows.Forms;
 using System.Xml;
+// TS Modules
+using Glow.glow_tools;
 using static Glow.TSModules;
 
 namespace Glow{
@@ -197,7 +199,7 @@ namespace Glow{
                 allCopyableLabels.AddRange(BATTERYLabels);
                 //
                 if (hiding_mode_wrapper != 1){
-                    var HIDINGLabels = new Label[] { OS_SavedUser_V, OS_DeviceID_V, OS_Serial_V, OS_WinKey_V, OS_WinLicenseURL_V, OS_WinLicenseVerifiURL_V, OS_Wallpaper_V, MB_DeviceSerialNumber_V, MB_MotherBoardSerial_V, MB_SystemSKU_V, MB_TPMManID_V, CPU_SerialName_V, RAM_Serial_V, RAM_PartNumber_V, GPU_MonitorSerialNumberID_V, DISK_Serial_V, DISK_VolumeSerial_V, NET_MacAdress_V, NET_Guid_V, NET_IPv4Adress_V, NET_IPv6Adress_V, NET_DNS_v4_1_V, NET_DNS_v4_2_V, NET_DNS_v6_1_V, NET_DNS_v6_2_V, USB_DeviceGUID_V, BATTERY_Serial_V };
+                    var HIDINGLabels = new Label[] { OS_SavedUser_V, OS_DeviceID_V, OS_Serial_V, OS_WinKey_V, OS_WinLicenseURL_V, OS_WinLicenseVerifiURL_V, OS_Wallpaper_V, MB_DeviceSerialNumber_V, MB_MotherBoardSerial_V, MB_SystemSKU_V, MB_TPMManID_V, CPU_SerialName_V, RAM_Serial_V, RAM_PartNumber_V, GPU_MonitorSerialNumberID_V, DISK_Serial_V, DISK_VolumeSerial_V, NET_MacAdress_V, NET_Guid_V, NET_IPv4Adress_V, NET_IPv6Adress_V, NET_P_IP_Adress_V, NET_P_ISP_V, NET_DNS_v4_1_V, NET_DNS_v4_2_V, NET_DNS_v6_1_V, NET_DNS_v6_2_V, USB_DeviceGUID_V, BATTERY_Serial_V };
                     allCopyableLabels.AddRange(HIDINGLabels);
                 }
                 //
@@ -480,8 +482,8 @@ namespace Glow{
         }
         // SOFTWARE LOAD
         // ======================================================================================================
-        private void Glow_Load(object sender, EventArgs e){
-            Text = TS_VersionEngine.TS_SofwareVersion(0);
+        private void Glow_Load(object sender, EventArgs e){ 
+            Text = TS_VersionEngine.TS_SoftwareVersion(0);
             // LAUNCH PROCESS 
             // ====================================
             RunSoftwareEngine();
@@ -1585,7 +1587,7 @@ namespace Glow{
                 string minidump_zip_file = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), Application.ProductName + "_Minidump_" + Dns.GetHostName() + "_" + DateTime.Now.ToString("dd.MM.yyyy_HH.mm.ss") + ".zip");
                 // COPY ASYNC
                 int currentFile = 0;
-                Text = string.Format(software_lang.TSReadLangs("Os_Content", "os_c_bsod_progress_copy"), TS_VersionEngine.TS_SofwareVersion(0));
+                Text = string.Format(software_lang.TSReadLangs("Os_Content", "os_c_bsod_progress_copy"), TS_VersionEngine.TS_SoftwareVersion(0));
                 foreach (string file_path in minidump_files_list){
                     string file_name = Path.GetFileName(file_path);
                     string target_file_path = Path.Combine(minidump_target_file, file_name);
@@ -1593,7 +1595,7 @@ namespace Glow{
                     currentFile++;
                 }
                 // ZIP ASYNC
-                Text = string.Format(software_lang.TSReadLangs("Os_Content", "os_c_bsod_progress_compress"), TS_VersionEngine.TS_SofwareVersion(0));
+                Text = string.Format(software_lang.TSReadLangs("Os_Content", "os_c_bsod_progress_compress"), TS_VersionEngine.TS_SoftwareVersion(0));
                 await Task.Run(() => {
                     using (FileStream zipToOpen = new FileStream(minidump_zip_file, FileMode.Create)){
                         using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Create)){
@@ -1614,7 +1616,7 @@ namespace Glow{
                 if (Directory.Exists(minidump_target_file)){
                     Directory.Delete(minidump_target_file, true);
                 }
-                Text = TS_VersionEngine.TS_SofwareVersion(0);
+                Text = TS_VersionEngine.TS_SoftwareVersion(0);
                 DialogResult open_minidump_zip_target = TS_MessageBoxEngine.TS_MessageBox(this, 5, string.Format(software_lang.TSReadLangs("Os_Content", "os_c_bsod_zip_success"), minidump_zip_file, "\n\n"));
                 if (open_minidump_zip_target == DialogResult.Yes){
                     string open_mdzt = string.Format("/select, \"{0}\"", minidump_zip_file.Trim().Replace("/", @"\"));
@@ -2043,15 +2045,21 @@ namespace Glow{
                     if (cpuManufacturer.IndexOf("Intel", StringComparison.OrdinalIgnoreCase) >= 0){
                         displayManufacturer = "Intel Corporation";
                         mbChipset = "Intel";
-                    }else if (cpuManufacturer.IndexOf("Advanced Micro", StringComparison.OrdinalIgnoreCase) >= 0){
-                        displayManufacturer = cpuManufacturer;
+                    }else if (cpuManufacturer.IndexOf("Advanced Micro", StringComparison.OrdinalIgnoreCase) >= 0 || cpuManufacturer.IndexOf("AMD", StringComparison.OrdinalIgnoreCase) >= 0){
+                        displayManufacturer = "Advanced Micro Devices, Inc.";
                         mbChipset = "AMD";
+                    }else if (cpuManufacturer.IndexOf("NVIDIA", StringComparison.OrdinalIgnoreCase) >= 0){
+                        displayManufacturer = "NVIDIA Corporation";
+                        mbChipset = "NVIDIA";
+                    }else if (cpuManufacturer.IndexOf("Apple", StringComparison.OrdinalIgnoreCase) >= 0){
+                        displayManufacturer = "Apple Inc.";
+                        mbChipset = "Apple";
                     }else{
                         displayManufacturer = cpuManufacturer;
                         mbChipset = cpuManufacturer;
                     }
                     cpu_man_list.Add(displayManufacturer);
-                    CPU_Manufacturer_V.Text = cpu_man_list[0];
+                    CPU_Manufacturer_V.Text = displayManufacturer;
                     MB_Chipset_V.Text = mbChipset;
                 }catch (Exception ex){
                     if (debug_status) { TSErrorLog.LogException(ex, "Cpu()"); }
@@ -2063,15 +2071,16 @@ namespace Glow{
                     var archMap = new Dictionary<int, string>{
                         { 0, "32 " + bitText + " - (x86)" },
                         { 1, "MIPS" },
-                        { 2, "ALPHA" },
-                        { 3, "POWER PC" },
-                        { 5, "ARM" },
-                        { 6, "IA64" },
-                        { 9, "64 " + bitText + " - (x64)" }
+                        { 2, "Alpha" },
+                        { 3, "PowerPC" },
+                        { 5, "ARM32" },
+                        { 6, "ia64 (Itanium)" },
+                        { 9, "64 " + bitText + " - (x64)" },
+                        { 12, "64 " + bitText + " - (ARM64)" }
                     };
-                    string archText = archMap.ContainsKey(arch) ? archMap[arch] : arch.ToString();
+                    string archText = archMap.ContainsKey(arch) ? archMap[arch] : $"Unknown ({arch})";
                     cpu_arch_list.Add(archText);
-                    CPU_Architectural_V.Text = cpu_arch_list[0];
+                    CPU_Architectural_V.Text = archText;
                 }catch (Exception ex){
                     if (debug_status) { TSErrorLog.LogException(ex, "Cpu()"); }
                 }
@@ -2557,35 +2566,48 @@ namespace Glow{
                 }
                 try{
                     // RAM MAN
-                    string ram_man = Convert.ToString(queryObj["Manufacturer"]).Trim();
-                    Dictionary<string, string> manufacturerDict = new Dictionary<string, string>{
+                    string ram_man = Convert.ToString(queryObj["Manufacturer"])?.Trim() ?? string.Empty;
+                    Dictionary<string, string> manufacturerDict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                    {
                         { "017A", "Apacer" },
                         { "059B", "Crucial" },
                         { "04CD", "G.Skill" },
-                        { "0198", "HyperX" },
+                        { "0198", "Kingston (HyperX)" },
                         { "029E", "Corsair" },
                         { "04CB", "A-DATA" },
                         { "00CE", "Samsung" },
                         { "00FE", "Micron" },
-                        { "00AD", "Hynix" },
+                        { "00AD", "SK Hynix" },
                         { "00B3", "Elpida" },
                         { "2C00", "Micron Technology" },
                         { "014F", "Transcend" },
                         { "1C1F", "Kingston" },
                         { "00A1", "Infineon" },
-                        { "7F7F", "Silicon Power" }
+                        { "7F7F", "Silicon Power" },
+                        { "0147", "Spector" },
+                        { "0251", "Patriot Memory" },
+                        { "0325", "PNY" },
+                        { "05CD", "Team Group" },
+                        { "008A", "Toshiba" },
+                        { "0294", "Ocz" },
+                        { "058A", "GeIL" },
+                        { "069A", "Longsys (Lexar)" },
+                        { "0128", "Asgard / Gloway" },
+                        { "80AD", "SK Hynix" },
+                        { "80CE", "Samsung" }
                     };
-                    //
+                    string detectedManufacturer;
                     if (string.IsNullOrEmpty(ram_man) || ram_man.Equals("unknown", StringComparison.OrdinalIgnoreCase)){
-                        ram_manufacturer_list.Add(software_lang.TSReadLangs("Ram_Content", "ram_c_unknown"));
+                        detectedManufacturer = software_lang.TSReadLangs("Ram_Content", "ram_c_unknown");
                     }else{
                         if (manufacturerDict.TryGetValue(ram_man, out string manufacturerName)){
-                            ram_manufacturer_list.Add(manufacturerName);
+                            detectedManufacturer = manufacturerName;
                         }else{
-                            ram_manufacturer_list.Add(ram_man);
+                            detectedManufacturer = ram_man;
                         }
                     }
-                    RAM_Manufacturer_V.Text = ram_manufacturer_list[0];
+                    ram_manufacturer_list.Add(detectedManufacturer);
+                    RAM_Manufacturer_V.Text = detectedManufacturer;
                 }catch (Exception ex){
                     if (debug_status) { TSErrorLog.LogException(ex, "Ram()"); }
                 }
@@ -4606,6 +4628,39 @@ namespace Glow{
                 }
             }
             try{
+                // GET PUBLIC IP & ISP AND LOCATION
+                string u_info = software_lang.TSReadLangs("Network_Content", "nk_c_unknown");
+                string ni_connection = software_lang.TSReadLangs("Network_Content", "nk_c_not_internet_connection");
+                //
+                if (hiding_mode_wrapper == 1){
+                    NET_P_IP_Adress_V.Text = new string('*', vis_m_property.Next(vn_range[0], vn_range[1])) + $" ({software_lang.TSReadLangs("HeaderHidingMode", "header_hiding_mode_on_ui")})";
+                    NET_P_ISP_V.Text = new string('*', vis_m_property.Next(vn_range[0], vn_range[1])) + $" ({software_lang.TSReadLangs("HeaderHidingMode", "header_hiding_mode_on_ui")})";
+                }
+                else{
+                    bool isConnected = IsNetworkAvailable().ConfigureAwait(false).GetAwaiter().GetResult();
+                    if (!isConnected){
+                        NET_P_IP_Adress_V.Text = ni_connection;
+                        NET_P_ISP_V.Text = ni_connection;
+                    }else{
+                        GetPublicIPInfo.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36");
+                        GetPublicIPInfo.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue { NoCache = true, NoStore = true, MustRevalidate = true };
+                        GetPublicIPInfo.DefaultRequestHeaders.Pragma.ParseAdd("no-cache");
+                        //
+                        var get_info = GetPublicIpInfoAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+                        //
+                        if (get_info != null && get_info.Success){
+                            NET_P_IP_Adress_V.Text = $"{get_info.IP ?? u_info} ({get_info.Type ?? u_info})";
+                            NET_P_ISP_V.Text = $"{get_info.Connection?.ISP ?? u_info}";
+                        }else{
+                            NET_P_IP_Adress_V.Text = u_info;
+                            NET_P_ISP_V.Text = u_info;
+                        }
+                    }
+                }
+            }catch (Exception ex){
+                if (debug_status) { TSErrorLog.LogException(ex, "Network()"); }
+            }
+            try{
                 // GET DNS ADRESS
                 UpdateDnsLabels(NET_DNS_v4_1_V, NET_DNS_v4_2_V, NET_DNS_v6_1_V, NET_DNS_v6_2_V);
             }catch (Exception ex){
@@ -4795,6 +4850,37 @@ namespace Glow{
             }catch (Exception ex){
                 if (debug_status) { TSErrorLog.LogException(ex, "NET_RotateGateway_Click()"); }
             }
+        }
+        // CHECK PRIVATE IP & ISP AND REGION INFO
+        private static readonly HttpClient GetPublicIPInfo = new HttpClient() { Timeout = TimeSpan.FromSeconds(5) };
+        static async Task<GetIpInfo> GetPublicIpInfoAsync(){
+            try{
+                string get_data = await GetPublicIPInfo.GetStringAsync("https://ipwho.is/").ConfigureAwait(false);
+                JavaScriptSerializer serializer = new JavaScriptSerializer();
+                dynamic serialize_data = serializer.Deserialize<dynamic>(get_data);
+                if (serialize_data["success"] == true){
+                    return new GetIpInfo{
+                        Success = serialize_data["success"],
+                        IP = serialize_data["ip"],
+                        Type = serialize_data["type"],
+                        Connection = new ConnectionIPInfo{
+                            ISP = serialize_data["connection"]?["isp"]
+                        }
+                    };
+                }
+                return null;
+            }catch{
+                return null;
+            }
+        }
+        public class GetIpInfo{
+            public bool Success { get; set; }
+            public string IP { get; set; }
+            public string Type { get; set; }
+            public ConnectionIPInfo Connection { get; set; }
+        }
+        public class ConnectionIPInfo{
+            public string ISP { get; set; }
         }
         // CHECK DNS
         private void UpdateDnsLabels(Label labelDns1, Label labelDns2, Label labelDns3, Label labelDns4){
@@ -5744,19 +5830,37 @@ namespace Glow{
             OSD_DataMainTable.ResumeLayout();
         }
         private void OSD_TextBox_TextChanged(object sender, EventArgs e){
-            string searchText = OSD_TextBox.Text.Trim().ToLower();
+            string searchText = OSD_TextBox.Text.Trim();
             bool isTextBoxEmpty = string.IsNullOrEmpty(searchText);
             OSD_DataMainTable.ClearSelection();
             OSD_TextBoxClearBtn.Enabled = !isTextBoxEmpty;
             if (OSD_DataMainTable.Rows.Count > 0)
                 OSD_DataMainTable.FirstDisplayedScrollingRowIndex = 0;
             if (!isTextBoxEmpty){
+                string[] searchWords = searchText.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (DataGridViewRow driver_row in OSD_DataMainTable.Rows){
-                    var cellValue = driver_row.Cells[1].Value;
-                    if (cellValue != null && cellValue.ToString().ToLower().Contains(searchText)){
-                        driver_row.Selected = true;
-                        OSD_DataMainTable.FirstDisplayedScrollingRowIndex = driver_row.Index;
-                        break;
+                    var cellValue = driver_row.Cells[1].Value?.ToString();
+                    if (!string.IsNullOrEmpty(cellValue)){
+                        string[] cellWords = cellValue.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        bool isMatch = true;
+                        foreach (var searchWord in searchWords){
+                            bool wordFound = false;
+                            foreach (var cellWord in cellWords){
+                                if (cellWord.StartsWith(searchWord, StringComparison.OrdinalIgnoreCase) || cellWord.IndexOf(searchWord, StringComparison.OrdinalIgnoreCase) >= 0){
+                                    wordFound = true;
+                                    break;
+                                }
+                            }
+                            if (!wordFound){
+                                isMatch = false;
+                                break;
+                            }
+                        }
+                        if (isMatch){
+                            driver_row.Selected = true;
+                            OSD_DataMainTable.FirstDisplayedScrollingRowIndex = driver_row.Index;
+                            break;
+                        }
                     }
                 }
             }
@@ -5909,19 +6013,37 @@ namespace Glow{
             SERVICE_DataMainTable.ResumeLayout();
         }
         private void Services_SearchTextBox_TextChanged(object sender, EventArgs e){
-            string searchText = SERVICE_TextBox.Text.Trim().ToLower();
+            string searchText = SERVICE_TextBox.Text.Trim();
             bool isTextBoxEmpty = string.IsNullOrEmpty(searchText);
             SERVICE_DataMainTable.ClearSelection();
             SERVICE_TextBoxClearBtn.Enabled = !isTextBoxEmpty;
             if (SERVICE_DataMainTable.Rows.Count > 0)
                 SERVICE_DataMainTable.FirstDisplayedScrollingRowIndex = 0;
-            if (!isTextBoxEmpty){
+            if (!isTextBoxEmpty) {
+                string[] searchWords = searchText.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (DataGridViewRow service_row in SERVICE_DataMainTable.Rows){
-                    var cellValue = service_row.Cells[1].Value;
-                    if (cellValue != null && cellValue.ToString().ToLower().Contains(searchText)){
-                        service_row.Selected = true;
-                        SERVICE_DataMainTable.FirstDisplayedScrollingRowIndex = service_row.Index;
-                        break;
+                    var cellValue = service_row.Cells[1].Value?.ToString();
+                    if (!string.IsNullOrEmpty(cellValue)){
+                        string[] cellWords = cellValue.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        bool isMatch = true;
+                        foreach (var searchWord in searchWords){
+                            bool wordFound = false;
+                            foreach (var cellWord in cellWords){
+                                if (cellWord.StartsWith(searchWord, StringComparison.OrdinalIgnoreCase) || cellWord.IndexOf(searchWord, StringComparison.OrdinalIgnoreCase) >= 0){
+                                    wordFound = true;
+                                    break;
+                                }
+                            }
+                            if (!wordFound){
+                                isMatch = false;
+                                break;
+                            }
+                        }
+                        if (isMatch){
+                            service_row.Selected = true;
+                            SERVICE_DataMainTable.FirstDisplayedScrollingRowIndex = service_row.Index;
+                            break;
+                        }
                     }
                 }
             }
@@ -6003,12 +6125,30 @@ namespace Glow{
             if (INSTAPPS_DataMainTable.Rows.Count > 0)
                 INSTAPPS_DataMainTable.FirstDisplayedScrollingRowIndex = 0;
             if (!isTextBoxEmpty){
+                string[] searchWords = searchText.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (DataGridViewRow service_row in INSTAPPS_DataMainTable.Rows){
                     var cellVal = service_row.Cells[1].Value?.ToString();
-                    if (!string.IsNullOrEmpty(cellVal) && cellVal.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) >= 0){
-                        service_row.Selected = true;
-                        INSTAPPS_DataMainTable.FirstDisplayedScrollingRowIndex = service_row.Index;
-                        break;
+                    if (!string.IsNullOrEmpty(cellVal)){
+                        string[] cellWords = cellVal.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        bool isMatch = true;
+                        foreach (var searchWord in searchWords){
+                            bool wordFound = false;
+                            foreach (var cellWord in cellWords){
+                                if (cellWord.StartsWith(searchWord, StringComparison.OrdinalIgnoreCase) || cellWord.IndexOf(searchWord, StringComparison.OrdinalIgnoreCase) >= 0){
+                                    wordFound = true;
+                                    break;
+                                }
+                            }
+                            if (!wordFound){
+                                isMatch = false;
+                                break;
+                            }
+                        }
+                        if (isMatch){
+                            service_row.Selected = true;
+                            INSTAPPS_DataMainTable.FirstDisplayedScrollingRowIndex = service_row.Index;
+                            break;
+                        }
                     }
                 }
             }
@@ -6521,16 +6661,16 @@ namespace Glow{
                 // TOOLS
                 toolsToolStripMenuItem.Text = software_lang.TSReadLangs("HeaderMenu", "header_menu_tools");
                 sFCandDISMAutoTool.Text = software_lang.TSReadLangs("HeaderTools", "ht_dism_and_sfc_tool");
-                cacheCleaningTool.Text = software_lang.TSReadLangs("HeaderTools", "ht_cache_cleanup_tool");
                 benchCPUTool.Text = software_lang.TSReadLangs("HeaderTools", "ht_bench_cpu");
                 benchRAMTool.Text = software_lang.TSReadLangs("HeaderTools", "ht_bench_ram");
                 benchDiskTool.Text = software_lang.TSReadLangs("HeaderTools", "ht_bench_disk");
+                cacheCleaningTool.Text = software_lang.TSReadLangs("HeaderTools", "ht_cache_cleanup_tool");
+                systemIdAnalysisTool.Text = software_lang.TSReadLangs("HeaderTools", "ht_system_id_analysis_tool");
                 screenOverlayTool.Text = software_lang.TSReadLangs("HeaderTools", "ht_overlay");
+                bluetoothFinderToolToolStripMenuItem.Text = software_lang.TSReadLangs("HeaderTools", "ht_bluetooth_finder_tool");
                 dnsTestTool.Text = software_lang.TSReadLangs("HeaderTools", "ht_dns_test_tool");
                 networkFixTool.Text = software_lang.TSReadLangs("HeaderTools", "ht_network_fix_tool");
                 showWiFiPasswordTool.Text = software_lang.TSReadLangs("HeaderTools", "ht_show_wifi_password_tool");
-                bluetoothFinderToolToolStripMenuItem.Text = software_lang.TSReadLangs("HeaderTools", "ht_bluetooth_finder_tool");
-                systemIdAnalysisTool.Text = software_lang.TSReadLangs("HeaderTools", "ht_system_id_analysis_tool");
                 monitorTestTool.Text = software_lang.TSReadLangs("HeaderTools", "ht_monitor_test");
                 monitorDeadPixelTestTool.Text = software_lang.TSReadLangs("HeaderTools", "ht_monitor_test_dead_pixel");
                 monitorDynamicRangeTestTool.Text = software_lang.TSReadLangs("HeaderTools", "ht_monitor_test_dynamic_range");
@@ -6785,6 +6925,8 @@ namespace Glow{
                 NET_LocalConSpeed.Text = software_lang.TSReadLangs("Network", "nk_connection_speed");
                 NET_IPv4Adress.Text = software_lang.TSReadLangs("Network", "nk_appointed_ipv4_adress");
                 NET_IPv6Adress.Text = software_lang.TSReadLangs("Network", "nk_appointed_ipv6_adress");
+                NET_P_IP_Adress.Text = software_lang.TSReadLangs("Network", "nk_p_ip");
+                NET_P_ISP.Text = software_lang.TSReadLangs("Network", "nk_p_isp");
                 NET_DNS_v4_1.Text = software_lang.TSReadLangs("Network", "nk_v4_dns1");
                 NET_DNS_v4_2.Text = software_lang.TSReadLangs("Network", "nk_v4_dns2");
                 NET_DNS_v6_1.Text = software_lang.TSReadLangs("Network", "nk_v6_dns1");
@@ -6991,16 +7133,16 @@ namespace Glow{
                     // TOOLS
                     TSImageRenderer(toolsToolStripMenuItem, Properties.Resources.tm_tools_light, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(sFCandDISMAutoTool, Properties.Resources.cx_sfc_and_dism_light, 0, ContentAlignment.MiddleRight);
-                    TSImageRenderer(cacheCleaningTool, Properties.Resources.cx_cache_clean_light, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(benchCPUTool, Properties.Resources.cx_bench_cpu_light, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(benchRAMTool, Properties.Resources.cx_bench_ram_light, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(benchDiskTool, Properties.Resources.cx_bench_disk_light, 0, ContentAlignment.MiddleRight);
+                    TSImageRenderer(cacheCleaningTool, Properties.Resources.cx_cache_clean_light, 0, ContentAlignment.MiddleRight);
+                    TSImageRenderer(systemIdAnalysisTool, Properties.Resources.cx_system_id_light, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(screenOverlayTool, Properties.Resources.cx_overlay_light, 0, ContentAlignment.MiddleRight);
+                    TSImageRenderer(bluetoothFinderToolToolStripMenuItem, Properties.Resources.cx_bt_finder_light, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(dnsTestTool, Properties.Resources.cx_dns_test_light, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(networkFixTool, Properties.Resources.cx_network_fix_light, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(showWiFiPasswordTool, Properties.Resources.cx_swpt_light, 0, ContentAlignment.MiddleRight);
-                    TSImageRenderer(bluetoothFinderToolToolStripMenuItem, Properties.Resources.cx_bt_finder_light, 0, ContentAlignment.MiddleRight);
-                    TSImageRenderer(systemIdAnalysisTool, Properties.Resources.cx_system_id_light, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(monitorTestTool, Properties.Resources.cx_test_monitor_light, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(monitorDeadPixelTestTool, Properties.Resources.cx_test_dead_pixel_light, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(monitorDynamicRangeTestTool, Properties.Resources.cx_test_dynamic_range_light, 0, ContentAlignment.MiddleRight);
@@ -7067,16 +7209,16 @@ namespace Glow{
                     // TOOLS
                     TSImageRenderer(toolsToolStripMenuItem, Properties.Resources.tm_tools_dark, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(sFCandDISMAutoTool, Properties.Resources.cx_sfc_and_dism_dark, 0, ContentAlignment.MiddleRight);
-                    TSImageRenderer(cacheCleaningTool, Properties.Resources.cx_cache_clean_dark, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(benchCPUTool, Properties.Resources.cx_bench_cpu_dark, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(benchRAMTool, Properties.Resources.cx_bench_ram_dark, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(benchDiskTool, Properties.Resources.cx_bench_disk_dark, 0, ContentAlignment.MiddleRight);
+                    TSImageRenderer(cacheCleaningTool, Properties.Resources.cx_cache_clean_dark, 0, ContentAlignment.MiddleRight);
+                    TSImageRenderer(systemIdAnalysisTool, Properties.Resources.cx_system_id_dark, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(screenOverlayTool, Properties.Resources.cx_overlay_dark, 0, ContentAlignment.MiddleRight);
+                    TSImageRenderer(bluetoothFinderToolToolStripMenuItem, Properties.Resources.cx_bt_finder_dark, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(dnsTestTool, Properties.Resources.cx_dns_test_dark, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(networkFixTool, Properties.Resources.cx_network_fix_dark, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(showWiFiPasswordTool, Properties.Resources.cx_swpt_dark, 0, ContentAlignment.MiddleRight);
-                    TSImageRenderer(bluetoothFinderToolToolStripMenuItem, Properties.Resources.cx_bt_finder_dark, 0, ContentAlignment.MiddleRight);
-                    TSImageRenderer(systemIdAnalysisTool, Properties.Resources.cx_system_id_dark, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(monitorTestTool, Properties.Resources.cx_test_monitor_dark, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(monitorDeadPixelTestTool, Properties.Resources.cx_test_dead_pixel_dark, 0, ContentAlignment.MiddleRight);
                     TSImageRenderer(monitorDynamicRangeTestTool, Properties.Resources.cx_test_dynamic_range_dark, 0, ContentAlignment.MiddleRight);
@@ -7746,6 +7888,10 @@ namespace Glow{
                 NET_IPv4Adress_V.ForeColor = TS_ThemeEngine.ColorMode(theme, "AccentColor");
                 NET_IPv6Adress.ForeColor = TS_ThemeEngine.ColorMode(theme, "ContentLabelLeft");
                 NET_IPv6Adress_V.ForeColor = TS_ThemeEngine.ColorMode(theme, "AccentColor");
+                NET_P_IP_Adress.ForeColor = TS_ThemeEngine.ColorMode(theme, "ContentLabelLeft");
+                NET_P_IP_Adress_V.ForeColor = TS_ThemeEngine.ColorMode(theme, "AccentColor");
+                NET_P_ISP.ForeColor = TS_ThemeEngine.ColorMode(theme, "ContentLabelLeft");
+                NET_P_ISP_V.ForeColor = TS_ThemeEngine.ColorMode(theme, "AccentColor");
                 NET_DNS_v4_1.ForeColor = TS_ThemeEngine.ColorMode(theme, "ContentLabelLeft");
                 NET_DNS_v4_1_V.ForeColor = TS_ThemeEngine.ColorMode(theme, "AccentColor");
                 NET_DNS_v4_2.ForeColor = TS_ThemeEngine.ColorMode(theme, "ContentLabelLeft");
@@ -8115,16 +8261,16 @@ namespace Glow{
             try{
                 var glow_other_pages = new (string name, Func<object> createTool, Action<object> applySettings)[]{
                     ("glow_sfc_and_dism_tool", () => new GlowSFCandDISMAutoTool(), tool => ((GlowSFCandDISMAutoTool)tool).SADTLoadEngine()),
-                    ("glow_cache_cleanup_tool", () => new GlowCacheCleanupTool(), tool => ((GlowCacheCleanupTool)tool).Cct_theme_settings()),
                     ("glow_bench_cpu_tool", () => new GlowBenchCPUTool(), tool => ((GlowBenchCPUTool)tool).Bench_cpu_theme_settings()),
                     ("glow_bench_ram_tool", () => new GlowBenchMemoryTool(), tool => ((GlowBenchMemoryTool)tool).Bench_ram_settings()),
                     ("glow_bench_disk_tool", () => new GlowBenchDiskTool(), tool => ((GlowBenchDiskTool)tool).Bench_disk_theme_settings()),
-                    ("glow_screen_overlay_tool", () => new GlowOverlayTool(), tool => ((GlowOverlayTool)tool).Screen_overlay_settings()),
-                    ("glow_dns_test_tool", () => new GlowDNSTestTool(), tool => ((GlowDNSTestTool)tool).Dns_test_settings()),
-                    ("glow_show_wifi_password_tool", () => new GlowShowWiFiPasswordTool(), tool => ((GlowShowWiFiPasswordTool)tool).Swpt_theme_settings()),
-                    ("glow_network_fix_tool", () => new GlowNetworkFixTool(), tool => ((GlowNetworkFixTool)tool).Nft_theme_settings()),
-                    ("glow_bluetooth_finder_tool", () => new GlowBluetoothFinderTool(), tool => ((GlowBluetoothFinderTool)tool).BTFinder_Preloader()),
+                    ("glow_cache_cleanup_tool", () => new GlowCacheCleanupTool(), tool => ((GlowCacheCleanupTool)tool).Cct_theme_settings()),
                     ("glow_system_id_analysis_tool", () => new GlowSystemIDAnalysisTool(), tool => ((GlowSystemIDAnalysisTool)tool).SIG_Preloader()),
+                    ("glow_screen_overlay_tool", () => new GlowOverlayTool(), tool => ((GlowOverlayTool)tool).Screen_overlay_settings()),
+                    ("glow_bluetooth_finder_tool", () => new GlowBluetoothFinderTool(), tool => ((GlowBluetoothFinderTool)tool).BTFinder_Preloader()),
+                    ("glow_dns_test_tool", () => new GlowDNSTestTool(), tool => ((GlowDNSTestTool)tool).Dns_test_settings()),
+                    ("glow_network_fix_tool", () => new GlowNetworkFixTool(), tool => ((GlowNetworkFixTool)tool).Nft_theme_settings()),
+                    ("glow_show_wifi_password_tool", () => new GlowShowWiFiPasswordTool(), tool => ((GlowShowWiFiPasswordTool)tool).Swpt_theme_settings()),
                     ("glow_monitor_test_engine_dead_pixel", () => new GlowMonitorTestTool(), tool => ((GlowMonitorTestTool)tool).Monitor_test_engine_theme_settings()),
                     ("glow_monitor_test_engine_dynamic_range", () => new GlowMonitorTestTool(), tool => ((GlowMonitorTestTool)tool).Monitor_test_engine_theme_settings()),
                     ("glow_monitor_stuck_pixel_fixer", () => new GlowStuckPixelFixerTool(), tool => ((GlowStuckPixelFixerTool)tool).ChangeDynamicUI()),
@@ -8465,7 +8611,7 @@ namespace Glow{
                     handler.UseProxy = false;
                     using (HttpClient httpClient = new HttpClient(handler)){
                         httpClient.Timeout = TimeSpan.FromSeconds(15);
-                        httpClient.DefaultRequestHeaders.CacheControl = new System.Net.Http.Headers.CacheControlHeaderValue{ NoCache = true, NoStore = true, MustRevalidate = true };
+                        httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue{ NoCache = true, NoStore = true, MustRevalidate = true };
                         httpClient.DefaultRequestHeaders.Pragma.ParseAdd("no-cache");
                         string versionUrl = TS_LinkSystem.github_link_lv;
                         versionUrl += (versionUrl.Contains("?") ? "&" : "?") + "_ts=" + DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -8955,7 +9101,7 @@ namespace Glow{
                     report.Sections.Add(BuildInstalledAppsSection(software_lang));
                 report.FooterItems.Add(new ReportFooterItem{
                     Label = Application.ProductName + " " + software_lang.TSReadLangs("PrintEngine", "pe_version"),
-                    Value = TS_VersionEngine.TS_SofwareVersion(1)
+                    Value = TS_VersionEngine.TS_SoftwareVersion(1)
                 });
                 report.FooterItems.Add(new ReportFooterItem{
                     Label = string.Empty,
@@ -9348,6 +9494,8 @@ namespace Glow{
                 if (debug_status) { TSErrorLog.LogException(ex, "BuildNetworkSection()"); }
             }
             section.Blocks.Add(KVList(
+                KV(NET_P_IP_Adress.Text, NET_P_IP_Adress_V.Text),
+                KV(NET_P_ISP.Text, NET_P_ISP_V.Text),
                 KV(NET_DNS_v4_1.Text, NET_DNS_v4_1_V.Text),
                 KV(NET_DNS_v4_2.Text, NET_DNS_v4_2_V.Text),
                 KV(NET_DNS_v6_1.Text, NET_DNS_v6_1_V.Text),
@@ -9889,11 +10037,6 @@ namespace Glow{
         private void SFCandDISMAutoTool_Click(object sender, EventArgs e){
             TSToolLauncher<GlowSFCandDISMAutoTool>("glow_sfc_and_dism_tool", "ht_dism_and_sfc_tool");
         }
-        // CACHE CLEANUP TOOL
-        // ======================================================================================================
-        private void CacheCleaningTool_Click(object sender, EventArgs e){
-            TSToolLauncher<GlowCacheCleanupTool>("glow_cache_cleanup_tool", "ht_cache_cleanup_tool");
-        }
         // CPU BENCH TOOL
         // ======================================================================================================
         private void BenchCPUTool_Click(object sender, EventArgs e){
@@ -9909,10 +10052,25 @@ namespace Glow{
         private void BenchDiskTool_Click(object sender, EventArgs e){
             TSToolLauncher<GlowBenchDiskTool>("glow_bench_disk_tool", "ht_bench_disk");
         }
+        // CACHE CLEANUP TOOL
+        // ======================================================================================================
+        private void CacheCleaningTool_Click(object sender, EventArgs e){
+            TSToolLauncher<GlowCacheCleanupTool>("glow_cache_cleanup_tool", "ht_cache_cleanup_tool");
+        }
+        // SYSTEM ID ANALYSIS TOOL
+        // ======================================================================================================
+        private void SystemIdAnalysisTool_Click(object sender, EventArgs e){
+            TSToolLauncher<GlowSystemIDAnalysisTool>("glow_system_id_analysis_tool", "ht_system_id_analysis_tool");
+        }
         // SCREEN OVERLAY
         // ======================================================================================================
         private void ScreenOverlayTool_Click(object sender, EventArgs e){
             TSToolLauncher<GlowOverlayTool>("glow_screen_overlay_tool", "ht_overlay");
+        }
+        // BLUETOOTH FINDER TOOL
+        // ======================================================================================================
+        private void BluetoothFinderToolToolStripMenuItem_Click(object sender, EventArgs e){
+            TSToolLauncher<GlowBluetoothFinderTool>("glow_bluetooth_finder_tool", "ht_bluetooth_finder_tool");
         }
         // DNS TEST TOOL
         // ======================================================================================================
@@ -9928,16 +10086,6 @@ namespace Glow{
         // ======================================================================================================
         private void ShowWiFiPasswordTool_Click(object sender, EventArgs e){
             TSToolLauncher<GlowShowWiFiPasswordTool>("glow_show_wifi_password_tool", "ht_show_wifi_password_tool");
-        }
-        // BLUETOOTH FINDER TOOL
-        // ======================================================================================================
-        private void BluetoothFinderToolToolStripMenuItem_Click(object sender, EventArgs e){
-            TSToolLauncher<GlowBluetoothFinderTool>("glow_bluetooth_finder_tool", "ht_bluetooth_finder_tool");
-        }
-        // SYSTEM ID GENERATOR TOOL
-        // ======================================================================================================
-        private void SystemIdAnalysisTool_Click(object sender, EventArgs e){
-            TSToolLauncher<GlowSystemIDAnalysisTool>("glow_system_id_analysis_tool", "ht_system_id_analysis_tool");
         }
         // MONITOR TEST TOOL
         // ======================================================================================================
