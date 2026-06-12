@@ -125,7 +125,7 @@ Glow includes a built-in suite for system maintenance:
 | `F10` | Open Debug Folder |
 | `F11` | Check Updates |
 | `F12` | About |
-| `CTRL + Shift + D` | Donate Page |
+| `CTRL + Alt + D` | Donate Page |
 | `CTRL + 1` | DISM and SFC Automation Tool |
 | `CTRL + 2` | CPU Benchmark Tool |
 | `CTRL + 3` | RAM Benchmark Tool |
