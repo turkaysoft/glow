@@ -81,6 +81,17 @@ Glow includes a built-in suite for system maintenance:
 
 ---
 
+## Getting Started
+
+1.  Navigate to the **[Releases](https://github.com/turkaysoft/glow/releases)** page.
+2.  Download the latest ZIP file.
+3.  **Extract all files from the ZIP** (Important: Application requires all folder contents to run correctly).
+4.  Launch the executable corresponding to your architecture:
+    * `Glow_x64.exe`: For standard 64-bit Intel/AMD systems.
+    * `Glow_arm64.exe`: For ARM-based devices like Surface Pro.
+
+---
+
 ## Translation Support
 
 * **Translation Support:** Community-driven localization via the official [Translation Guide](https://github.com/turkaysoft/glow/discussions/20).
@@ -98,14 +109,37 @@ Glow includes a built-in suite for system maintenance:
 
 ---
 
-## Getting Started
+## Shortcut Keys
 
-1.  Navigate to the **[Releases](https://github.com/turkaysoft/glow/releases)** page.
-2.  Download the latest ZIP file.
-3.  **Extract all files from the ZIP** (Important: Application requires all folder contents to run correctly).
-4.  Launch the executable corresponding to your architecture:
-    * `Glow_x64.exe`: For standard 64-bit Intel/AMD systems.
-    * `Glow_arm64.exe`: For ARM-based devices like Surface Pro.
+| Shortcut | Action |
+|--|--|
+| `F1` | Light Theme |
+| `F2` | Dark Theme |
+| `F3` | System Theme |
+| `F4` | Starting With: Windowed |
+| `F5` | Starting With: Full Screen |
+| `F6` | Hiding Mode: On |
+| `F7` | Hiding Mode: Off |
+| `F8` | Debug Mode: On |
+| `F9` | Debug Mode: Off |
+| `F10` | Open Debug Folder |
+| `F11` | Check Updates |
+| `F12` | About |
+| `CTRL + Shift + D` | Donate Page |
+| `CTRL + 1` | DISM and SFC Automation Tool |
+| `CTRL + 2` | CPU Benchmark Tool |
+| `CTRL + 3` | RAM Benchmark Tool |
+| `CTRL + 4` | Disk Benchmark Tool |
+| `CTRL + 5` | Cache Cleanup Tool |
+| `CTRL + 6` | System ID Analysis Tool |
+| `CTRL + 7` | Screen Overlay |
+| `CTRL + Shift + B` | Bluetooth Information Tool |
+| `CTRL + Shift + D` | DNS Test Tool |
+| `CTRL + Shift + N` | Network Troubleshooting Tool |
+| `CTRL + Shift + W` | Wi-Fi Password Showing Tool |
+| `CTRL + Shift + M` | Dead Pixel Test |
+| `CTRL + Alt + M` | Dynamic Color Range Test |
+| `CTRL + Alt + Shift + M` | Stuck Pixel Repair Tool |
 
 ---
 
