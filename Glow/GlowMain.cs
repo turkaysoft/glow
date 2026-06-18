@@ -317,7 +317,7 @@ namespace Glow{
             typeof(DataGridView).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, SERVICE_DataMainTable, new object[]{ true });
             typeof(DataGridView).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, INSTAPPS_DataMainTable, new object[]{ true });
             typeof(FlowLayoutPanel).InvokeMember("DoubleBuffered", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty, null, EXPORT_CB_FLP, new object[]{ true });
-            // THEME - LANG - STARTUP - HIDIN MODE PRELOADER
+            // THEME - LANG - STARTUP - HIDING - DEBUG MODE PRELOADER
             // ======================================================================================================
             TSSettingsModule software_read_settings = new TSSettingsModule(ts_sf);
             //
@@ -395,11 +395,15 @@ namespace Glow{
                 Invoke(new Action(() =>{
                     debugOnToolStripMenuItem.Enabled = enabled;
                     debugOffToolStripMenuItem.Enabled = enabled;
+                    debugZIPToolStripMenuItem.Enabled = enabled;
+                    debugDeleteToolStripMenuItem.Enabled = enabled;
                 }));
                 return;
             }
             debugOnToolStripMenuItem.Enabled = enabled;
             debugOffToolStripMenuItem.Enabled = enabled;
+            debugZIPToolStripMenuItem.Enabled = enabled;
+            debugDeleteToolStripMenuItem.Enabled = enabled;
         }
         // TASK ALL PROCESS
         // ======================================================================================================
@@ -473,12 +477,12 @@ namespace Glow{
                     TSLogger.Log("<--- ALL TASKS COMPLETED --->");
                     TSLogger.Log($"<--- Total Load Time: {btTime.Elapsed.TotalSeconds:F2} seconds --->");
                     TSLogger.Log("<--------------------------->");
-                    // FILE LOCK RELEASE
-                    TSLogger.Close();
+                    // UNLOCK LOG FILE
+                    TSLogger.UnlockFile();
                 }
                 // DEBUG MODE MENU ENABLE
                 SetDebugMenuState(true);
-            }catch (Exception ex){ if (debug_status) { TSErrorLog.LogException(ex, "GlowBootstrapper()"); } }
+            }catch (Exception ex) { if (debug_status) { TSErrorLog.LogException(ex, "GlowBootstrapper()"); } }
         }
         // SOFTWARE LOAD
         // ======================================================================================================
@@ -1220,92 +1224,152 @@ namespace Glow{
         private async Task Ms_office_version(){
             try{
                 TSGetLangs software_lang = new TSGetLangs(lang_path);
+                //
                 string LicensedText = software_lang.TSReadLangs("Os_Content", "os_c_office_licensed");
                 string GraceText = software_lang.TSReadLangs("Os_Content", "os_c_office_grace");
                 string OtherText = software_lang.TSReadLangs("Os_Content", "os_c_office_other");
                 string OfficeNotFoundText = software_lang.TSReadLangs("Os_Content", "os_c_office_not_found");
+                //
                 var productsList = await Task.Run(() => {
                     var found = new List<(string fullName, string license)>();
-                    var baseDirs = new[] {
+                    //
+                    var baseDirs = new[]{
                         $@"{Program.windows_disk}Program Files\Microsoft Office",
-                        $@"{Program.windows_disk}Program Files (x86)\Microsoft Office"
+                        $@"{Program.windows_disk}Program Files (x86)\Microsoft Office",
+                        $@"{Program.windows_disk}Program Files\Microsoft Office\root",
+                        $@"{Program.windows_disk}Program Files (x86)\Microsoft Office\root",
+                        $@"{Program.windows_disk}Common Files\Microsoft Shared\Office16",
+                        $@"{Program.windows_disk}Common Files (x86)\Microsoft Shared\Office16"
                     };
-                    IEnumerable<string> EnumerateDirectoriesSafe(string root, int maxDepth){
-                        var dirs = new List<string>();
-                        void Recurse(string path, int depth){
-                            if (depth > maxDepth) return;
+                    //
+                    IEnumerable<string> FindOsppFiles(){
+                        var results = new List<string>();
+                        foreach (var baseDir in baseDirs){
+                            if (!Directory.Exists(baseDir)) continue;
                             try{
-                                foreach (var dir in Directory.EnumerateDirectories(path)){
-                                    dirs.Add(dir);
-                                    Recurse(dir, depth + 1);
-                                }
+                                string directPath = Path.Combine(baseDir, "ospp.vbs");
+                                if (File.Exists(directPath)) results.Add(directPath);
+                                // Depth Limit: 6
+                                GetAllDirectoriesWithDepthLimit(baseDir, 6, results);
                             }catch (Exception ex){
-                                if (debug_status) { TSErrorLog.LogException(ex, "Ms_office_version()"); }
+                                if (debug_status) TSErrorLog.LogException(ex, "Ms_office_version() - FindOsppFiles");
                             }
                         }
-                        Recurse(root, 1);
-                        return dirs;
+                        return results;
                     }
-                    foreach (var baseDir in baseDirs){
-                        if (!Directory.Exists(baseDir)) continue;
+                    //
+                    void GetAllDirectoriesWithDepthLimit(string path, int maxDepth, List<string> results){
+                        var stack = new Stack<(string Path, int Depth)>();
+                        stack.Push((path, 0));
+                        while (stack.Count > 0){
+                            var (current, depth) = stack.Pop();
+                            if (depth >= maxDepth) continue;
+                            try{
+                                foreach (var dir in Directory.GetDirectories(current)){
+                                    string candidate = Path.Combine(dir, "ospp.vbs");
+                                    if (File.Exists(candidate) && !results.Contains(candidate)){
+                                        results.Add(candidate);
+                                    }
+                                    stack.Push((dir, depth + 1));
+                                }
+                            }catch (Exception ex){
+                                if (debug_status) TSErrorLog.LogException(ex, $"GetAllDirectoriesWithDepthLimit - {current}");
+                            }
+                        }
+                    }
+                    //
+                    var osppFiles = FindOsppFiles().Distinct();
+                    foreach (var osppPath in osppFiles){
                         try{
-                            var dirs = EnumerateDirectoriesSafe(baseDir, 5).ToList();
-                            foreach (var dir in dirs){
-                                string osppPath = Path.Combine(dir, "ospp.vbs");
-                                if (!File.Exists(osppPath)) continue;
-                                var psi = new ProcessStartInfo("cscript.exe", $"\"{osppPath}\" /dstatus"){
-                                    RedirectStandardOutput = true,
-                                    UseShellExecute = false,
-                                    CreateNoWindow = true
-                                };
-                                using (var process = Process.Start(psi)){
-                                    if (process == null) continue;
-                                    string output = process.StandardOutput.ReadToEnd();
-                                    process.WaitForExit();
-                                    string currentName = null, currentChannel = null;
-                                    foreach (string line in output.Split('\n')){
-                                        string readLine = line.Trim();
-                                        if (string.IsNullOrEmpty(readLine)) continue;
-                                        if (readLine.StartsWith("LICENSE NAME:"))
-                                            currentName = readLine.Substring(13).Trim();
-                                        else if (readLine.StartsWith("LICENSE DESCRIPTION:")){
-                                            string desc = readLine.Substring(20).Trim().ToUpperInvariant();
-                                            if (desc.Contains("RETAIL")) currentChannel = "Retail";
-                                            else if (desc.Contains("VL")) currentChannel = "Volume";
-                                            else if (desc.Contains("OEM")) currentChannel = "OEM";
-                                            else currentChannel = OtherText;
-                                        }else if (readLine.StartsWith("LICENSE STATUS:") && currentName != null){
-                                            string status = readLine.Substring(15).Trim();
-                                            string readable = status.Contains("LICENSED") ? LicensedText : status.Contains("OOB_GRACE") ? GraceText : status;
-                                            string version = currentName.Split(',')[0].Trim();
-                                            found.Add((version, $"{readable} / {currentChannel ?? OtherText}"));
-                                            currentName = null;
-                                            currentChannel = null;
+                            var psi = new ProcessStartInfo("cscript.exe", $"\"{osppPath}\" /dstatus"){
+                                RedirectStandardOutput = true,
+                                UseShellExecute = false,
+                                CreateNoWindow = true,
+                                StandardOutputEncoding = Encoding.UTF8
+                            };
+                            //
+                            using (var process = Process.Start(psi)){
+                                if (process == null) continue;
+                                string output = process.StandardOutput.ReadToEnd();
+                                process.WaitForExit();
+                                //
+                                string currentName = null;
+                                string currentChannel = null;
+                                //
+                                var lines = output.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                                foreach (var rawLine in lines){
+                                    string line = rawLine.Trim();
+                                    if (string.IsNullOrEmpty(line)) continue;
+                                    if (line.StartsWith("LICENSE NAME:", StringComparison.OrdinalIgnoreCase)){
+                                        currentName = line.Substring(13).Trim();
+                                        currentChannel = null;
+                                    }else if (line.StartsWith("LICENSE DESCRIPTION:", StringComparison.OrdinalIgnoreCase)){
+                                        string desc = line.Substring(20).Trim().ToUpperInvariant();
+                                        if (desc.Contains("RETAIL")) currentChannel = "Retail";
+                                        else if (desc.Contains("VL")) currentChannel = "Volume";
+                                        else if (desc.Contains("OEM")) currentChannel = "OEM";
+                                        else currentChannel = OtherText;
+                                    }else if (line.StartsWith("LICENSE STATUS:", StringComparison.OrdinalIgnoreCase) && currentName != null){
+                                        string status = line.Substring(15).Trim();
+                                        string readable;
+                                        if (status.IndexOf("LICENSED", StringComparison.OrdinalIgnoreCase) >= 0){
+                                            readable = LicensedText;
+                                        }else if (status.IndexOf("OOB_GRACE", StringComparison.OrdinalIgnoreCase) >= 0){
+                                            readable = GraceText;
+                                        }else{
+                                            readable = status;
                                         }
+                                        string version = currentName.Split(',')[0].Trim();
+                                        found.Add((version, $"{readable} / {currentChannel ?? OtherText}"));
+                                        currentName = null;
+                                        currentChannel = null;
                                     }
                                 }
                             }
                         }catch (Exception ex){
-                            if (debug_status) { TSErrorLog.LogException(ex, "Ms_office_version()"); }
+                            if (debug_status) TSErrorLog.LogException(ex, $"Ms_office_version() - osppPath: {osppPath}");
                         }
                     }
+                    //
                     return found;
                 });
                 string displayText;
                 if (!productsList.Any()){
                     displayText = OfficeNotFoundText;
                 }else{
-                    var groupedOffice = productsList.GroupBy(p => p.fullName).Select(g => {
-                        string licenseStatus = g.Select(x => x.license).Distinct().FirstOrDefault() ?? OtherText;
-                        return $"{g.Key} ({licenseStatus})";
-                    });
-                    displayText = string.Join(", ", groupedOffice);
+                    var groups = productsList.GroupBy(p => p.fullName);
+                    var bestEntries = new List<string>();
+                    //
+                    foreach (var group in groups){
+                        var items = group.ToList();
+                        var licensedItems = items.Where(i => i.license.StartsWith(LicensedText)).ToList();
+                        if (licensedItems.Any()){
+                            var uniqueLicensed = licensedItems.Select(i => i.license).Distinct();
+                            foreach (var lic in uniqueLicensed){
+                                bestEntries.Add($"{group.Key} ({lic})");
+                            }
+                        }else{
+                            var graceItems = items.Where(i => i.license.StartsWith(GraceText)).ToList();
+                            if (graceItems.Any()){
+                                var uniqueGrace = graceItems.Select(i => i.license).Distinct();
+                                foreach (var gr in uniqueGrace){
+                                    bestEntries.Add($"{group.Key} ({gr})");
+                                }
+                            }else{
+                                var otherItems = items.Select(i => i.license).Distinct();
+                                foreach (var other in otherItems){
+                                    bestEntries.Add($"{group.Key} ({other})");
+                                }
+                            }
+                        }
+                    }
+                    displayText = string.Join(", ", bestEntries);
                 }
                 if (IsHandleCreated){
                     BeginInvoke(new Action(() => OS_MSOfficeVersion_V.Text = displayText));
                 }
             }catch (Exception ex){
-                if (debug_status) { TSErrorLog.LogException(ex, "Ms_office_version()"); }
+                if (debug_status) TSErrorLog.LogException(ex, "Ms_office_version()");
             }
         }
         // WIN LICENSE TYPE
@@ -2078,7 +2142,7 @@ namespace Glow{
                         { 9, "64 " + bitText + " - (x64)" },
                         { 12, "64 " + bitText + " - (ARM64)" }
                     };
-                    string archText = archMap.ContainsKey(arch) ? archMap[arch] : $"Unknown ({arch})";
+                    string archText = archMap.ContainsKey(arch) ? archMap[arch] : $"{software_lang.TSReadLangs("Cpu_Content", "cpu_c_unknown")} ({arch})";
                     cpu_arch_list.Add(archText);
                     CPU_Architectural_V.Text = archText;
                 }catch (Exception ex){
@@ -4642,15 +4706,20 @@ namespace Glow{
                         NET_P_IP_Adress_V.Text = ni_connection;
                         NET_P_ISP_V.Text = ni_connection;
                     }else{
-                        GetPublicIPInfo.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36");
+                        GetPublicIPInfo.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36");
                         GetPublicIPInfo.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue { NoCache = true, NoStore = true, MustRevalidate = true };
                         GetPublicIPInfo.DefaultRequestHeaders.Pragma.ParseAdd("no-cache");
                         //
                         var get_info = GetPublicIpInfoAsync().ConfigureAwait(false).GetAwaiter().GetResult();
                         //
-                        if (get_info != null && get_info.Success){
-                            NET_P_IP_Adress_V.Text = $"{get_info.IP ?? u_info} ({get_info.Type ?? u_info})";
-                            NET_P_ISP_V.Text = $"{get_info.Connection?.ISP ?? u_info}";
+                        if (get_info != null && !string.IsNullOrEmpty(get_info.IP)){
+                            string ipType = "";
+                            if (IPAddress.TryParse(get_info.IP, out IPAddress parsedIp)){
+                                if (parsedIp.AddressFamily == AddressFamily.InterNetwork){ ipType = "(IPv4)"; }
+                                else if (parsedIp.AddressFamily == AddressFamily.InterNetworkV6){ ipType = "(IPv6)"; }
+                            }
+                            NET_P_IP_Adress_V.Text = $"{get_info.IP} {ipType}";
+                            NET_P_ISP_V.Text = $"{get_info.ISP ?? u_info}";
                         }else{
                             NET_P_IP_Adress_V.Text = u_info;
                             NET_P_ISP_V.Text = u_info;
@@ -4855,17 +4924,13 @@ namespace Glow{
         private static readonly HttpClient GetPublicIPInfo = new HttpClient() { Timeout = TimeSpan.FromSeconds(5) };
         static async Task<GetIpInfo> GetPublicIpInfoAsync(){
             try{
-                string get_data = await GetPublicIPInfo.GetStringAsync("https://ipwho.is/").ConfigureAwait(false);
+                string get_data = await GetPublicIPInfo.GetStringAsync("https://ipinfo.io/json").ConfigureAwait(false);
                 JavaScriptSerializer serializer = new JavaScriptSerializer();
                 dynamic serialize_data = serializer.Deserialize<dynamic>(get_data);
-                if (serialize_data["success"] == true){
+                if (serialize_data != null && serialize_data.ContainsKey("ip")){
                     return new GetIpInfo{
-                        Success = serialize_data["success"],
                         IP = serialize_data["ip"],
-                        Type = serialize_data["type"],
-                        Connection = new ConnectionIPInfo{
-                            ISP = serialize_data["connection"]?["isp"]
-                        }
+                        ISP = serialize_data["org"],
                     };
                 }
                 return null;
@@ -4874,12 +4939,7 @@ namespace Glow{
             }
         }
         public class GetIpInfo{
-            public bool Success { get; set; }
             public string IP { get; set; }
-            public string Type { get; set; }
-            public ConnectionIPInfo Connection { get; set; }
-        }
-        public class ConnectionIPInfo{
             public string ISP { get; set; }
         }
         // CHECK DNS
@@ -8538,23 +8598,20 @@ namespace Glow{
                     return;
                 }
                 var confirm = TS_MessageBoxEngine.TS_MessageBox(this, 6, string.Format(software_lang.TSReadLangs("HeaderDebugMode", "header_debug_mode_delete_check"), "\n\n"));
-                //
                 if (confirm != DialogResult.Yes)
                     return;
-                //
-                string currentLog = TSLogger.CurrentLogFile;
+                TSLogger.UnlockFile();
                 int deletedCount = 0;
-                //
                 foreach (var file in Directory.EnumerateFiles(logDir, "*.log", SearchOption.TopDirectoryOnly)){
-                    if (!string.IsNullOrEmpty(currentLog) && string.Equals(file, currentLog, StringComparison.OrdinalIgnoreCase)){
-                        continue;
-                    }
                     try{
                         File.SetAttributes(file, FileAttributes.Normal);
                         File.Delete(file);
                         deletedCount++;
                     }catch{ }
                 }
+                try{
+                    Directory.Delete(logDir, false);
+                }catch{ }
                 TS_MessageBoxEngine.TS_MessageBox(this, 1, string.Format(software_lang.TSReadLangs("HeaderDebugMode", "header_debug_mode_delete_success"), deletedCount));
             }catch (Exception ex){
                 if (debug_status){
@@ -10149,13 +10206,13 @@ namespace Glow{
             try{
                 if (ts_token_engine_stopper) return;
                 ts_token_engine_stopper = true;
-                if (debug_status){
+                if (debug_status && !TSLogger.IsClosed){
                     TSLogger.Log("<---------------------------->");
                     TSLogger.Log("<--- ALL TASKS TERMINATED --->");
                     TSLogger.Log("<---------------------------->");
                 }
             }catch (Exception ex){
-                if (debug_status && !this.IsDisposed){
+                if (debug_status && !this.IsDisposed && !TSLogger.IsClosed){
                     TSErrorLog.LogException(ex, "CancelAllTasks()");
                 }
             }
@@ -10166,6 +10223,10 @@ namespace Glow{
             isExiting = true;
             loop_status = false;
             CancelAllTasks();
+            if (debug_status){
+                TSLogger.Log("<--- THE APPLICATION HAS BEEN SUCCESSFULLY CLOSED --->");
+            }
+            TSLogger.Close();
             if (Application.MessageLoop){
                 Application.Exit();
             }else{

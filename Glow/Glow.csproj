@@ -183,12 +183,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="TSModules.cs" />
-    <Compile Include="TSPreloader.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TSPreloader.Designer.cs">
-      <DependentUpon>TSPreloader.cs</DependentUpon>
-    </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>

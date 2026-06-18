@@ -32,7 +32,7 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.Label_Info = new System.Windows.Forms.Label();
+            this.Label_Info = new Glow.TSCustomLabel();
             this.DGV_MainTable = new System.Windows.Forms.DataGridView();
             this.Btn_Compare = new Glow.TSCustomButton();
             this.Btn_Save = new Glow.TSCustomButton();
@@ -42,6 +42,7 @@
             // Label_Info
             // 
             this.Label_Info.BackColor = System.Drawing.Color.White;
+            this.Label_Info.BorderRadius = 5;
             this.Label_Info.Dock = System.Windows.Forms.DockStyle.Top;
             this.Label_Info.Font = new System.Drawing.Font("Segoe UI Semibold", 10.5F, System.Drawing.FontStyle.Bold);
             this.Label_Info.ImeMode = System.Windows.Forms.ImeMode.NoControl;
@@ -165,7 +166,7 @@
             this.Btn_Save.UseVisualStyleBackColor = false;
             this.Btn_Save.Click += new System.EventHandler(this.Btn_Save_Click);
             // 
-            // GlowSystemIDGenerator
+            // GlowSystemIDAnalysisTool
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
@@ -178,7 +179,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = global::Glow.Properties.Resources.GlowLogo;
             this.MaximizeBox = false;
-            this.Name = "GlowSystemIDGenerator";
+            this.Name = "GlowSystemIDAnalysisTool";
             this.Padding = new System.Windows.Forms.Padding(10);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "GlowSystemIDGenerator";
@@ -191,7 +192,7 @@
         #endregion
 
         private TSCustomButton Btn_Save;
-        internal System.Windows.Forms.Label Label_Info;
+        internal TSCustomLabel Label_Info;
         private System.Windows.Forms.DataGridView DGV_MainTable;
         private TSCustomButton Btn_Compare;
     }

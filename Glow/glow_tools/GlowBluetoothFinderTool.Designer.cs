@@ -28,28 +28,27 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GlowBluetoothFinderTool));
             this.BackPanel = new System.Windows.Forms.Panel();
             this.BTSelector = new Glow.TSCustomComboBox();
-            this.InPanel7 = new System.Windows.Forms.Panel();
+            this.InPanel7 = new Glow.TSCustomPanel();
             this.BT_HardwareID = new System.Windows.Forms.Label();
             this.BT_HardwareID_V = new System.Windows.Forms.Label();
-            this.InPanel6 = new System.Windows.Forms.Panel();
+            this.InPanel6 = new Glow.TSCustomPanel();
             this.BT_Publisher = new System.Windows.Forms.Label();
             this.BT_Publisher_V = new System.Windows.Forms.Label();
-            this.InPanel5 = new System.Windows.Forms.Panel();
+            this.InPanel5 = new Glow.TSCustomPanel();
             this.BT_DriverDate = new System.Windows.Forms.Label();
             this.BT_DriverDate_V = new System.Windows.Forms.Label();
-            this.InPanel4 = new System.Windows.Forms.Panel();
+            this.InPanel4 = new Glow.TSCustomPanel();
             this.BT_DriverVersion = new System.Windows.Forms.Label();
             this.BT_DriverVersion_V = new System.Windows.Forms.Label();
-            this.InPanel3 = new System.Windows.Forms.Panel();
+            this.InPanel3 = new Glow.TSCustomPanel();
             this.BT_LMPVersion = new System.Windows.Forms.Label();
             this.BT_LMPVersion_V = new System.Windows.Forms.Label();
-            this.InPanel2 = new System.Windows.Forms.Panel();
+            this.InPanel2 = new Glow.TSCustomPanel();
             this.BT_Version = new System.Windows.Forms.Label();
             this.BT_Version_V = new System.Windows.Forms.Label();
-            this.InPanel1 = new System.Windows.Forms.Panel();
+            this.InPanel1 = new Glow.TSCustomPanel();
             this.BT_Adapter = new System.Windows.Forms.Label();
             this.BT_Adapter_V = new System.Windows.Forms.Label();
             this.BTCopyInfoBtn = new Glow.TSCustomButton();
@@ -87,6 +86,7 @@
             this.BTSelector.BorderColor = System.Drawing.SystemColors.ControlDark;
             this.BTSelector.ButtonColor = System.Drawing.SystemColors.ControlDark;
             this.BTSelector.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.BTSelector.DisabledArrowColor = System.Drawing.SystemColors.GrayText;
             this.BTSelector.DisabledBackColor = System.Drawing.SystemColors.Control;
             this.BTSelector.DisabledButtonColor = System.Drawing.SystemColors.ControlDark;
             this.BTSelector.DisabledForeColor = System.Drawing.SystemColors.GrayText;
@@ -99,9 +99,12 @@
             this.BTSelector.FormattingEnabled = true;
             this.BTSelector.HoverBackColor = System.Drawing.SystemColors.Window;
             this.BTSelector.HoverButtonColor = System.Drawing.SystemColors.ControlDark;
+            this.BTSelector.HoverForeColor = System.Drawing.SystemColors.WindowText;
             this.BTSelector.Location = new System.Drawing.Point(10, 10);
             this.BTSelector.Margin = new System.Windows.Forms.Padding(3, 3, 10, 25);
             this.BTSelector.Name = "BTSelector";
+            this.BTSelector.SelectedBackColor = System.Drawing.SystemColors.Highlight;
+            this.BTSelector.SelectedForeColor = System.Drawing.SystemColors.HighlightText;
             this.BTSelector.Size = new System.Drawing.Size(764, 28);
             this.BTSelector.TabIndex = 0;
             this.BTSelector.SelectedIndexChanged += new System.EventHandler(this.BTSelector_SelectedIndexChanged);
@@ -111,6 +114,9 @@
             this.InPanel7.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.InPanel7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+            this.InPanel7.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.InPanel7.BorderRadius = 5;
+            this.InPanel7.BorderSize = 0;
             this.InPanel7.Controls.Add(this.BT_HardwareID);
             this.InPanel7.Controls.Add(this.BT_HardwareID_V);
             this.InPanel7.Location = new System.Drawing.Point(10, 414);
@@ -155,6 +161,9 @@
             this.InPanel6.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.InPanel6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+            this.InPanel6.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.InPanel6.BorderRadius = 5;
+            this.InPanel6.BorderSize = 0;
             this.InPanel6.Controls.Add(this.BT_Publisher);
             this.InPanel6.Controls.Add(this.BT_Publisher_V);
             this.InPanel6.Location = new System.Drawing.Point(10, 356);
@@ -199,6 +208,9 @@
             this.InPanel5.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.InPanel5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+            this.InPanel5.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.InPanel5.BorderRadius = 5;
+            this.InPanel5.BorderSize = 0;
             this.InPanel5.Controls.Add(this.BT_DriverDate);
             this.InPanel5.Controls.Add(this.BT_DriverDate_V);
             this.InPanel5.Location = new System.Drawing.Point(10, 298);
@@ -243,6 +255,9 @@
             this.InPanel4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.InPanel4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+            this.InPanel4.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.InPanel4.BorderRadius = 5;
+            this.InPanel4.BorderSize = 0;
             this.InPanel4.Controls.Add(this.BT_DriverVersion);
             this.InPanel4.Controls.Add(this.BT_DriverVersion_V);
             this.InPanel4.Location = new System.Drawing.Point(10, 240);
@@ -287,6 +302,9 @@
             this.InPanel3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.InPanel3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+            this.InPanel3.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.InPanel3.BorderRadius = 5;
+            this.InPanel3.BorderSize = 0;
             this.InPanel3.Controls.Add(this.BT_LMPVersion);
             this.InPanel3.Controls.Add(this.BT_LMPVersion_V);
             this.InPanel3.Location = new System.Drawing.Point(10, 182);
@@ -331,6 +349,9 @@
             this.InPanel2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.InPanel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+            this.InPanel2.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.InPanel2.BorderRadius = 5;
+            this.InPanel2.BorderSize = 0;
             this.InPanel2.Controls.Add(this.BT_Version);
             this.InPanel2.Controls.Add(this.BT_Version_V);
             this.InPanel2.Location = new System.Drawing.Point(10, 124);
@@ -375,6 +396,9 @@
             this.InPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.InPanel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+            this.InPanel1.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.InPanel1.BorderRadius = 5;
+            this.InPanel1.BorderSize = 0;
             this.InPanel1.Controls.Add(this.BT_Adapter);
             this.InPanel1.Controls.Add(this.BT_Adapter_V);
             this.InPanel1.Location = new System.Drawing.Point(10, 66);
@@ -449,7 +473,7 @@
             this.Controls.Add(this.BackPanel);
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.Icon = Properties.Resources.GlowLogo;
+            this.Icon = global::Glow.Properties.Resources.GlowLogo;
             this.MaximizeBox = false;
             this.Name = "GlowBluetoothFinderTool";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -474,23 +498,23 @@
         internal System.Windows.Forms.Label BT_Adapter;
         internal System.Windows.Forms.Label BT_Adapter_V;
         private TSCustomButton BTCopyInfoBtn;
-        private System.Windows.Forms.Panel InPanel1;
-        private System.Windows.Forms.Panel InPanel3;
+        private TSCustomPanel InPanel1;
+        private TSCustomPanel InPanel3;
         internal System.Windows.Forms.Label BT_LMPVersion;
         internal System.Windows.Forms.Label BT_LMPVersion_V;
-        private System.Windows.Forms.Panel InPanel2;
+        private TSCustomPanel InPanel2;
         internal System.Windows.Forms.Label BT_Version;
         internal System.Windows.Forms.Label BT_Version_V;
-        private System.Windows.Forms.Panel InPanel4;
+        private TSCustomPanel InPanel4;
         internal System.Windows.Forms.Label BT_DriverVersion;
         internal System.Windows.Forms.Label BT_DriverVersion_V;
-        private System.Windows.Forms.Panel InPanel6;
+        private TSCustomPanel InPanel6;
         internal System.Windows.Forms.Label BT_Publisher;
         internal System.Windows.Forms.Label BT_Publisher_V;
-        private System.Windows.Forms.Panel InPanel5;
+        private TSCustomPanel InPanel5;
         internal System.Windows.Forms.Label BT_DriverDate;
         internal System.Windows.Forms.Label BT_DriverDate_V;
-        private System.Windows.Forms.Panel InPanel7;
+        private TSCustomPanel InPanel7;
         internal System.Windows.Forms.Label BT_HardwareID;
         internal System.Windows.Forms.Label BT_HardwareID_V;
         private TSCustomComboBox BTSelector;

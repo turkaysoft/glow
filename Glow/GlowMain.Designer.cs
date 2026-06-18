@@ -312,8 +312,8 @@
             this.RAM_TLP = new System.Windows.Forms.TableLayoutPanel();
             this.ram_panel_1 = new System.Windows.Forms.Panel();
             this.RAM_ProgressLabel = new System.Windows.Forms.Label();
-            this.RAM_ProgressBGPanel = new System.Windows.Forms.Panel();
-            this.RAM_ProgressFEPanel = new System.Windows.Forms.Panel();
+            this.RAM_ProgressBGPanel = new Glow.TSCustomPanel();
+            this.RAM_ProgressFEPanel = new Glow.TSCustomPanel();
             this.RAM_UsageVirtualRam = new System.Windows.Forms.Label();
             this.RAM_UsageVirtualRam_V = new System.Windows.Forms.Label();
             this.RAM_EmptyVirtualRam = new System.Windows.Forms.Label();
@@ -458,8 +458,8 @@
             this.DISK_UsedSpace = new System.Windows.Forms.Label();
             this.DISK_PBar_Label = new System.Windows.Forms.Label();
             this.DISK_Selector_List = new Glow.TSCustomComboBox();
-            this.DISK_PBar_BG = new System.Windows.Forms.Panel();
-            this.DISK_PBar_FE = new System.Windows.Forms.Panel();
+            this.DISK_PBar_BG = new Glow.TSCustomPanel();
+            this.DISK_PBar_FE = new Glow.TSCustomPanel();
             this.DISK_Man_V = new System.Windows.Forms.Label();
             this.DISK_Man = new System.Windows.Forms.Label();
             this.DISK_VolumeName_V = new System.Windows.Forms.Label();
@@ -480,23 +480,23 @@
             this.DISK_Serial_V = new System.Windows.Forms.Label();
             this.DISK_VolumeSerial = new System.Windows.Forms.Label();
             this.disk_panel_1 = new System.Windows.Forms.Panel();
-            this.DISK_TotalTLP = new System.Windows.Forms.TableLayoutPanel();
-            this.DISK_TTLP_Panel_4 = new System.Windows.Forms.Panel();
-            this.DISK_TTLP_P4_L2 = new System.Windows.Forms.Label();
-            this.DISK_TTLP_P4_L1 = new System.Windows.Forms.Label();
-            this.DISK_TLP_PB_4 = new Glow.TSCustomPanel();
-            this.DISK_TTLP_Panel_3 = new System.Windows.Forms.Panel();
-            this.DISK_TTLP_P3_L2 = new System.Windows.Forms.Label();
-            this.DISK_TTLP_P3_L1 = new System.Windows.Forms.Label();
-            this.DISK_TLP_PB_3 = new Glow.TSCustomPanel();
-            this.DISK_TTLP_Panel_2 = new System.Windows.Forms.Panel();
-            this.DISK_TTLP_P2_L2 = new System.Windows.Forms.Label();
-            this.DISK_TTLP_P2_L1 = new System.Windows.Forms.Label();
-            this.DISK_TLP_PB_2 = new Glow.TSCustomPanel();
-            this.DISK_TTLP_Panel_1 = new System.Windows.Forms.Panel();
+            this.DISK_MainTLP = new System.Windows.Forms.TableLayoutPanel();
+            this.DISK_TTLP_Panel_1 = new Glow.TSCustomPanel();
             this.DISK_TTLP_P1_L2 = new System.Windows.Forms.Label();
             this.DISK_TTLP_P1_L1 = new System.Windows.Forms.Label();
             this.DISK_TLP_PB_1 = new Glow.TSCustomPanel();
+            this.DISK_TTLP_Panel_4 = new Glow.TSCustomPanel();
+            this.DISK_TTLP_P4_L2 = new System.Windows.Forms.Label();
+            this.DISK_TTLP_P4_L1 = new System.Windows.Forms.Label();
+            this.DISK_TLP_PB_4 = new Glow.TSCustomPanel();
+            this.DISK_TTLP_Panel_2 = new Glow.TSCustomPanel();
+            this.DISK_TTLP_P2_L2 = new System.Windows.Forms.Label();
+            this.DISK_TTLP_P2_L1 = new System.Windows.Forms.Label();
+            this.DISK_TLP_PB_2 = new Glow.TSCustomPanel();
+            this.DISK_TTLP_Panel_3 = new Glow.TSCustomPanel();
+            this.DISK_TTLP_P3_L2 = new System.Windows.Forms.Label();
+            this.DISK_TTLP_P3_L1 = new System.Windows.Forms.Label();
+            this.DISK_TLP_PB_3 = new Glow.TSCustomPanel();
             this.DISK_TTLP_L1 = new System.Windows.Forms.Label();
             this.NETWORK = new System.Windows.Forms.TabPage();
             this.NET_TLP = new System.Windows.Forms.TableLayoutPanel();
@@ -547,10 +547,10 @@
             this.NET_LT_BandWidth = new System.Windows.Forms.Label();
             this.NET_LT_BandWidth_V = new System.Windows.Forms.Label();
             this.NET_LT_TLP = new System.Windows.Forms.TableLayoutPanel();
-            this.NET_LT_P2 = new System.Windows.Forms.Panel();
+            this.NET_LT_P2 = new Glow.TSCustomPanel();
             this.NET_LT_UL2 = new System.Windows.Forms.Label();
             this.NET_LT_UL1 = new System.Windows.Forms.Label();
-            this.NET_LT_P1 = new System.Windows.Forms.Panel();
+            this.NET_LT_P1 = new Glow.TSCustomPanel();
             this.NET_LT_DL2 = new System.Windows.Forms.Label();
             this.NET_LT_DL1 = new System.Windows.Forms.Label();
             this.NET_LT_Device = new System.Windows.Forms.Label();
@@ -626,8 +626,8 @@
             this.BATTERY_TLP = new System.Windows.Forms.TableLayoutPanel();
             this.battery_panel_1 = new System.Windows.Forms.Panel();
             this.BATTERY_ProgressLabel = new System.Windows.Forms.Label();
-            this.BATTERY_PBG_Panel = new System.Windows.Forms.Panel();
-            this.BATTERY_PFE_Panel = new System.Windows.Forms.Panel();
+            this.BATTERY_PBG_Panel = new Glow.TSCustomPanel();
+            this.BATTERY_PFE_Panel = new Glow.TSCustomPanel();
             this.BATTERY_Chemistry_V = new System.Windows.Forms.Label();
             this.BATTERY_Chemistry = new System.Windows.Forms.Label();
             this.BATTERY_Status = new System.Windows.Forms.Label();
@@ -689,7 +689,7 @@
             this.print_panel_1 = new System.Windows.Forms.Panel();
             this.EXPORT_ModeSelector_List = new Glow.TSCustomComboBox();
             this.Export_ModeTitle = new System.Windows.Forms.Label();
-            this.EXPORT_CB_FLP = new System.Windows.Forms.FlowLayoutPanel();
+            this.EXPORT_CB_FLP = new Glow.TSCustomFLP();
             this.EXPORT_CB_OS = new Glow.TSCustomCheckBox();
             this.EXPORT_CB_MB = new Glow.TSCustomCheckBox();
             this.EXPORT_CB_CPU = new Glow.TSCustomCheckBox();
@@ -705,13 +705,13 @@
             this.EXPORT_CB_APPS = new Glow.TSCustomCheckBox();
             this.EXPORT_StartEngineBtn = new Glow.TSCustomButton();
             this.EXPORT_Selector_List = new Glow.TSCustomComboBox();
-            this.EXPORT_ProgressBGPanel = new System.Windows.Forms.Panel();
-            this.EXPORT_ProgressFEPanel = new System.Windows.Forms.Panel();
+            this.EXPORT_ProgressBGPanel = new Glow.TSCustomPanel();
+            this.EXPORT_ProgressFEPanel = new Glow.TSCustomPanel();
             this.EXPORT_Selector = new System.Windows.Forms.Label();
             this.EXPORT_ProgessLabel = new System.Windows.Forms.Label();
             this.print_panel_2 = new System.Windows.Forms.Panel();
             this.EXPORT_Donate = new Glow.TSCustomButton();
-            this.EXPORT_DonateLabel = new System.Windows.Forms.Label();
+            this.EXPORT_DonateLabel = new Glow.TSCustomLabel();
             this.Header_InPanel = new System.Windows.Forms.Panel();
             this.HeaderImage = new System.Windows.Forms.PictureBox();
             this.HeaderText = new System.Windows.Forms.Label();
@@ -758,11 +758,11 @@
             this.disk_panel_2.SuspendLayout();
             this.DISK_PBar_BG.SuspendLayout();
             this.disk_panel_1.SuspendLayout();
-            this.DISK_TotalTLP.SuspendLayout();
-            this.DISK_TTLP_Panel_4.SuspendLayout();
-            this.DISK_TTLP_Panel_3.SuspendLayout();
-            this.DISK_TTLP_Panel_2.SuspendLayout();
+            this.DISK_MainTLP.SuspendLayout();
             this.DISK_TTLP_Panel_1.SuspendLayout();
+            this.DISK_TTLP_Panel_4.SuspendLayout();
+            this.DISK_TTLP_Panel_2.SuspendLayout();
+            this.DISK_TTLP_Panel_3.SuspendLayout();
             this.NETWORK.SuspendLayout();
             this.NET_TLP.SuspendLayout();
             this.network_panel_1.SuspendLayout();
@@ -1192,9 +1192,9 @@
             this.toolsToolStripMenuItem,
             this.donateToolStripMenuItem,
             this.aboutToolStripMenuItem});
-            this.HeaderMenu.Location = new System.Drawing.Point(581, 9);
+            this.HeaderMenu.Location = new System.Drawing.Point(461, 9);
             this.HeaderMenu.Name = "HeaderMenu";
-            this.HeaderMenu.Size = new System.Drawing.Size(225, 24);
+            this.HeaderMenu.Size = new System.Drawing.Size(345, 24);
             this.HeaderMenu.TabIndex = 1;
             this.HeaderMenu.Text = "menuStrip1";
             // 
@@ -1458,7 +1458,7 @@
             this.debugOnToolStripMenuItem.Enabled = false;
             this.debugOnToolStripMenuItem.Name = "debugOnToolStripMenuItem";
             this.debugOnToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F8;
-            this.debugOnToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+            this.debugOnToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.debugOnToolStripMenuItem.Text = "DebugOn";
             this.debugOnToolStripMenuItem.Click += new System.EventHandler(this.DebugOnToolStripMenuItem_Click);
             // 
@@ -1468,7 +1468,7 @@
             this.debugOffToolStripMenuItem.Enabled = false;
             this.debugOffToolStripMenuItem.Name = "debugOffToolStripMenuItem";
             this.debugOffToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F9;
-            this.debugOffToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+            this.debugOffToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.debugOffToolStripMenuItem.Text = "DebugOff";
             this.debugOffToolStripMenuItem.Click += new System.EventHandler(this.DebugOffToolStripMenuItem_Click);
             // 
@@ -1477,23 +1477,25 @@
             this.debugFolderToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.debugFolderToolStripMenuItem.Name = "debugFolderToolStripMenuItem";
             this.debugFolderToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F10;
-            this.debugFolderToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+            this.debugFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.debugFolderToolStripMenuItem.Text = "DebugFolder";
             this.debugFolderToolStripMenuItem.Click += new System.EventHandler(this.DebugFolderToolStripMenuItem_Click);
             // 
             // debugZIPToolStripMenuItem
             // 
             this.debugZIPToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+            this.debugZIPToolStripMenuItem.Enabled = false;
             this.debugZIPToolStripMenuItem.Name = "debugZIPToolStripMenuItem";
-            this.debugZIPToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+            this.debugZIPToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.debugZIPToolStripMenuItem.Text = "DebugZIP";
             this.debugZIPToolStripMenuItem.Click += new System.EventHandler(this.DebugZIPToolStripMenuItem_Click);
             // 
             // debugDeleteToolStripMenuItem
             // 
             this.debugDeleteToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+            this.debugDeleteToolStripMenuItem.Enabled = false;
             this.debugDeleteToolStripMenuItem.Name = "debugDeleteToolStripMenuItem";
-            this.debugDeleteToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+            this.debugDeleteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.debugDeleteToolStripMenuItem.Text = "DebugDelete";
             this.debugDeleteToolStripMenuItem.Click += new System.EventHandler(this.DebugDeleteToolStripMenuItem_Click);
             // 
@@ -1660,7 +1662,7 @@
             // 
             this.donateToolStripMenuItem.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.donateToolStripMenuItem.Name = "donateToolStripMenuItem";
-            this.donateToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            this.donateToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
             | System.Windows.Forms.Keys.D)));
             this.donateToolStripMenuItem.Size = new System.Drawing.Size(57, 20);
             this.donateToolStripMenuItem.Text = "Donate";
@@ -4695,6 +4697,10 @@
             // 
             // RAM_ProgressBGPanel
             // 
+            this.RAM_ProgressBGPanel.BackColor = System.Drawing.Color.White;
+            this.RAM_ProgressBGPanel.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.RAM_ProgressBGPanel.BorderRadius = 4;
+            this.RAM_ProgressBGPanel.BorderSize = 0;
             this.RAM_ProgressBGPanel.Controls.Add(this.RAM_ProgressFEPanel);
             this.RAM_ProgressBGPanel.Dock = System.Windows.Forms.DockStyle.Right;
             this.RAM_ProgressBGPanel.Location = new System.Drawing.Point(775, 10);
@@ -4705,6 +4711,9 @@
             // RAM_ProgressFEPanel
             // 
             this.RAM_ProgressFEPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(103)))), ((int)(((byte)(192)))));
+            this.RAM_ProgressFEPanel.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.RAM_ProgressFEPanel.BorderRadius = 4;
+            this.RAM_ProgressFEPanel.BorderSize = 0;
             this.RAM_ProgressFEPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.RAM_ProgressFEPanel.Location = new System.Drawing.Point(0, 301);
             this.RAM_ProgressFEPanel.Name = "RAM_ProgressFEPanel";
@@ -6294,7 +6303,7 @@
             this.DISK_TLP.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.DISK_TLP.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.DISK_TLP.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.DISK_TLP.Size = new System.Drawing.Size(802, 1283);
+            this.DISK_TLP.Size = new System.Drawing.Size(802, 1312);
             this.DISK_TLP.TabIndex = 0;
             // 
             // disk_panel_3
@@ -6332,7 +6341,7 @@
             this.disk_panel_3.Controls.Add(this.DISK_MediaStatus);
             this.disk_panel_3.Controls.Add(this.DISK_MediaLoaded_V);
             this.disk_panel_3.Dock = System.Windows.Forms.DockStyle.Top;
-            this.disk_panel_3.Location = new System.Drawing.Point(5, 599);
+            this.disk_panel_3.Location = new System.Drawing.Point(5, 628);
             this.disk_panel_3.Margin = new System.Windows.Forms.Padding(2, 1, 3, 1);
             this.disk_panel_3.Name = "disk_panel_3";
             this.disk_panel_3.Size = new System.Drawing.Size(794, 680);
@@ -6795,7 +6804,7 @@
             this.disk_panel_2.Controls.Add(this.DISK_Serial_V);
             this.disk_panel_2.Controls.Add(this.DISK_VolumeSerial);
             this.disk_panel_2.Dock = System.Windows.Forms.DockStyle.Top;
-            this.disk_panel_2.Location = new System.Drawing.Point(5, 97);
+            this.disk_panel_2.Location = new System.Drawing.Point(5, 126);
             this.disk_panel_2.Margin = new System.Windows.Forms.Padding(2, 1, 3, 1);
             this.disk_panel_2.Name = "disk_panel_2";
             this.disk_panel_2.Padding = new System.Windows.Forms.Padding(10);
@@ -6873,6 +6882,10 @@
             // 
             // DISK_PBar_BG
             // 
+            this.DISK_PBar_BG.BackColor = System.Drawing.Color.White;
+            this.DISK_PBar_BG.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.DISK_PBar_BG.BorderRadius = 4;
+            this.DISK_PBar_BG.BorderSize = 0;
             this.DISK_PBar_BG.Controls.Add(this.DISK_PBar_FE);
             this.DISK_PBar_BG.Dock = System.Windows.Forms.DockStyle.Right;
             this.DISK_PBar_BG.Location = new System.Drawing.Point(775, 10);
@@ -6883,6 +6896,9 @@
             // DISK_PBar_FE
             // 
             this.DISK_PBar_FE.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(103)))), ((int)(((byte)(192)))));
+            this.DISK_PBar_FE.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.DISK_PBar_FE.BorderRadius = 4;
+            this.DISK_PBar_FE.BorderSize = 0;
             this.DISK_PBar_FE.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.DISK_PBar_FE.Location = new System.Drawing.Point(0, 480);
             this.DISK_PBar_FE.Name = "DISK_PBar_FE";
@@ -7148,49 +7164,111 @@
             // disk_panel_1
             // 
             this.disk_panel_1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(235)))), ((int)(((byte)(235)))));
-            this.disk_panel_1.Controls.Add(this.DISK_TotalTLP);
+            this.disk_panel_1.Controls.Add(this.DISK_MainTLP);
             this.disk_panel_1.Controls.Add(this.DISK_TTLP_L1);
             this.disk_panel_1.Dock = System.Windows.Forms.DockStyle.Top;
             this.disk_panel_1.Location = new System.Drawing.Point(5, 4);
             this.disk_panel_1.Margin = new System.Windows.Forms.Padding(2, 1, 3, 1);
             this.disk_panel_1.Name = "disk_panel_1";
             this.disk_panel_1.Padding = new System.Windows.Forms.Padding(13, 5, 13, 12);
-            this.disk_panel_1.Size = new System.Drawing.Size(794, 91);
+            this.disk_panel_1.Size = new System.Drawing.Size(794, 120);
             this.disk_panel_1.TabIndex = 0;
             // 
-            // DISK_TotalTLP
+            // DISK_MainTLP
             // 
-            this.DISK_TotalTLP.BackColor = System.Drawing.Color.Transparent;
-            this.DISK_TotalTLP.ColumnCount = 4;
-            this.DISK_TotalTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.DISK_TotalTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.DISK_TotalTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.DISK_TotalTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.DISK_TotalTLP.Controls.Add(this.DISK_TTLP_Panel_4, 3, 0);
-            this.DISK_TotalTLP.Controls.Add(this.DISK_TTLP_Panel_3, 2, 0);
-            this.DISK_TotalTLP.Controls.Add(this.DISK_TTLP_Panel_2, 1, 0);
-            this.DISK_TotalTLP.Controls.Add(this.DISK_TTLP_Panel_1, 0, 0);
-            this.DISK_TotalTLP.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.DISK_TotalTLP.Location = new System.Drawing.Point(13, 46);
-            this.DISK_TotalTLP.Margin = new System.Windows.Forms.Padding(14, 3, 14, 3);
-            this.DISK_TotalTLP.Name = "DISK_TotalTLP";
-            this.DISK_TotalTLP.RowCount = 1;
-            this.DISK_TotalTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.DISK_TotalTLP.Size = new System.Drawing.Size(768, 33);
-            this.DISK_TotalTLP.TabIndex = 1;
+            this.DISK_MainTLP.ColumnCount = 2;
+            this.DISK_MainTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.DISK_MainTLP.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.DISK_MainTLP.Controls.Add(this.DISK_TTLP_Panel_1, 0, 0);
+            this.DISK_MainTLP.Controls.Add(this.DISK_TTLP_Panel_4, 1, 1);
+            this.DISK_MainTLP.Controls.Add(this.DISK_TTLP_Panel_2, 1, 0);
+            this.DISK_MainTLP.Controls.Add(this.DISK_TTLP_Panel_3, 0, 1);
+            this.DISK_MainTLP.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.DISK_MainTLP.Location = new System.Drawing.Point(13, 46);
+            this.DISK_MainTLP.Name = "DISK_MainTLP";
+            this.DISK_MainTLP.RowCount = 2;
+            this.DISK_MainTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.DISK_MainTLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.DISK_MainTLP.Size = new System.Drawing.Size(768, 62);
+            this.DISK_MainTLP.TabIndex = 4;
+            // 
+            // DISK_TTLP_Panel_1
+            // 
+            this.DISK_TTLP_Panel_1.BackColor = System.Drawing.Color.Transparent;
+            this.DISK_TTLP_Panel_1.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.DISK_TTLP_Panel_1.BorderRadius = 4;
+            this.DISK_TTLP_Panel_1.BorderSize = 0;
+            this.DISK_TTLP_Panel_1.Controls.Add(this.DISK_TTLP_P1_L2);
+            this.DISK_TTLP_Panel_1.Controls.Add(this.DISK_TTLP_P1_L1);
+            this.DISK_TTLP_Panel_1.Controls.Add(this.DISK_TLP_PB_1);
+            this.DISK_TTLP_Panel_1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.DISK_TTLP_Panel_1.Location = new System.Drawing.Point(1, 3);
+            this.DISK_TTLP_Panel_1.Margin = new System.Windows.Forms.Padding(1, 3, 1, 1);
+            this.DISK_TTLP_Panel_1.Name = "DISK_TTLP_Panel_1";
+            this.DISK_TTLP_Panel_1.Padding = new System.Windows.Forms.Padding(5);
+            this.DISK_TTLP_Panel_1.Size = new System.Drawing.Size(382, 27);
+            this.DISK_TTLP_Panel_1.TabIndex = 0;
+            // 
+            // DISK_TTLP_P1_L2
+            // 
+            this.DISK_TTLP_P1_L2.AutoSize = true;
+            this.DISK_TTLP_P1_L2.BackColor = System.Drawing.Color.Transparent;
+            this.DISK_TTLP_P1_L2.Dock = System.Windows.Forms.DockStyle.Left;
+            this.DISK_TTLP_P1_L2.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold);
+            this.DISK_TTLP_P1_L2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.DISK_TTLP_P1_L2.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.DISK_TTLP_P1_L2.Location = new System.Drawing.Point(95, 5);
+            this.DISK_TTLP_P1_L2.Margin = new System.Windows.Forms.Padding(3);
+            this.DISK_TTLP_P1_L2.Name = "DISK_TTLP_P1_L2";
+            this.DISK_TTLP_P1_L2.Padding = new System.Windows.Forms.Padding(1, 0, 0, 0);
+            this.DISK_TTLP_P1_L2.Size = new System.Drawing.Size(53, 17);
+            this.DISK_TTLP_P1_L2.TabIndex = 1;
+            this.DISK_TTLP_P1_L2.Text = "X Value";
+            this.DISK_TTLP_P1_L2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // DISK_TTLP_P1_L1
+            // 
+            this.DISK_TTLP_P1_L1.AutoSize = true;
+            this.DISK_TTLP_P1_L1.BackColor = System.Drawing.Color.Transparent;
+            this.DISK_TTLP_P1_L1.Dock = System.Windows.Forms.DockStyle.Left;
+            this.DISK_TTLP_P1_L1.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold);
+            this.DISK_TTLP_P1_L1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.DISK_TTLP_P1_L1.Location = new System.Drawing.Point(22, 5);
+            this.DISK_TTLP_P1_L1.Margin = new System.Windows.Forms.Padding(3);
+            this.DISK_TTLP_P1_L1.Name = "DISK_TTLP_P1_L1";
+            this.DISK_TTLP_P1_L1.Padding = new System.Windows.Forms.Padding(2, 0, 0, 0);
+            this.DISK_TTLP_P1_L1.Size = new System.Drawing.Size(73, 17);
+            this.DISK_TTLP_P1_L1.TabIndex = 0;
+            this.DISK_TTLP_P1_L1.Text = "SSD Sayısı:";
+            this.DISK_TTLP_P1_L1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // DISK_TLP_PB_1
+            // 
+            this.DISK_TLP_PB_1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.DISK_TLP_PB_1.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.DISK_TLP_PB_1.BorderRadius = 5;
+            this.DISK_TLP_PB_1.BorderSize = 0;
+            this.DISK_TLP_PB_1.Dock = System.Windows.Forms.DockStyle.Left;
+            this.DISK_TLP_PB_1.Location = new System.Drawing.Point(5, 5);
+            this.DISK_TLP_PB_1.Name = "DISK_TLP_PB_1";
+            this.DISK_TLP_PB_1.Size = new System.Drawing.Size(17, 17);
+            this.DISK_TLP_PB_1.TabIndex = 2;
             // 
             // DISK_TTLP_Panel_4
             // 
             this.DISK_TTLP_Panel_4.BackColor = System.Drawing.Color.Transparent;
+            this.DISK_TTLP_Panel_4.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.DISK_TTLP_Panel_4.BorderRadius = 4;
+            this.DISK_TTLP_Panel_4.BorderSize = 0;
             this.DISK_TTLP_Panel_4.Controls.Add(this.DISK_TTLP_P4_L2);
             this.DISK_TTLP_Panel_4.Controls.Add(this.DISK_TTLP_P4_L1);
             this.DISK_TTLP_Panel_4.Controls.Add(this.DISK_TLP_PB_4);
             this.DISK_TTLP_Panel_4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.DISK_TTLP_Panel_4.Location = new System.Drawing.Point(577, 3);
-            this.DISK_TTLP_Panel_4.Margin = new System.Windows.Forms.Padding(1, 3, 1, 3);
+            this.DISK_TTLP_Panel_4.Location = new System.Drawing.Point(385, 32);
+            this.DISK_TTLP_Panel_4.Margin = new System.Windows.Forms.Padding(1, 1, 1, 3);
             this.DISK_TTLP_Panel_4.Name = "DISK_TTLP_Panel_4";
             this.DISK_TTLP_Panel_4.Padding = new System.Windows.Forms.Padding(5);
-            this.DISK_TTLP_Panel_4.Size = new System.Drawing.Size(190, 27);
+            this.DISK_TTLP_Panel_4.Size = new System.Drawing.Size(382, 27);
             this.DISK_TTLP_Panel_4.TabIndex = 3;
             // 
             // DISK_TTLP_P4_L2
@@ -7238,77 +7316,21 @@
             this.DISK_TLP_PB_4.Size = new System.Drawing.Size(17, 17);
             this.DISK_TLP_PB_4.TabIndex = 5;
             // 
-            // DISK_TTLP_Panel_3
-            // 
-            this.DISK_TTLP_Panel_3.BackColor = System.Drawing.Color.Transparent;
-            this.DISK_TTLP_Panel_3.Controls.Add(this.DISK_TTLP_P3_L2);
-            this.DISK_TTLP_Panel_3.Controls.Add(this.DISK_TTLP_P3_L1);
-            this.DISK_TTLP_Panel_3.Controls.Add(this.DISK_TLP_PB_3);
-            this.DISK_TTLP_Panel_3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.DISK_TTLP_Panel_3.Location = new System.Drawing.Point(385, 3);
-            this.DISK_TTLP_Panel_3.Margin = new System.Windows.Forms.Padding(1, 3, 1, 3);
-            this.DISK_TTLP_Panel_3.Name = "DISK_TTLP_Panel_3";
-            this.DISK_TTLP_Panel_3.Padding = new System.Windows.Forms.Padding(5);
-            this.DISK_TTLP_Panel_3.Size = new System.Drawing.Size(190, 27);
-            this.DISK_TTLP_Panel_3.TabIndex = 2;
-            // 
-            // DISK_TTLP_P3_L2
-            // 
-            this.DISK_TTLP_P3_L2.AutoSize = true;
-            this.DISK_TTLP_P3_L2.BackColor = System.Drawing.Color.Transparent;
-            this.DISK_TTLP_P3_L2.Dock = System.Windows.Forms.DockStyle.Left;
-            this.DISK_TTLP_P3_L2.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold);
-            this.DISK_TTLP_P3_L2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
-            this.DISK_TTLP_P3_L2.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.DISK_TTLP_P3_L2.Location = new System.Drawing.Point(96, 5);
-            this.DISK_TTLP_P3_L2.Margin = new System.Windows.Forms.Padding(3);
-            this.DISK_TTLP_P3_L2.Name = "DISK_TTLP_P3_L2";
-            this.DISK_TTLP_P3_L2.Padding = new System.Windows.Forms.Padding(1, 0, 0, 0);
-            this.DISK_TTLP_P3_L2.Size = new System.Drawing.Size(53, 17);
-            this.DISK_TTLP_P3_L2.TabIndex = 1;
-            this.DISK_TTLP_P3_L2.Text = "X Value";
-            this.DISK_TTLP_P3_L2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // DISK_TTLP_P3_L1
-            // 
-            this.DISK_TTLP_P3_L1.AutoSize = true;
-            this.DISK_TTLP_P3_L1.BackColor = System.Drawing.Color.Transparent;
-            this.DISK_TTLP_P3_L1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.DISK_TTLP_P3_L1.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold);
-            this.DISK_TTLP_P3_L1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.DISK_TTLP_P3_L1.Location = new System.Drawing.Point(22, 5);
-            this.DISK_TTLP_P3_L1.Margin = new System.Windows.Forms.Padding(3);
-            this.DISK_TTLP_P3_L1.Name = "DISK_TTLP_P3_L1";
-            this.DISK_TTLP_P3_L1.Padding = new System.Windows.Forms.Padding(2, 0, 0, 0);
-            this.DISK_TTLP_P3_L1.Size = new System.Drawing.Size(74, 17);
-            this.DISK_TTLP_P3_L1.TabIndex = 0;
-            this.DISK_TTLP_P3_L1.Text = "USB Sayısı:";
-            this.DISK_TTLP_P3_L1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // DISK_TLP_PB_3
-            // 
-            this.DISK_TLP_PB_3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
-            this.DISK_TLP_PB_3.BorderColor = System.Drawing.Color.DodgerBlue;
-            this.DISK_TLP_PB_3.BorderRadius = 5;
-            this.DISK_TLP_PB_3.BorderSize = 0;
-            this.DISK_TLP_PB_3.Dock = System.Windows.Forms.DockStyle.Left;
-            this.DISK_TLP_PB_3.Location = new System.Drawing.Point(5, 5);
-            this.DISK_TLP_PB_3.Name = "DISK_TLP_PB_3";
-            this.DISK_TLP_PB_3.Size = new System.Drawing.Size(17, 17);
-            this.DISK_TLP_PB_3.TabIndex = 4;
-            // 
             // DISK_TTLP_Panel_2
             // 
             this.DISK_TTLP_Panel_2.BackColor = System.Drawing.Color.Transparent;
+            this.DISK_TTLP_Panel_2.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.DISK_TTLP_Panel_2.BorderRadius = 4;
+            this.DISK_TTLP_Panel_2.BorderSize = 0;
             this.DISK_TTLP_Panel_2.Controls.Add(this.DISK_TTLP_P2_L2);
             this.DISK_TTLP_Panel_2.Controls.Add(this.DISK_TTLP_P2_L1);
             this.DISK_TTLP_Panel_2.Controls.Add(this.DISK_TLP_PB_2);
             this.DISK_TTLP_Panel_2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.DISK_TTLP_Panel_2.Location = new System.Drawing.Point(193, 3);
-            this.DISK_TTLP_Panel_2.Margin = new System.Windows.Forms.Padding(1, 3, 1, 3);
+            this.DISK_TTLP_Panel_2.Location = new System.Drawing.Point(385, 3);
+            this.DISK_TTLP_Panel_2.Margin = new System.Windows.Forms.Padding(1, 3, 1, 1);
             this.DISK_TTLP_Panel_2.Name = "DISK_TTLP_Panel_2";
             this.DISK_TTLP_Panel_2.Padding = new System.Windows.Forms.Padding(5);
-            this.DISK_TTLP_Panel_2.Size = new System.Drawing.Size(190, 27);
+            this.DISK_TTLP_Panel_2.Size = new System.Drawing.Size(382, 27);
             this.DISK_TTLP_Panel_2.TabIndex = 1;
             // 
             // DISK_TTLP_P2_L2
@@ -7356,64 +7378,67 @@
             this.DISK_TLP_PB_2.Size = new System.Drawing.Size(17, 17);
             this.DISK_TLP_PB_2.TabIndex = 3;
             // 
-            // DISK_TTLP_Panel_1
+            // DISK_TTLP_Panel_3
             // 
-            this.DISK_TTLP_Panel_1.BackColor = System.Drawing.Color.Transparent;
-            this.DISK_TTLP_Panel_1.Controls.Add(this.DISK_TTLP_P1_L2);
-            this.DISK_TTLP_Panel_1.Controls.Add(this.DISK_TTLP_P1_L1);
-            this.DISK_TTLP_Panel_1.Controls.Add(this.DISK_TLP_PB_1);
-            this.DISK_TTLP_Panel_1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.DISK_TTLP_Panel_1.Location = new System.Drawing.Point(1, 3);
-            this.DISK_TTLP_Panel_1.Margin = new System.Windows.Forms.Padding(1, 3, 1, 3);
-            this.DISK_TTLP_Panel_1.Name = "DISK_TTLP_Panel_1";
-            this.DISK_TTLP_Panel_1.Padding = new System.Windows.Forms.Padding(5);
-            this.DISK_TTLP_Panel_1.Size = new System.Drawing.Size(190, 27);
-            this.DISK_TTLP_Panel_1.TabIndex = 0;
+            this.DISK_TTLP_Panel_3.BackColor = System.Drawing.Color.Transparent;
+            this.DISK_TTLP_Panel_3.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.DISK_TTLP_Panel_3.BorderRadius = 4;
+            this.DISK_TTLP_Panel_3.BorderSize = 0;
+            this.DISK_TTLP_Panel_3.Controls.Add(this.DISK_TTLP_P3_L2);
+            this.DISK_TTLP_Panel_3.Controls.Add(this.DISK_TTLP_P3_L1);
+            this.DISK_TTLP_Panel_3.Controls.Add(this.DISK_TLP_PB_3);
+            this.DISK_TTLP_Panel_3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.DISK_TTLP_Panel_3.Location = new System.Drawing.Point(1, 32);
+            this.DISK_TTLP_Panel_3.Margin = new System.Windows.Forms.Padding(1, 1, 1, 3);
+            this.DISK_TTLP_Panel_3.Name = "DISK_TTLP_Panel_3";
+            this.DISK_TTLP_Panel_3.Padding = new System.Windows.Forms.Padding(5);
+            this.DISK_TTLP_Panel_3.Size = new System.Drawing.Size(382, 27);
+            this.DISK_TTLP_Panel_3.TabIndex = 2;
             // 
-            // DISK_TTLP_P1_L2
+            // DISK_TTLP_P3_L2
             // 
-            this.DISK_TTLP_P1_L2.AutoSize = true;
-            this.DISK_TTLP_P1_L2.BackColor = System.Drawing.Color.Transparent;
-            this.DISK_TTLP_P1_L2.Dock = System.Windows.Forms.DockStyle.Left;
-            this.DISK_TTLP_P1_L2.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold);
-            this.DISK_TTLP_P1_L2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
-            this.DISK_TTLP_P1_L2.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.DISK_TTLP_P1_L2.Location = new System.Drawing.Point(95, 5);
-            this.DISK_TTLP_P1_L2.Margin = new System.Windows.Forms.Padding(3);
-            this.DISK_TTLP_P1_L2.Name = "DISK_TTLP_P1_L2";
-            this.DISK_TTLP_P1_L2.Padding = new System.Windows.Forms.Padding(1, 0, 0, 0);
-            this.DISK_TTLP_P1_L2.Size = new System.Drawing.Size(53, 17);
-            this.DISK_TTLP_P1_L2.TabIndex = 1;
-            this.DISK_TTLP_P1_L2.Text = "X Value";
-            this.DISK_TTLP_P1_L2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.DISK_TTLP_P3_L2.AutoSize = true;
+            this.DISK_TTLP_P3_L2.BackColor = System.Drawing.Color.Transparent;
+            this.DISK_TTLP_P3_L2.Dock = System.Windows.Forms.DockStyle.Left;
+            this.DISK_TTLP_P3_L2.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold);
+            this.DISK_TTLP_P3_L2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.DISK_TTLP_P3_L2.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.DISK_TTLP_P3_L2.Location = new System.Drawing.Point(96, 5);
+            this.DISK_TTLP_P3_L2.Margin = new System.Windows.Forms.Padding(3);
+            this.DISK_TTLP_P3_L2.Name = "DISK_TTLP_P3_L2";
+            this.DISK_TTLP_P3_L2.Padding = new System.Windows.Forms.Padding(1, 0, 0, 0);
+            this.DISK_TTLP_P3_L2.Size = new System.Drawing.Size(53, 17);
+            this.DISK_TTLP_P3_L2.TabIndex = 1;
+            this.DISK_TTLP_P3_L2.Text = "X Value";
+            this.DISK_TTLP_P3_L2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // DISK_TTLP_P1_L1
+            // DISK_TTLP_P3_L1
             // 
-            this.DISK_TTLP_P1_L1.AutoSize = true;
-            this.DISK_TTLP_P1_L1.BackColor = System.Drawing.Color.Transparent;
-            this.DISK_TTLP_P1_L1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.DISK_TTLP_P1_L1.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold);
-            this.DISK_TTLP_P1_L1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.DISK_TTLP_P1_L1.Location = new System.Drawing.Point(22, 5);
-            this.DISK_TTLP_P1_L1.Margin = new System.Windows.Forms.Padding(3);
-            this.DISK_TTLP_P1_L1.Name = "DISK_TTLP_P1_L1";
-            this.DISK_TTLP_P1_L1.Padding = new System.Windows.Forms.Padding(2, 0, 0, 0);
-            this.DISK_TTLP_P1_L1.Size = new System.Drawing.Size(73, 17);
-            this.DISK_TTLP_P1_L1.TabIndex = 0;
-            this.DISK_TTLP_P1_L1.Text = "SSD Sayısı:";
-            this.DISK_TTLP_P1_L1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.DISK_TTLP_P3_L1.AutoSize = true;
+            this.DISK_TTLP_P3_L1.BackColor = System.Drawing.Color.Transparent;
+            this.DISK_TTLP_P3_L1.Dock = System.Windows.Forms.DockStyle.Left;
+            this.DISK_TTLP_P3_L1.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold);
+            this.DISK_TTLP_P3_L1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.DISK_TTLP_P3_L1.Location = new System.Drawing.Point(22, 5);
+            this.DISK_TTLP_P3_L1.Margin = new System.Windows.Forms.Padding(3);
+            this.DISK_TTLP_P3_L1.Name = "DISK_TTLP_P3_L1";
+            this.DISK_TTLP_P3_L1.Padding = new System.Windows.Forms.Padding(2, 0, 0, 0);
+            this.DISK_TTLP_P3_L1.Size = new System.Drawing.Size(74, 17);
+            this.DISK_TTLP_P3_L1.TabIndex = 0;
+            this.DISK_TTLP_P3_L1.Text = "USB Sayısı:";
+            this.DISK_TTLP_P3_L1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // DISK_TLP_PB_1
+            // DISK_TLP_PB_3
             // 
-            this.DISK_TLP_PB_1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
-            this.DISK_TLP_PB_1.BorderColor = System.Drawing.Color.DodgerBlue;
-            this.DISK_TLP_PB_1.BorderRadius = 5;
-            this.DISK_TLP_PB_1.BorderSize = 0;
-            this.DISK_TLP_PB_1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.DISK_TLP_PB_1.Location = new System.Drawing.Point(5, 5);
-            this.DISK_TLP_PB_1.Name = "DISK_TLP_PB_1";
-            this.DISK_TLP_PB_1.Size = new System.Drawing.Size(17, 17);
-            this.DISK_TLP_PB_1.TabIndex = 2;
+            this.DISK_TLP_PB_3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.DISK_TLP_PB_3.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.DISK_TLP_PB_3.BorderRadius = 5;
+            this.DISK_TLP_PB_3.BorderSize = 0;
+            this.DISK_TLP_PB_3.Dock = System.Windows.Forms.DockStyle.Left;
+            this.DISK_TLP_PB_3.Location = new System.Drawing.Point(5, 5);
+            this.DISK_TLP_PB_3.Name = "DISK_TLP_PB_3";
+            this.DISK_TLP_PB_3.Size = new System.Drawing.Size(17, 17);
+            this.DISK_TLP_PB_3.TabIndex = 4;
             // 
             // DISK_TTLP_L1
             // 
@@ -8150,6 +8175,9 @@
             // NET_LT_P2
             // 
             this.NET_LT_P2.BackColor = System.Drawing.Color.Transparent;
+            this.NET_LT_P2.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.NET_LT_P2.BorderRadius = 4;
+            this.NET_LT_P2.BorderSize = 0;
             this.NET_LT_P2.Controls.Add(this.NET_LT_UL2);
             this.NET_LT_P2.Controls.Add(this.NET_LT_UL1);
             this.NET_LT_P2.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -8195,6 +8223,9 @@
             // NET_LT_P1
             // 
             this.NET_LT_P1.BackColor = System.Drawing.Color.Transparent;
+            this.NET_LT_P1.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.NET_LT_P1.BorderRadius = 4;
+            this.NET_LT_P1.BorderSize = 0;
             this.NET_LT_P1.Controls.Add(this.NET_LT_DL2);
             this.NET_LT_P1.Controls.Add(this.NET_LT_DL1);
             this.NET_LT_P1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -9332,6 +9363,10 @@
             // 
             // BATTERY_PBG_Panel
             // 
+            this.BATTERY_PBG_Panel.BackColor = System.Drawing.Color.White;
+            this.BATTERY_PBG_Panel.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.BATTERY_PBG_Panel.BorderRadius = 4;
+            this.BATTERY_PBG_Panel.BorderSize = 0;
             this.BATTERY_PBG_Panel.Controls.Add(this.BATTERY_PFE_Panel);
             this.BATTERY_PBG_Panel.Dock = System.Windows.Forms.DockStyle.Right;
             this.BATTERY_PBG_Panel.Location = new System.Drawing.Point(775, 10);
@@ -9342,6 +9377,9 @@
             // BATTERY_PFE_Panel
             // 
             this.BATTERY_PFE_Panel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(95)))), ((int)(((byte)(146)))));
+            this.BATTERY_PFE_Panel.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.BATTERY_PFE_Panel.BorderRadius = 4;
+            this.BATTERY_PFE_Panel.BorderSize = 0;
             this.BATTERY_PFE_Panel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.BATTERY_PFE_Panel.Location = new System.Drawing.Point(0, 257);
             this.BATTERY_PFE_Panel.Name = "BATTERY_PFE_Panel";
@@ -10415,6 +10453,7 @@
             this.EXPORT_CB_FLP.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.EXPORT_CB_FLP.BackColor = System.Drawing.Color.White;
+            this.EXPORT_CB_FLP.BorderRadius = 7;
             this.EXPORT_CB_FLP.Controls.Add(this.EXPORT_CB_OS);
             this.EXPORT_CB_FLP.Controls.Add(this.EXPORT_CB_MB);
             this.EXPORT_CB_FLP.Controls.Add(this.EXPORT_CB_CPU);
@@ -10801,6 +10840,10 @@
             // 
             // EXPORT_ProgressBGPanel
             // 
+            this.EXPORT_ProgressBGPanel.BackColor = System.Drawing.Color.White;
+            this.EXPORT_ProgressBGPanel.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.EXPORT_ProgressBGPanel.BorderRadius = 4;
+            this.EXPORT_ProgressBGPanel.BorderSize = 0;
             this.EXPORT_ProgressBGPanel.Controls.Add(this.EXPORT_ProgressFEPanel);
             this.EXPORT_ProgressBGPanel.Location = new System.Drawing.Point(10, 137);
             this.EXPORT_ProgressBGPanel.Margin = new System.Windows.Forms.Padding(3, 3, 3, 10);
@@ -10812,6 +10855,9 @@
             // EXPORT_ProgressFEPanel
             // 
             this.EXPORT_ProgressFEPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(95)))), ((int)(((byte)(146)))));
+            this.EXPORT_ProgressFEPanel.BorderColor = System.Drawing.Color.DodgerBlue;
+            this.EXPORT_ProgressFEPanel.BorderRadius = 4;
+            this.EXPORT_ProgressFEPanel.BorderSize = 0;
             this.EXPORT_ProgressFEPanel.Dock = System.Windows.Forms.DockStyle.Left;
             this.EXPORT_ProgressFEPanel.Location = new System.Drawing.Point(0, 0);
             this.EXPORT_ProgressFEPanel.Name = "EXPORT_ProgressFEPanel";
@@ -10854,7 +10900,7 @@
             this.print_panel_2.Location = new System.Drawing.Point(5, 236);
             this.print_panel_2.Margin = new System.Windows.Forms.Padding(2, 1, 3, 1);
             this.print_panel_2.Name = "print_panel_2";
-            this.print_panel_2.Padding = new System.Windows.Forms.Padding(12);
+            this.print_panel_2.Padding = new System.Windows.Forms.Padding(10, 12, 10, 12);
             this.print_panel_2.Size = new System.Drawing.Size(811, 251);
             this.print_panel_2.TabIndex = 1;
             // 
@@ -10888,14 +10934,15 @@
             // EXPORT_DonateLabel
             // 
             this.EXPORT_DonateLabel.BackColor = System.Drawing.Color.White;
+            this.EXPORT_DonateLabel.BorderRadius = 7;
             this.EXPORT_DonateLabel.Dock = System.Windows.Forms.DockStyle.Top;
             this.EXPORT_DonateLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
             this.EXPORT_DonateLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.EXPORT_DonateLabel.Location = new System.Drawing.Point(12, 12);
+            this.EXPORT_DonateLabel.Location = new System.Drawing.Point(10, 12);
             this.EXPORT_DonateLabel.Margin = new System.Windows.Forms.Padding(3, 3, 3, 15);
             this.EXPORT_DonateLabel.Name = "EXPORT_DonateLabel";
-            this.EXPORT_DonateLabel.Padding = new System.Windows.Forms.Padding(10);
-            this.EXPORT_DonateLabel.Size = new System.Drawing.Size(787, 161);
+            this.EXPORT_DonateLabel.Padding = new System.Windows.Forms.Padding(12);
+            this.EXPORT_DonateLabel.Size = new System.Drawing.Size(791, 161);
             this.EXPORT_DonateLabel.TabIndex = 0;
             this.EXPORT_DonateLabel.Text = "N/A Support Text";
             this.EXPORT_DonateLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -11044,15 +11091,15 @@
             this.DISK_PBar_BG.ResumeLayout(false);
             this.disk_panel_1.ResumeLayout(false);
             this.disk_panel_1.PerformLayout();
-            this.DISK_TotalTLP.ResumeLayout(false);
-            this.DISK_TTLP_Panel_4.ResumeLayout(false);
-            this.DISK_TTLP_Panel_4.PerformLayout();
-            this.DISK_TTLP_Panel_3.ResumeLayout(false);
-            this.DISK_TTLP_Panel_3.PerformLayout();
-            this.DISK_TTLP_Panel_2.ResumeLayout(false);
-            this.DISK_TTLP_Panel_2.PerformLayout();
+            this.DISK_MainTLP.ResumeLayout(false);
             this.DISK_TTLP_Panel_1.ResumeLayout(false);
             this.DISK_TTLP_Panel_1.PerformLayout();
+            this.DISK_TTLP_Panel_4.ResumeLayout(false);
+            this.DISK_TTLP_Panel_4.PerformLayout();
+            this.DISK_TTLP_Panel_2.ResumeLayout(false);
+            this.DISK_TTLP_Panel_2.PerformLayout();
+            this.DISK_TTLP_Panel_3.ResumeLayout(false);
+            this.DISK_TTLP_Panel_3.PerformLayout();
             this.NETWORK.ResumeLayout(false);
             this.NETWORK.PerformLayout();
             this.NET_TLP.ResumeLayout(false);
@@ -11482,11 +11529,10 @@
         internal System.Windows.Forms.Label USB_ConMan_V;
         private System.Windows.Forms.Panel disk_panel_1;
         internal System.Windows.Forms.Label DISK_TTLP_L1;
-        private System.Windows.Forms.TableLayoutPanel DISK_TotalTLP;
-        private System.Windows.Forms.Panel DISK_TTLP_Panel_4;
-        private System.Windows.Forms.Panel DISK_TTLP_Panel_3;
-        private System.Windows.Forms.Panel DISK_TTLP_Panel_2;
-        private System.Windows.Forms.Panel DISK_TTLP_Panel_1;
+        private TSCustomPanel DISK_TTLP_Panel_4;
+        private TSCustomPanel DISK_TTLP_Panel_3;
+        private TSCustomPanel DISK_TTLP_Panel_2;
+        private TSCustomPanel DISK_TTLP_Panel_1;
         internal System.Windows.Forms.Label DISK_TTLP_P1_L1;
         internal System.Windows.Forms.Label DISK_TTLP_P1_L2;
         internal System.Windows.Forms.Label DISK_TTLP_P4_L2;
@@ -11507,8 +11553,8 @@
         internal System.Windows.Forms.Label NET_LT_Device;
         internal System.Windows.Forms.Label NET_LT_Device_V;
         private System.Windows.Forms.TableLayoutPanel NET_LT_TLP;
-        private System.Windows.Forms.Panel NET_LT_P2;
-        private System.Windows.Forms.Panel NET_LT_P1;
+        private TSCustomPanel NET_LT_P2;
+        private TSCustomPanel NET_LT_P1;
         internal System.Windows.Forms.Panel network_panel_1;
         internal System.Windows.Forms.Label NET_Physical_V;
         internal System.Windows.Forms.Label NET_Physical;
@@ -11546,8 +11592,8 @@
         internal System.Windows.Forms.Label CPU_Usage_V;
         private System.Windows.Forms.Button PRINT_RotateBtn;
         private System.Windows.Forms.TabPage EXPORT;
-        private System.Windows.Forms.Panel BATTERY_PBG_Panel;
-        private System.Windows.Forms.Panel BATTERY_PFE_Panel;
+        private TSCustomPanel BATTERY_PBG_Panel;
+        private TSCustomPanel BATTERY_PFE_Panel;
         internal System.Windows.Forms.Label BATTERY_ProgressLabel;
         internal System.Windows.Forms.Label GPU_CurrentColor;
         internal System.Windows.Forms.Label GPU_CurrentColor_V;
@@ -11555,13 +11601,13 @@
         internal System.Windows.Forms.Label GPU_ScreenBit_V;
         internal System.Windows.Forms.Label OS_NETFrameworkVersion;
         internal System.Windows.Forms.Label OS_NETFrameworkVersion_V;
-        private System.Windows.Forms.Panel RAM_ProgressBGPanel;
-        private System.Windows.Forms.Panel RAM_ProgressFEPanel;
+        private TSCustomPanel RAM_ProgressBGPanel;
+        private TSCustomPanel RAM_ProgressFEPanel;
         internal System.Windows.Forms.Label RAM_ProgressLabel;
         private System.Windows.Forms.TableLayoutPanel EXPORT_TLP;
         private System.Windows.Forms.Panel print_panel_1;
-        private System.Windows.Forms.Panel EXPORT_ProgressBGPanel;
-        private System.Windows.Forms.Panel EXPORT_ProgressFEPanel;
+        private TSCustomPanel EXPORT_ProgressBGPanel;
+        private TSCustomPanel EXPORT_ProgressFEPanel;
         internal System.Windows.Forms.Label EXPORT_Selector;
         internal System.Windows.Forms.Label EXPORT_ProgessLabel;
         internal System.Windows.Forms.Label NET_LT_DL2;
@@ -11595,8 +11641,8 @@
         internal System.Windows.Forms.Label OS_WinDefCoreIsolation_V;
         internal System.Windows.Forms.Label NET_LT_BandWidth;
         internal System.Windows.Forms.Label NET_LT_BandWidth_V;
-        private System.Windows.Forms.Panel DISK_PBar_BG;
-        private System.Windows.Forms.Panel DISK_PBar_FE;
+        private TSCustomPanel DISK_PBar_BG;
+        private TSCustomPanel DISK_PBar_FE;
         private System.Windows.Forms.ToolStripMenuItem donateToolStripMenuItem;
         private System.Windows.Forms.Button INSTALLED_RotateBtn;
         private System.Windows.Forms.TabPage INSTAPPS;
@@ -11648,7 +11694,7 @@
         internal System.Windows.Forms.Label OS_MSOfficeVersion_V;
         private System.Windows.Forms.Panel print_panel_2;
         private TSCustomButton EXPORT_Donate;
-        internal System.Windows.Forms.Label EXPORT_DonateLabel;
+        internal TSCustomLabel EXPORT_DonateLabel;
         private System.Windows.Forms.ToolStripMenuItem screenOverlayTool;
         private System.Windows.Forms.ToolStripMenuItem systemThemeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem monitorStuckPixelFixerTool;
@@ -11765,7 +11811,7 @@
         private TSCustomButton MB_BIOSOpenBtn;
         internal System.Windows.Forms.Label OS_WinLicenseTime;
         internal System.Windows.Forms.Label OS_WinLicenseTime_V;
-        private System.Windows.Forms.FlowLayoutPanel EXPORT_CB_FLP;
+        private TSCustomFLP EXPORT_CB_FLP;
         private TSCustomCheckBox EXPORT_CB_OS;
         private TSCustomCheckBox EXPORT_CB_MB;
         private TSCustomCheckBox EXPORT_CB_CPU;
@@ -11800,6 +11846,7 @@
         internal System.Windows.Forms.Label NET_P_IP_Adress;
         internal System.Windows.Forms.Label NET_P_ISP;
         internal System.Windows.Forms.Label NET_P_IP_Adress_V;
+        private System.Windows.Forms.TableLayoutPanel DISK_MainTLP;
     }
 }
 

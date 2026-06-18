@@ -186,7 +186,9 @@ namespace Glow.glow_tools{
                     Filter = software_lang.TSReadLangs("ShowWiFiPasswordTool", "swpt_save_txt") + " (*.txt)|*.txt"
                 }){
                     if (saveDlg.ShowDialog() == DialogResult.OK){
-                        File.WriteAllText(saveDlg.FileName, string.Join(Environment.NewLine, PrintWiFiList));
+                        string content = string.Join(Environment.NewLine, PrintWiFiList);
+                        content = content.TrimEnd(Environment.NewLine.ToCharArray());
+                        File.WriteAllText(saveDlg.FileName, content);
                         var res = TS_MessageBoxEngine.TS_MessageBox(this, 5, string.Format(software_lang.TSReadLangs("ShowWiFiPasswordTool", "swpt_save_success") + Environment.NewLine + Environment.NewLine + software_lang.TSReadLangs("ShowWiFiPasswordTool", "swpt_save_info_open"), Application.ProductName, saveDlg.FileName));
                         if (res == DialogResult.Yes)
                             Process.Start(saveDlg.FileName);

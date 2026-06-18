@@ -117,7 +117,7 @@ namespace Glow{
                 m_form.Activate();
             }
         }
-        // TS LOGGER - IMPROVED VERSION
+        // TS LOGGER - IMPROVED VERSION - V2
         // ======================================================================================================
         public static class TSLogger{
             private static readonly object _lock = new object();
@@ -126,7 +126,10 @@ namespace Glow{
             private static string _currentLogFile;
             private static readonly string _logDir;
             private static StreamWriter _writer;
+            private static bool _isClosed = false;
+            private static bool _isUnlocked = false;
             public static string LogDirectory => _logDir;
+            public static bool IsClosed => _isClosed;
             public static string CurrentLogFile{
                 get { lock (_lock) { return _currentLogFile; } }
             }
@@ -135,10 +138,12 @@ namespace Glow{
                 try{
                     AppDomain.CurrentDomain.ProcessExit += (_, __) => CloseWriter_NoThrow();
                     AppDomain.CurrentDomain.DomainUnload += (_, __) => CloseWriter_NoThrow();
-                }catch { }
+                }catch{ }
             }
             public static void Enable(bool fileEnabled, bool consoleEnabled){
                 lock (_lock){
+                    _isClosed = false;
+                    _isUnlocked = false;
                     _fileEnabled = fileEnabled;
                     _consoleEnabled = consoleEnabled;
                     CloseWriter_NoThrow();
@@ -146,28 +151,44 @@ namespace Glow{
                         _currentLogFile = null;
                         return;
                     }
-                    InitializeInternal_NoThrow();
+                    InitializeInternal_NoThrow(false);
+                }
+            }
+            public static void UnlockFile(){
+                lock (_lock){
+                    if (string.IsNullOrEmpty(_currentLogFile))
+                        return;
+                    CloseWriter_NoThrow();
+                    _isUnlocked = true;
+                    if (_consoleEnabled){
+                        Console.WriteLine($"[DEBUG] TSLogger: File unlocked - {_currentLogFile}");
+                    }
                 }
             }
             public static void Close(){
                 lock (_lock){
+                    _isClosed = true;
+                    _isUnlocked = false;
+                    _fileEnabled = false;
+                    _consoleEnabled = false;
                     CloseWriter_NoThrow();
+                    _currentLogFile = null;
                 }
             }
             public static void Log(string message){
                 lock (_lock){
-                    if (!_fileEnabled && !_consoleEnabled)
+                    if (_isClosed || (!_fileEnabled && !_consoleEnabled))
                         return;
-
                     Write_NoLock(message);
                 }
             }
             public static void Log(Exception ex){
-                if (ex == null)
+                if (ex == null || _isClosed)
                     return;
                 Log(ex.ToString());
             }
-            private static void InitializeInternal_NoThrow(){
+            private static void InitializeInternal_NoThrow(bool keepUnlocked = true){
+                if (_isClosed) return;
                 try{
                     if (!Directory.Exists(_logDir)){
                         Directory.CreateDirectory(_logDir);
@@ -185,6 +206,9 @@ namespace Glow{
                             _writer = new StreamWriter(fs, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false)){
                                 AutoFlush = true
                             };
+                            if (!keepUnlocked){
+                                _isUnlocked = false;
+                            }
                             return;
                         }catch (IOException){
                             fs?.Dispose();
@@ -206,16 +230,38 @@ namespace Glow{
                     }
                 }
             }
+            private static void EnsureWriterOpen(){
+                if (_writer != null)
+                    return;
+                if (_isUnlocked && !string.IsNullOrEmpty(_currentLogFile)){
+                    if (File.Exists(_currentLogFile)){
+                        try{
+                            var fs = new FileStream(_currentLogFile, FileMode.Append, FileAccess.Write, FileShare.Read);
+                            _writer = new StreamWriter(fs, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false)){
+                                AutoFlush = true
+                            };
+                            return;
+                        }catch{ }
+                    }else{
+                        if (_consoleEnabled){
+                            Console.WriteLine($"[DEBUG] TSLogger: Log file was deleted, creating new one.");
+                        }
+                    }
+                }
+                InitializeInternal_NoThrow(true);
+            }
             private static void CloseWriter_NoThrow(){
                 try{
                     if (_writer != null){
                         _writer.Flush();
                         _writer.Dispose();
                     }
-                }catch (ObjectDisposedException){ }catch{ }
+                }catch (ObjectDisposedException){ }
+                catch{ }
                 _writer = null;
             }
             private static void Write_NoLock(string text){
+                if (_isClosed) return;
                 if (text == null)
                     text = "";
                 string[] lines = SplitLines(text);
@@ -228,19 +274,41 @@ namespace Glow{
                     }
                 }
                 if (_fileEnabled){
+                    EnsureWriterOpen();
                     if (_writer == null){
-                        InitializeInternal_NoThrow();
+                        if (_consoleEnabled){
+                            Console.WriteLine("[DEBUG] TSLogger: Failed to open writer.");
+                        }
+                        return;
                     }
-                    if (_writer != null){
-                        try{
-                            for (int i = 0; i < lines.Length; i++){
-                                _writer.WriteLine(prefix + lines[i]);
-                            }
-                        }catch (ObjectDisposedException){
-                            _writer = null;
-                        }catch (IOException){
+                    try{
+                        for (int i = 0; i < lines.Length; i++){
+                            _writer.WriteLine(prefix + lines[i]);
+                        }
+                        if (_isUnlocked){
+                            _writer.Flush();
+                            _writer.Dispose();
                             _writer = null;
                         }
+                    }catch (ObjectDisposedException){
+                        _writer = null;
+                        EnsureWriterOpen();
+                        if (_writer != null){
+                            try{
+                                for (int i = 0; i < lines.Length; i++){
+                                    _writer.WriteLine(prefix + lines[i]);
+                                }
+                                if (_isUnlocked){
+                                    _writer.Flush();
+                                    _writer.Dispose();
+                                    _writer = null;
+                                }
+                            }catch{
+                                _writer = null;
+                            }
+                        }
+                    }catch (IOException){
+                        _writer = null;
                     }
                 }
             }
@@ -256,11 +324,12 @@ namespace Glow{
                 return Array.Empty<string>();
             }
         }
-        // TS ERROR LOGGER - IMPROVED VERSION
+        
+        // TS ERROR LOGGER - IMPROVED VERSION - V2
         // ======================================================================================================
         public static class TSErrorLog{
             public static void LogException(Exception ex, string context = null){
-                if (ex == null)
+                if (ex == null || TSLogger.IsClosed)
                     return;
                 string formattedLog = FormatException(ex, context);
                 TSLogger.Log(formattedLog);
@@ -308,7 +377,7 @@ namespace Glow{
                     sb.AppendLine(indent + "InnerException:");
                     sb.Append(FormatException(ex.InnerException, null, depth + 1));
                 }
-                sb.AppendLine(indent + header);
+                sb.Append(indent + header);
                 return sb.ToString();
             }
             private static string ExtractFirstFrameInfo(Exception ex){
@@ -322,7 +391,7 @@ namespace Glow{
                             return $"Location   : {file}:{line}\n";
                         }
                     }
-                }catch { }
+                }catch{ }
                 return "";
             }
         }
@@ -724,7 +793,7 @@ namespace Glow{
             // LIGHT THEME COLORS
             // ====================================
             public static readonly Dictionary<string, Color> LightTheme = new Dictionary<string, Color>{
-                // TS PRELOADER
+                // TS TEMPLATE
                 { "TSBT_BGColor", Color.FromArgb(236, 242, 248) },
                 { "TSBT_BGColor2", Color.White },
                 { "TSBT_AccentColor", Color.FromArgb(54, 95, 146) },
@@ -776,7 +845,7 @@ namespace Glow{
             // DARK THEME COLORS
             // ====================================
             public static readonly Dictionary<string, Color> DarkTheme = new Dictionary<string, Color>{
-                // TS PRELOADER
+                // TS TEMPLATE
                 { "TSBT_BGColor", Color.FromArgb(27, 30, 34) },
                 { "TSBT_BGColor2", Color.FromArgb(34, 38, 44) },
                 { "TSBT_AccentColor", Color.FromArgb(88, 153, 233) },
@@ -1185,7 +1254,7 @@ namespace Glow{
                                 if (response.IsSuccessStatusCode)
                                     return true;
                             }
-                        }catch { }
+                        }catch{ }
                     }
                 }
             }catch{

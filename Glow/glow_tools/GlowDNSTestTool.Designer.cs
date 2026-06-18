@@ -35,7 +35,7 @@
             this.DNSTable = new System.Windows.Forms.DataGridView();
             this.BGPanel = new System.Windows.Forms.Panel();
             this.INTERNALPanel = new System.Windows.Forms.Panel();
-            this.DNS_PerfectResultLabel = new System.Windows.Forms.Label();
+            this.DNS_PerfectResultLabel = new Glow.TSCustomLabel();
             this.Btn_FLP = new System.Windows.Forms.FlowLayoutPanel();
             this.DNS_TestStartBtn = new Glow.TSCustomButton();
             this.DNS_TestExportBtn = new Glow.TSCustomButton();
@@ -121,6 +121,7 @@
             // DNS_PerfectResultLabel
             // 
             this.DNS_PerfectResultLabel.BackColor = System.Drawing.Color.White;
+            this.DNS_PerfectResultLabel.BorderRadius = 5;
             this.DNS_PerfectResultLabel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.DNS_PerfectResultLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 9.5F, System.Drawing.FontStyle.Bold);
             this.DNS_PerfectResultLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
@@ -228,6 +229,6 @@
         private System.Windows.Forms.Panel BGPanel;
         private System.Windows.Forms.FlowLayoutPanel Btn_FLP;
         private System.Windows.Forms.Panel INTERNALPanel;
-        internal System.Windows.Forms.Label DNS_PerfectResultLabel;
+        internal TSCustomLabel DNS_PerfectResultLabel;
     }
 }

@@ -32,10 +32,9 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GlowCacheCleanupTool));
             this.BG_Panel = new System.Windows.Forms.Panel();
-            this.CCT_SelectLabel = new System.Windows.Forms.Label();
             this.CCTTable = new System.Windows.Forms.DataGridView();
+            this.CCT_SelectLabel = new Glow.TSCustomLabel();
             this.CCT_StartBtn = new Glow.TSCustomButton();
             this.BG_Panel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.CCTTable)).BeginInit();
@@ -53,21 +52,6 @@
             this.BG_Panel.Padding = new System.Windows.Forms.Padding(10);
             this.BG_Panel.Size = new System.Drawing.Size(759, 357);
             this.BG_Panel.TabIndex = 0;
-            // 
-            // CCT_SelectLabel
-            // 
-            this.CCT_SelectLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.CCT_SelectLabel.BackColor = System.Drawing.Color.White;
-            this.CCT_SelectLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 9.5F, System.Drawing.FontStyle.Bold);
-            this.CCT_SelectLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.CCT_SelectLabel.Location = new System.Drawing.Point(10, 255);
-            this.CCT_SelectLabel.Margin = new System.Windows.Forms.Padding(3, 0, 3, 20);
-            this.CCT_SelectLabel.Name = "CCT_SelectLabel";
-            this.CCT_SelectLabel.Padding = new System.Windows.Forms.Padding(10, 0, 10, 0);
-            this.CCT_SelectLabel.Size = new System.Drawing.Size(739, 35);
-            this.CCT_SelectLabel.TabIndex = 1;
-            this.CCT_SelectLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // CCTTable
             // 
@@ -124,6 +108,22 @@
             this.CCTTable.TabIndex = 0;
             this.CCTTable.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.CCTTable_CellClick);
             // 
+            // CCT_SelectLabel
+            // 
+            this.CCT_SelectLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.CCT_SelectLabel.BackColor = System.Drawing.Color.White;
+            this.CCT_SelectLabel.BorderRadius = 5;
+            this.CCT_SelectLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 9.5F, System.Drawing.FontStyle.Bold);
+            this.CCT_SelectLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.CCT_SelectLabel.Location = new System.Drawing.Point(10, 255);
+            this.CCT_SelectLabel.Margin = new System.Windows.Forms.Padding(3, 0, 3, 16);
+            this.CCT_SelectLabel.Name = "CCT_SelectLabel";
+            this.CCT_SelectLabel.Padding = new System.Windows.Forms.Padding(10, 0, 10, 0);
+            this.CCT_SelectLabel.Size = new System.Drawing.Size(739, 39);
+            this.CCT_SelectLabel.TabIndex = 1;
+            this.CCT_SelectLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // CCT_StartBtn
             // 
             this.CCT_StartBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(95)))), ((int)(((byte)(146)))));
@@ -160,7 +160,7 @@
             this.Controls.Add(this.BG_Panel);
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.Icon = Properties.Resources.GlowLogo;
+            this.Icon = global::Glow.Properties.Resources.GlowLogo;
             this.MaximizeBox = false;
             this.Name = "GlowCacheCleanupTool";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -178,6 +178,6 @@
         private System.Windows.Forms.Panel BG_Panel;
         private TSCustomButton CCT_StartBtn;
         private System.Windows.Forms.DataGridView CCTTable;
-        internal System.Windows.Forms.Label CCT_SelectLabel;
+        internal TSCustomLabel CCT_SelectLabel;
     }
 }

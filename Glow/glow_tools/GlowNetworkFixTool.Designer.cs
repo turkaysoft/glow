@@ -28,11 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GlowNetworkFixTool));
             this.Panel_BG = new System.Windows.Forms.Panel();
             this.NFT_StartBtn = new Glow.TSCustomButton();
-            this.NFT_ResultList = new TSCustomListBox();
-            this.NFT_TitleLabel = new System.Windows.Forms.Label();
+            this.NFT_ResultList = new Glow.TSCustomListBox();
+            this.NFT_TitleLabel = new Glow.TSCustomLabel();
             this.Panel_BG.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -81,13 +80,16 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.NFT_ResultList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.NFT_ResultList.Cursor = System.Windows.Forms.Cursors.Default;
+            this.NFT_ResultList.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
             this.NFT_ResultList.Font = new System.Drawing.Font("Segoe UI Semibold", 9.75F, System.Drawing.FontStyle.Bold);
             this.NFT_ResultList.FormattingEnabled = true;
             this.NFT_ResultList.IntegralHeight = false;
-            this.NFT_ResultList.ItemHeight = 17;
+            this.NFT_ResultList.ItemHeight = 23;
             this.NFT_ResultList.Location = new System.Drawing.Point(10, 65);
             this.NFT_ResultList.Margin = new System.Windows.Forms.Padding(3, 0, 3, 20);
             this.NFT_ResultList.Name = "NFT_ResultList";
+            this.NFT_ResultList.SelectedBackColor = System.Drawing.Color.DodgerBlue;
+            this.NFT_ResultList.SelectedForeColor = System.Drawing.Color.White;
             this.NFT_ResultList.Size = new System.Drawing.Size(514, 196);
             this.NFT_ResultList.TabIndex = 1;
             this.NFT_ResultList.SelectedIndexChanged += new System.EventHandler(this.NFT_ResultList_SelectedIndexChanged);
@@ -95,6 +97,7 @@
             // NFT_TitleLabel
             // 
             this.NFT_TitleLabel.BackColor = System.Drawing.Color.White;
+            this.NFT_TitleLabel.BorderRadius = 5;
             this.NFT_TitleLabel.Dock = System.Windows.Forms.DockStyle.Top;
             this.NFT_TitleLabel.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
             this.NFT_TitleLabel.ImeMode = System.Windows.Forms.ImeMode.NoControl;
@@ -115,7 +118,7 @@
             this.Controls.Add(this.Panel_BG);
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.Icon = Properties.Resources.GlowLogo;
+            this.Icon = global::Glow.Properties.Resources.GlowLogo;
             this.MaximizeBox = false;
             this.Name = "GlowNetworkFixTool";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -129,7 +132,7 @@
         #endregion
 
         private System.Windows.Forms.Panel Panel_BG;
-        internal System.Windows.Forms.Label NFT_TitleLabel;
+        internal TSCustomLabel NFT_TitleLabel;
         private TSCustomButton NFT_StartBtn;
         private TSCustomListBox NFT_ResultList;
     }
