@@ -66,19 +66,24 @@ Glow queries deep system layers to provide professional-grade data across specia
 ---
 
 ## Advanced Tools Menu
-Glow includes a built-in suite for system maintenance:
-* **DISM & SFC Automation:** Automated system file repair and image health management.
-* **Cache Cleanup:** Instantly clear system, browser, and temporary junk files.
-* **Performance Benchmarks:** High-precision CPU, RAM, and Disk performance testing modules.
-* **Screen Overlay:** Real-time system monitoring overlay for power users.
-* **Network Suite:** DNS Test Tool and Network Troubleshooting for connectivity issues.
-* **Security & Access:** Wi-Fi Password Showing Tool and System ID Generation.
-* **Connectivity Tools:** Bluetooth Information utilities.
-* **Monitor Test Suite:**
-    * **Dead Pixel Test:** Identify faulty pixels across various color ranges.
-    * **Dynamic Color Range:** Test your monitor's color depth and accuracy.
-    * **Stuck Pixel Repair:** Advanced tool designed to revive unresponsive pixels.
 
+Glow includes a built-in suite for system maintenance:
+* **DISM and SFC Automation Tool:** Automated system file repair and image health management.
+* **CPU Benchmark Tool:** CPU performance testing module.
+* **RAM Benchmark Tool:** RAM performance testing module.
+* **Disk Benchmark Tool:** Disk performance testing module.
+* **Cache Cleanup Tool:** Instantly clear system and temporary junk files.
+* **System ID Analysis Tool:** Detailed analysis for unique system identifiers.
+* **Hardware Security Audit Tool:** Comprehensive security auditing for your system hardware.
+* **Bluetooth Information Tool:** Detailed connectivity utilities for Bluetooth devices.
+* **DNS Test Tool:** Network suite tool for analyzing and testing DNS performance.
+* **Network Troubleshooting Tool:** Diagnostic suite for resolving connectivity issues.
+* **Wi-Fi Password Showing Tool:** Instantly display saved Wi-Fi networks and security keys.
+* **Monitor Test Tools:**
+    * **Dead Pixel Test:** Identify faulty pixels across various color ranges.
+    * **Dynamic Color Range Test:** Test your monitor's color depth and accuracy.
+    * **Stuck Pixel Repair Tool:** Advanced tool designed to revive unresponsive pixels.
+ 
 ---
 
 ## Getting Started
@@ -132,7 +137,7 @@ Glow includes a built-in suite for system maintenance:
 | `CTRL + 4` | Disk Benchmark Tool |
 | `CTRL + 5` | Cache Cleanup Tool |
 | `CTRL + 6` | System ID Analysis Tool |
-| `CTRL + 7` | Screen Overlay |
+| `CTRL + 7` | Hardware Security Audit Tool |
 | `CTRL + Shift + B` | Bluetooth Information Tool |
 | `CTRL + Shift + D` | DNS Test Tool |
 | `CTRL + Shift + N` | Network Troubleshooting Tool |
