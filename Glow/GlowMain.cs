@@ -80,7 +80,7 @@ namespace Glow{
             turkishToolStripMenuItem.Click += LanguageToolStripMenuItem_Click;
             // DYNAMIC THEME LISTENER
             // ==================
-            SystemEvents.UserPreferenceChanged += (s, e) => TSUseSystemTheme();
+            SystemEvents.UserPreferenceChanged += SystemEvents_UserPreferenceChanged;
             // PAGE CONTROL FOR PARALLEL LOADING PROCEDURE
             // ==================
             var rotateButtons = new[] {
@@ -490,9 +490,9 @@ namespace Glow{
             // LAUNCH PROCESS
             // ====================================
             RunSoftwareEngine();
-            // SOFTWARE UPDATE CHECK
+            // SOFTWARE UPDATE CHECK NATIVE
             // ====================================
-            Task.Run(() => Software_update_check(0));
+            try { _ = Software_update_check(0); } catch (Exception ex) { if (debug_status) { TSErrorLog.LogException(ex, "Glow_Load()"); } }
             // DYNAMIC MULTI CLICK COPYABLE LABELS
             // ====================================
             TSCAC_Properties();
@@ -672,12 +672,16 @@ namespace Glow{
                 try{
                     // OS SHUTDOWN TIME
                     string sd_time_path = @"System\CurrentControlSet\Control\Windows";
-                    RegistryKey sd_time_key = Registry.LocalMachine.OpenSubKey(sd_time_path);
-                    byte[] sd_time_val = (byte[])sd_time_key.GetValue("ShutdownTime");
-                    sd_time_key.Close();
-                    long sd_time_as_long = BitConverter.ToInt64(sd_time_val, 0);
-                    DateTime shut_down_time = DateTime.FromFileTime(sd_time_as_long);
-                    OS_SystemLastShutDown_V.SetTextSafe(shut_down_time.ToString("dd.MM.yyyy - HH:mm:ss"));
+                    using (RegistryKey sd_time_key = Registry.LocalMachine.OpenSubKey(sd_time_path)){
+                        object sd_time_raw = sd_time_key?.GetValue("ShutdownTime");
+                        if (sd_time_raw is byte[] sd_time_val && sd_time_val.Length >= 8){
+                            long sd_time_as_long = BitConverter.ToInt64(sd_time_val, 0);
+                            DateTime shut_down_time = DateTime.FromFileTime(sd_time_as_long);
+                            OS_SystemLastShutDown_V.SetTextSafe(shut_down_time.ToString("dd.MM.yyyy - HH:mm:ss"));
+                        }else{
+                            OS_SystemLastShutDown_V.SetTextSafe(software_lang.TSReadLangs("Os_Content", "os_c_unknown"));
+                        }
+                    }
                 }catch (Exception ex){
                     if (debug_status) { TSErrorLog.LogException(ex, "Os()"); }
                 }
@@ -1173,7 +1177,8 @@ namespace Glow{
             string time_hour = software_lang.TSReadLangs("Os_Content", "os_c_hour");
             string time_miniutes = software_lang.TSReadLangs("Os_Content", "os_c_minute");
             //
-            if (seconds <= 0) return time_never;
+            if (seconds < 0) return software_lang.TSReadLangs("Os_Content", "os_c_unknown");
+            if (seconds == 0) return time_never;
             int h = seconds / 3600;
             int m = (seconds % 3600) / 60;
             string result_timeout = "";
@@ -1198,8 +1203,15 @@ namespace Glow{
             string searchTime = acPower ? "Current AC Power Setting Index:" : "Current DC Power Setting Index:";
             foreach (var splitLine in get_time_output.Split(new[] { Environment.NewLine }, StringSplitOptions.None)){
                 if (splitLine.Contains(searchTime)){
-                    string convertTime = splitLine.Split(':')[1].Trim();
-                    return Convert.ToInt32(convertTime, 16);
+                    string[] timeParts = splitLine.Split(new[] { ':' }, 2);
+                    if (timeParts.Length < 2) continue;
+                    string convertTime = timeParts[1].Trim();
+                    if (convertTime.StartsWith("0x", StringComparison.OrdinalIgnoreCase))
+                        convertTime = convertTime.Substring(2);
+                    if (int.TryParse(convertTime, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out int parsedTime))
+                        return parsedTime;
+                    if (int.TryParse(convertTime, out parsedTime))
+                        return parsedTime;
                 }
             }
             return -1;
@@ -1525,9 +1537,11 @@ namespace Glow{
             timedOut = false;
             Encoding oemEncoding = Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage);
             string windir = Environment.GetEnvironmentVariable("windir");
-            if (string.IsNullOrEmpty(windir))
-                windir = Program.Windows_disk + "Windows";
-            string slmgrPath = windir + @"\System32\slmgr.vbs";
+            if (string.IsNullOrWhiteSpace(windir))
+                windir = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+            if (string.IsNullOrWhiteSpace(windir))
+                windir = Path.Combine(Program.Windows_disk, "Windows");
+            string slmgrPath = Path.Combine(windir, "System32", "slmgr.vbs");
             ProcessStartInfo win_lic_url_listener = new ProcessStartInfo{
                 FileName = "cscript.exe",
                 Arguments = "//Nologo \"" + slmgrPath + "\" /dlv",
@@ -3320,11 +3334,17 @@ namespace Glow{
                         }
                         gpuAgg[gpuKey] = agg;
                     }
+                    int currentCount = GPU_Selector_List.Items.Count;
+                    while (gpu_vram_list.Count < currentCount) gpu_vram_list.Add(string.Empty);
+                    while (gpu_dxfl_list.Count < currentCount) gpu_dxfl_list.Add(string.Empty);
+                    while (gpu_dxfl_max_list.Count < currentCount) gpu_dxfl_max_list.Add(string.Empty);
                     foreach (var kv in gpuAgg){
                         string gpuKey = kv.Key;
                         string gpuName = gpuKey;
                         int bar = gpuKey.IndexOf('|');
                         if (bar > 0) gpuName = gpuKey.Substring(0, bar);
+                        string dxDevId = (bar > 0 && bar + 1 < gpuKey.Length) ? gpuKey.Substring(bar + 1) : string.Empty;
+                        if (dxDevId.StartsWith("i:", StringComparison.OrdinalIgnoreCase)) dxDevId = string.Empty;
                         //
                         long vramBytes = kv.Value.vramMaxBytes;
                         string bestDxfl = kv.Value.bestDxfl;
@@ -3347,11 +3367,27 @@ namespace Glow{
                         }
                         //
                         if (candidateIndices.Count > 0){
-                            for (int k = 0; k < candidateIndices.Count; k++){
-                                int idx = candidateIndices[k];
-                                if (idx >= 0 && idx < gpu_vram_list.Count && string.IsNullOrWhiteSpace(gpu_vram_list[idx])){
-                                    bestIndex = idx;
-                                    break;
+                            string dxSig = ExtractPciSignature(dxDevId);
+                            if (!string.IsNullOrEmpty(dxSig)){
+                                for (int k = 0; k < candidateIndices.Count; k++){
+                                    int idx = candidateIndices[k];
+                                    if (idx >= 0 && idx < gpu_vram_list.Count && idx < gpu_device_id_list.Count && string.IsNullOrWhiteSpace(gpu_vram_list[idx])){
+                                        string wmiSig = ExtractPciSignature(gpu_device_id_list[idx]);
+                                        if (string.Equals(wmiSig, dxSig, StringComparison.OrdinalIgnoreCase)){
+                                            bestIndex = idx;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            //
+                            if (bestIndex < 0){
+                                for (int k = 0; k < candidateIndices.Count; k++){
+                                    int idx = candidateIndices[k];
+                                    if (idx >= 0 && idx < gpu_vram_list.Count && string.IsNullOrWhiteSpace(gpu_vram_list[idx])){
+                                        bestIndex = idx;
+                                        break;
+                                    }
                                 }
                             }
                             //
@@ -3378,7 +3414,7 @@ namespace Glow{
                                 }
                             }
                         }
-                        if (bestIndex >= 0){
+                        if (bestIndex >= 0 && bestIndex < gpu_vram_list.Count && bestIndex < gpu_dxfl_list.Count && bestIndex < gpu_dxfl_max_list.Count){
                             string dynamicStr = TS_FormatSize(vramBytes);
                             double roundedBytes = 0;
                             //
@@ -3428,8 +3464,19 @@ namespace Glow{
         }
         // VRAM AND FEATURE LEVELS PARSER ALGORITHM
         // ======================================================================================================
-        private static string StripGpuIndexSuffix(string s){
-            if (string.IsNullOrWhiteSpace(s)) return string.Empty;
+        private static string ExtractPciSignature(string deviceId){
+            if (string.IsNullOrWhiteSpace(deviceId)) return null;
+            Match ven = Regex.Match(deviceId, @"VEN_([0-9A-Fa-f]{4})");
+            if (!ven.Success) return null;
+            Match dev = Regex.Match(deviceId, @"DEV_([0-9A-Fa-f]{4})");
+            if (!dev.Success) return null;
+            string sig = ("VEN_" + ven.Groups[1].Value + "&DEV_" + dev.Groups[1].Value).ToUpperInvariant();
+            Match subsys = Regex.Match(deviceId, @"SUBSYS_([0-9A-Fa-f]{8})");
+            if (subsys.Success)
+                sig += ("&SUBSYS_" + subsys.Groups[1].Value).ToUpperInvariant();
+            return sig;
+        }
+        private static string StripGpuIndexSuffix(string s){            if (string.IsNullOrWhiteSpace(s)) return string.Empty;
             int hash = s.LastIndexOf('#');
             if (hash > 0){
                 string tail = s.Substring(hash + 1).Trim();
@@ -3760,6 +3807,7 @@ namespace Glow{
                     if (!seenDisks.Add(diskIndex))
                         continue;
                     var logicalDisks = new List<ManagementObject>();
+                    var storageVolumes = new List<ManagementObject>();
                     try{
                         var disk_part_text_query = $"associators of {{{drive_info.Path.RelativePath}}} where AssocClass = Win32_DiskDriveToDiskPartition";
                         using (var disk_part_query = new ManagementObjectSearcher(disk_part_text_query)){
@@ -3772,6 +3820,26 @@ namespace Glow{
                         }
                     }catch (Exception ex){
                         if (debug_status) { TSErrorLog.LogException(ex, "Disk()"); }
+                    }
+                    try{
+                        var seenVolumes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        using (var partitionQuery = new ManagementObjectSearcher("root\\Microsoft\\Windows\\Storage", $"SELECT * FROM MSFT_Partition WHERE DiskNumber={diskIndex}")){
+                            foreach (ManagementObject partition in partitionQuery.Get().Cast<ManagementObject>()){
+                                var volumeQueryText = $"associators of {{{partition.Path.RelativePath}}} where AssocClass = MSFT_PartitionToVolume";
+                                using (var volumeQuery = new ManagementObjectSearcher("root\\Microsoft\\Windows\\Storage", volumeQueryText)){
+                                    foreach (ManagementObject volume in volumeQuery.Get().Cast<ManagementObject>()){
+                                        string volumeKey = Convert.ToString(volume["ObjectId"])?.Trim();
+                                        if (string.IsNullOrEmpty(volumeKey))
+                                            volumeKey = Convert.ToString(volume["Path"])?.Trim();
+                                        if (!string.IsNullOrEmpty(volumeKey) && seenVolumes.Add(volumeKey))
+                                            storageVolumes.Add(volume);
+                                    }
+                                }
+                            }
+                        }
+                    }catch (Exception ex){
+                        // Keep the existing Win32_LogicalDisk path as a compatibility fallback.
+                        if (debug_status) { TSErrorLog.LogException(ex, "Disk() - MSFT_Volume"); }
                     }
                     // DISK CAPTION
                     try{
@@ -3821,6 +3889,7 @@ namespace Glow{
                     // DISK VOLUME NAME
                     try{
                         var volumeNames = logicalDisks.Select(ld => Convert.ToString(ld["VolumeName"])?.Trim()).Where(s => !string.IsNullOrEmpty(s)).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+                        volumeNames.AddRange(storageVolumes.Select(v => Convert.ToString(v["FileSystemLabel"])?.Trim()).Where(s => !string.IsNullOrEmpty(s) && !volumeNames.Contains(s, StringComparer.OrdinalIgnoreCase)));
                         disk_volume_name_list.Add(volumeNames.Count > 0 ? string.Join(", ", volumeNames) : software_lang.TSReadLangs("StorageContent", "se_c_local_disk"));
                     }catch{
                         disk_volume_name_list.Add(software_lang.TSReadLangs("StorageContent", "se_c_local_disk"));
@@ -3834,7 +3903,7 @@ namespace Glow{
                     }
                     // DISK SERIAL NUMBER
                     try{
-                        var disk_serial_number = Convert.ToString(drive_info["SerialNumber"])?.Trim();
+                        var disk_serial_number = new string((Convert.ToString(drive_info["SerialNumber"]) ?? string.Empty).Where(c => !char.IsControl(c)).ToArray()).Trim();
                         if (!string.IsNullOrEmpty(disk_serial_number)){
                             if (stealth_status != 1)
                                 disk_serial_list.Add(disk_serial_number);
@@ -3868,10 +3937,18 @@ namespace Glow{
                     // DISK SPACE & FREE & USED               
                     try{
                         double diskSizeBytes = Convert.ToDouble(drive_info["Size"]);
-                        double freeBytes = logicalDisks.Sum(ld => {
-                            try { return Convert.ToDouble(ld["FreeSpace"]); }
-                            catch { return 0d; }
-                        });
+                        double freeBytes;
+                        if (storageVolumes.Count > 0){
+                            freeBytes = storageVolumes.Sum(volume => {
+                                try { return Convert.ToDouble(volume["SizeRemaining"]); }
+                                catch { return 0d; }
+                            });
+                        }else{
+                            freeBytes = logicalDisks.Sum(ld => {
+                                try { return Convert.ToDouble(ld["FreeSpace"]); }
+                                catch { return 0d; }
+                            });
+                        }
                         double usedBytes = diskSizeBytes - freeBytes;
                         if (usedBytes < 0) usedBytes = 0;
                         disk_total_space_list.Add(TS_FormatSize(diskSizeBytes));
@@ -3885,6 +3962,7 @@ namespace Glow{
                     // DISK FILE SYSTEM
                     try{
                         var fileSystems = logicalDisks.Select(ld => Convert.ToString(ld["FileSystem"])?.Trim()).Where(s => !string.IsNullOrEmpty(s)).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+                        fileSystems.AddRange(storageVolumes.Select(v => Convert.ToString(v["FileSystem"])?.Trim()).Where(s => !string.IsNullOrEmpty(s) && !fileSystems.Contains(s, StringComparer.OrdinalIgnoreCase)));
                         disk_file_system_list.Add(fileSystems.Count > 0 ? string.Join(", ", fileSystems) : software_lang.TSReadLangs("StorageContent", "se_c_unknown"));
                     }catch{
                         disk_file_system_list.Add(software_lang.TSReadLangs("StorageContent", "se_c_unknown"));
@@ -5669,7 +5747,7 @@ namespace Glow{
             try{
                 if (File.Exists(battery_report_path))
                     File.Delete(battery_report_path);
-                Process.Start(new ProcessStartInfo("powercfg", "/batteryreport") { CreateNoWindow = true, UseShellExecute = false });
+                using (Process.Start(new ProcessStartInfo("powercfg", "/batteryreport") { CreateNoWindow = true, UseShellExecute = false })) { }
                 await StartBatteryReportProcessAsync();
             }catch (Exception ex){
                 if (debug_status) { TSErrorLog.LogException(ex, "BATTERY_ReportBtn_Click()"); }
@@ -5684,11 +5762,23 @@ namespace Glow{
         }
         private async Task Battery_report_check_process_async(){
             try{
+                const int reportWaitTimeoutMs = 60000;
+                const int lockWaitTimeoutMs = 30000;
+                var waitTimeout = Stopwatch.StartNew();
                 while (!File.Exists(battery_report_path)){
+                    if (waitTimeout.ElapsedMilliseconds >= reportWaitTimeoutMs){
+                        if (debug_status) { TSLogger.Log("<--- Battery report was not created within timeout, giving up. --->"); }
+                        return;
+                    }
                     await Task.Delay(500);
                 }
+                waitTimeout.Restart();
                 bool fileReady = false;
                 while (!fileReady){
+                    if (waitTimeout.ElapsedMilliseconds >= lockWaitTimeoutMs){
+                        if (debug_status) { TSLogger.Log("<--- Battery report file stayed locked within timeout, giving up. --->"); }
+                        return;
+                    }
                     try{
                         using (var stream = new FileStream(battery_report_path, FileMode.Open, FileAccess.Read, FileShare.None)) { }
                         fileReady = true;
@@ -5696,6 +5786,14 @@ namespace Glow{
                     catch { await Task.Delay(200); }
                 }
                 string new_battery_report_path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), $"{Application.ProductName}_{Dns.GetHostName()}_battery_report_{DateTime.Now:dd.MM.yyyy_HH.mm.ss}.html");
+                int duplicateCounter = 1;
+                string base_report_path = new_battery_report_path;
+                while (File.Exists(new_battery_report_path)){
+                    string dir = Path.GetDirectoryName(base_report_path);
+                    string name = Path.GetFileNameWithoutExtension(base_report_path);
+                    new_battery_report_path = Path.Combine(dir, $"{name}_{duplicateCounter}.html");
+                    duplicateCounter++;
+                }
                 File.Move(battery_report_path, new_battery_report_path);
                 TSGetLangs software_lang = new TSGetLangs(lang_path);
                 string messageText = string.Format(software_lang.TSReadLangs("Battery_Content", "by_report_create_message"), new_battery_report_path, "\n\n");
@@ -5861,14 +5959,18 @@ namespace Glow{
         }
         private void OSD_DataMainTable_CellDoubleClick(object sender, DataGridViewCellEventArgs e){
             TSGetLangs software_lang = new TSGetLangs(lang_path);
+            string firstCellText = string.Empty;
             try{
+                if (e.RowIndex < 0 || e.RowIndex >= OSD_DataMainTable.Rows.Count) return;
                 if (OSD_DataMainTable.SelectedRows.Count > 0){
-                    Clipboard.SetText(string.Format("{0} | {1} | {2} | {3} | {4} | {5}", OSD_DataMainTable.Rows[e.RowIndex].Cells[0].Value.ToString(), OSD_DataMainTable.Rows[e.RowIndex].Cells[1].Value.ToString(), OSD_DataMainTable.Rows[e.RowIndex].Cells[2].Value.ToString(), OSD_DataMainTable.Rows[e.RowIndex].Cells[3].Value.ToString(), OSD_DataMainTable.Rows[e.RowIndex].Cells[4].Value.ToString(), OSD_DataMainTable.Rows[e.RowIndex].Cells[5].Value.ToString()));
-                    TS_MessageBoxEngine.TS_MessageBox(this, 1, string.Format(software_lang.TSReadLangs("Osd_Content", "osd_c_copy_success"), OSD_DataMainTable.Rows[e.RowIndex].Cells[0].Value));
+                    var cells = OSD_DataMainTable.Rows[e.RowIndex].Cells;
+                    firstCellText = cells[0].Value?.ToString() ?? string.Empty;
+                    Clipboard.SetText(string.Format("{0} | {1} | {2} | {3} | {4} | {5}", firstCellText, cells[1].Value?.ToString() ?? string.Empty, cells[2].Value?.ToString() ?? string.Empty, cells[3].Value?.ToString() ?? string.Empty, cells[4].Value?.ToString() ?? string.Empty, cells[5].Value?.ToString() ?? string.Empty));
+                    TS_MessageBoxEngine.TS_MessageBox(this, 1, string.Format(software_lang.TSReadLangs("Osd_Content", "osd_c_copy_success"), firstCellText));
                 }
             }catch (Exception ex){
                 if (debug_status) { TSErrorLog.LogException(ex, "OSD_DataMainTable_CellDoubleClick()"); }
-                TS_MessageBoxEngine.TS_MessageBox(this, 3, string.Format(software_lang.TSReadLangs("Osd_Content", "osd_c_copy_error"), OSD_DataMainTable.Rows[e.RowIndex].Cells[0].Value));
+                TS_MessageBoxEngine.TS_MessageBox(this, 3, string.Format(software_lang.TSReadLangs("Osd_Content", "osd_c_copy_error"), firstCellText));
             }
         }
         private void OSD_DataMainTable_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e){
@@ -6060,14 +6162,18 @@ namespace Glow{
         }
         private void SERVICE_DataMainTable_CellDoubleClick(object sender, DataGridViewCellEventArgs e){
             TSGetLangs software_lang = new TSGetLangs(lang_path);
+            string firstCellText = string.Empty;
             try{
+                if (e.RowIndex < 0 || e.RowIndex >= SERVICE_DataMainTable.Rows.Count) return;
                 if (SERVICE_DataMainTable.SelectedRows.Count > 0){
-                    Clipboard.SetText(string.Format("{0} | {1} | {2} | {3} | {4} | {5}", SERVICE_DataMainTable.Rows[e.RowIndex].Cells[0].Value.ToString(), SERVICE_DataMainTable.Rows[e.RowIndex].Cells[1].Value.ToString(), SERVICE_DataMainTable.Rows[e.RowIndex].Cells[2].Value.ToString(), SERVICE_DataMainTable.Rows[e.RowIndex].Cells[3].Value.ToString(), SERVICE_DataMainTable.Rows[e.RowIndex].Cells[4].Value.ToString(), SERVICE_DataMainTable.Rows[e.RowIndex].Cells[5].Value.ToString()));
-                    TS_MessageBoxEngine.TS_MessageBox(this, 1, string.Format(software_lang.TSReadLangs("Services_Content", "ss_c_copy_success"), SERVICE_DataMainTable.Rows[e.RowIndex].Cells[0].Value));
+                    var cells = SERVICE_DataMainTable.Rows[e.RowIndex].Cells;
+                    firstCellText = cells[0].Value?.ToString() ?? string.Empty;
+                    Clipboard.SetText(string.Format("{0} | {1} | {2} | {3} | {4} | {5}", firstCellText, cells[1].Value?.ToString() ?? string.Empty, cells[2].Value?.ToString() ?? string.Empty, cells[3].Value?.ToString() ?? string.Empty, cells[4].Value?.ToString() ?? string.Empty, cells[5].Value?.ToString() ?? string.Empty));
+                    TS_MessageBoxEngine.TS_MessageBox(this, 1, string.Format(software_lang.TSReadLangs("Services_Content", "ss_c_copy_success"), firstCellText));
                 }
             }catch (Exception ex){
                 if (debug_status) { TSErrorLog.LogException(ex, "SERVICE_DataMainTable_CellDoubleClick()"); }
-                TS_MessageBoxEngine.TS_MessageBox(this, 3, string.Format(software_lang.TSReadLangs("Services_Content", "ss_c_copy_error"), SERVICE_DataMainTable.Rows[e.RowIndex].Cells[0].Value));
+                TS_MessageBoxEngine.TS_MessageBox(this, 3, string.Format(software_lang.TSReadLangs("Services_Content", "ss_c_copy_error"), firstCellText));
             }
         }
         private void SERVICE_DataMainTable_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e){
@@ -6514,29 +6620,11 @@ namespace Glow{
                 if (string.IsNullOrWhiteSpace(folderPath) || !Directory.Exists(folderPath)) return false;
                 string full = Path.GetFullPath(folderPath).TrimEnd(Path.DirectorySeparatorChar).TrimEnd(Path.AltDirectorySeparatorChar);
                 string winDir = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
-                string[] prefixes = new string[]{
-                    winDir,
-                    Environment.SystemDirectory,
-                    Path.Combine(winDir, "SysWOW64"),
-                    Path.Combine(winDir, "System"),
-                    Path.Combine(winDir, "Fonts"),
-                    Path.Combine(winDir, "WinSxS"),
-                    Path.Combine(winDir, "servicing"),
-                    Path.Combine(winDir, "assembly"),
-                    Path.Combine(winDir, "Globalization"),
-                    Path.Combine(winDir, "Speech"),
-                    Path.Combine(winDir, "Logs"),
-                    Path.Combine(winDir, "Temp"),
-                    Path.Combine(winDir, "Tasks"),
-                    Path.Combine(winDir, "Prefetch"),
-                    Path.Combine(winDir, "Boot")
-                };
-                foreach (var p in prefixes){
-                    if (string.IsNullOrEmpty(p)) continue;
-                    string fp = Path.GetFullPath(p).TrimEnd(Path.DirectorySeparatorChar).TrimEnd(Path.AltDirectorySeparatorChar);
-                    if (full.Equals(fp, StringComparison.OrdinalIgnoreCase)) return true;
-                    if (full.StartsWith(fp + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)) return true;
-                }
+                if (string.IsNullOrWhiteSpace(winDir)) return false;
+                string fp = Path.GetFullPath(winDir).TrimEnd(Path.DirectorySeparatorChar).TrimEnd(Path.AltDirectorySeparatorChar);
+                if (string.IsNullOrEmpty(fp)) return false;
+                if (full.Equals(fp, StringComparison.OrdinalIgnoreCase)) return true;
+                if (full.StartsWith(fp + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)) return true;
                 return false;
             }catch{
                 return false;
@@ -7293,7 +7381,18 @@ namespace Glow{
                 if (debug_status) { TSErrorLog.LogException(ex, "DarkThemeToolStripMenuItem_Click()"); }
             }
         }
-        private void TSUseSystemTheme(){ if (themeSystem == 2) Theme_engine(TSThemeModeHelper.GetSystemTheme(2)); }
+        private void SystemEvents_UserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e){
+            TSUseSystemTheme();
+        }
+        private void TSUseSystemTheme(){
+            if (themeSystem != 2) return;
+            if (IsDisposed || Disposing) return;
+            if (InvokeRequired){
+                try { BeginInvoke(new Action(() => TSUseSystemTheme())); } catch { }
+                return;
+            }
+            Theme_engine(TSThemeModeHelper.GetSystemTheme(2));
+        }
         private void SaveTheme(int ts){
             // SAVE CURRENT THEME
             try{
@@ -8835,12 +8934,12 @@ namespace Glow{
         // ======================================================================================================
         private void CheckForUpdatesToolStripMenuItem_Click(object sender, EventArgs e){
             try{
-                Task.Run(() => Software_update_check(1));
+                _ = Software_update_check(1);
             }catch (Exception ex){
                 if (debug_status) { TSErrorLog.LogException(ex, "CheckForUpdatesToolStripMenuItem_Click()"); }
             }
         }
-        public async void Software_update_check(int _check_update_ui){
+        public async Task Software_update_check(int _check_update_ui){
             try{
                 TSGetLangs software_lang = new TSGetLangs(lang_path);
                 SetUpdateMenuEnabled(false);
@@ -8900,18 +8999,23 @@ namespace Glow{
                 if (debug_status){
                     TSErrorLog.LogException(ex, "Software_update_check()");
                 }
-                TSGetLangs software_lang = new TSGetLangs(lang_path);
-                TS_MessageBoxEngine.TS_MessageBox(this, 3, string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_error"), "\n\n", ex.Message), string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_title"), Application.ProductName));
+                if (_check_update_ui == 1 && !IsDisposed && !Disposing){
+                    TSGetLangs software_lang = new TSGetLangs(lang_path);
+                    TS_MessageBoxEngine.TS_MessageBox(this, 3, string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_error"), "\n\n", ex.Message), string.Format(software_lang.TSReadLangs("SoftwareUpdate", "su_title"), Application.ProductName));
+                }
             }finally{
                 SetUpdateMenuEnabled(true);
             }
         }
         private void SetUpdateMenuEnabled(bool enabled){
-            if (InvokeRequired){
-                BeginInvoke(new Action(() => checkForUpdatesToolStripMenuItem.Enabled = enabled));
-            }else{
-                checkForUpdatesToolStripMenuItem.Enabled = enabled;
-            }
+            try{
+                if (IsDisposed || Disposing) return;
+                if (InvokeRequired){
+                    BeginInvoke(new Action(() => checkForUpdatesToolStripMenuItem.Enabled = enabled));
+                }else{
+                    checkForUpdatesToolStripMenuItem.Enabled = enabled;
+                }
+            }catch { }
         }
         // EXPORT PAGE - SUPPORT SECTION
         // ======================================================================================================
@@ -10456,6 +10560,7 @@ namespace Glow{
             if (isExiting) return;
             isExiting = true;
             loop_status = false;
+            try { SystemEvents.UserPreferenceChanged -= SystemEvents_UserPreferenceChanged; } catch { }
             CancelAllTasks();
             if (debug_status){
                 TSLogger.Log("<--- THE APPLICATION HAS BEEN SUCCESSFULLY CLOSED --->");

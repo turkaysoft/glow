@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -72,20 +74,28 @@ namespace Glow.glow_tools{
                 TSGetLangs software_lang = new TSGetLangs(GlowMain.lang_path);
                 Text = string.Format(software_lang.TSReadLangs("ShowWiFiPasswordTool", "swpt_title"), Application.ProductName) + " - " + software_lang.TSReadLangs("ShowWiFiPasswordTool", "swpt_load");
                 await Task.Run(() => {
-                    string[] wifiProfiles = Ts_ExtractWiFiProfileNames(Ts_GetWiFiPassword("netsh wlan show profile"));
+                    string[] wifiProfiles = Ts_ExtractWiFiProfileNames(Ts_GetWiFiPassword("wlan show profile"));
                     if (wifiProfiles.Length == 0){
+                        if (IsDisposed || !IsHandleCreated) return;
                         Invoke(new Action(() => {
                             TS_MessageBoxEngine.TS_MessageBox(this, 2, string.Format(software_lang.TSReadLangs("ShowWiFiPasswordTool", "swpt_no_profile"), "\n", software_lang.TSReadLangs("HeaderTools", "ht_show_wifi_password_tool")));
                             Close();
                         }));
                         return;
                     }
+                    var rows = new List<KeyValuePair<string, string>>(wifiProfiles.Length);
+                    foreach (string profile in wifiProfiles){
+                        if (IsDisposed || !IsHandleCreated) return;
+                        string clean = profile.Trim();
+                        rows.Add(new KeyValuePair<string, string>(clean, GetWiFiPassword(clean)));
+                    }
+                    if (IsDisposed || !IsHandleCreated) return;
                     Invoke(new Action(() => {
+                        if (IsDisposed || !IsHandleCreated) return;
                         Text = string.Format(software_lang.TSReadLangs("ShowWiFiPasswordTool", "swpt_title"), Application.ProductName);
                         SWPT_ExportBtn.Enabled = true;
-                        foreach (string profile in wifiProfiles){
-                            string password = GetWiFiPassword(profile.Trim());
-                            SWP_DGV.Rows.Add(profile.Trim(), password);
+                        foreach (var row in rows){
+                            SWP_DGV.Rows.Add(row.Key, row.Value);
                         }
                         SWP_DGV.ClearSelection();
                     }));
@@ -99,46 +109,51 @@ namespace Glow.glow_tools{
         static string GetWiFiPassword(string networkName){
             TSGetLangs software_lang = new TSGetLangs(GlowMain.lang_path);
             try{
-                string wifiDetails = Ts_GetWiFiPassword($"netsh wlan show profile \"{networkName}\" key=clear");
-                string passwordKey = "Key Content            : ";
-                int startIndex = wifiDetails.IndexOf(passwordKey);
-                if (startIndex == -1)
+                string wifiDetails = Ts_GetWiFiPassword("wlan show profile name=\"" + networkName + "\" key=clear");
+                Match m = Regex.Match(wifiDetails, @"(?im)^\s*Key Content\s*:\s*(.+?)\s*$");
+                if (!m.Success)
                     return software_lang.TSReadLangs("ShowWiFiPasswordTool", "swpt_profile_no_password");
-                startIndex += passwordKey.Length;
-                int endIndex = wifiDetails.IndexOf("\n", startIndex);
-                return wifiDetails.Substring(startIndex, endIndex - startIndex).Trim();
+                return m.Groups[1].Value.Trim();
             }catch (Exception ex){
                 if (GlowMain.debug_status) { TSErrorLog.LogException(ex, "GetWiFiPassword()"); }
                 return software_lang.TSReadLangs("ShowWiFiPasswordTool", "swpt_profile_no_read");
             }
         }
-        // EXECUTE CMD INTERFACE CODE
+        // EXECUTE NETSH DIRECTLY (NO CMD LAYER, OEM ENCODING FOR NON-ASCII OUTPUT)
         // ======================================================================================================
-        static string Ts_GetWiFiPassword(string get_command){
+        static string Ts_GetWiFiPassword(string netshArgs){
+            Encoding oemEncoding;
+            try{ oemEncoding = Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.OEMCodePage); }
+            catch{ oemEncoding = Encoding.Default; }
             ProcessStartInfo wifi_psi = new ProcessStartInfo{
-                FileName = "cmd.exe",
-                Arguments = $"/c {get_command}",
+                FileName = "netsh",
+                Arguments = netshArgs,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
+                StandardOutputEncoding = oemEncoding,
+                StandardErrorEncoding = oemEncoding,
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
             using (Process process_result = Process.Start(wifi_psi)){
+                if (process_result == null) return string.Empty;
+                Task<string> errTask = Task.Run(() => {
+                    try{ return process_result.StandardError.ReadToEnd(); }
+                    catch{ return string.Empty; }
+                });
                 string wifi_output_result = process_result.StandardOutput.ReadToEnd();
                 process_result.WaitForExit();
-                return wifi_output_result;
+                try{ errTask.Wait(5000); }catch { }
+                return wifi_output_result ?? string.Empty;
             }
         }
         // GET ONLY THE REQUIRED SITE WITH CMD
         // ======================================================================================================
         static string[] Ts_ExtractWiFiProfileNames(string get_wifi_profiles){
-            string userProfilesSection = "User profiles";
-            int startIndex = get_wifi_profiles.IndexOf(userProfilesSection);
-            if (startIndex == -1){
-                return new string[0];
-            }
-            string profileSection = get_wifi_profiles.Substring(startIndex);
-            MatchCollection matches = Regex.Matches(profileSection, @"All User Profile\s*:\s*(.*)");
+            if (string.IsNullOrEmpty(get_wifi_profiles)) return new string[0];
+            int startIndex = get_wifi_profiles.IndexOf("User profiles", StringComparison.OrdinalIgnoreCase);
+            string profileSection = startIndex >= 0 ? get_wifi_profiles.Substring(startIndex) : get_wifi_profiles;
+            MatchCollection matches = Regex.Matches(profileSection, @"All User Profile\s*:\s*(.*)", RegexOptions.IgnoreCase);
             string[] profileNames = new string[matches.Count];
             for (int i = 0; i < matches.Count; i++){
                 profileNames[i] = matches[i].Groups[1].Value.Trim();

@@ -8,22 +8,21 @@ using static Glow.TSModules;
 
 namespace Glow.glow_tools{
     public partial class GlowMonitorTestTool : Form{
-        public GlowMonitorTestTool() { InitializeComponent(); this.ResizeRedraw = true; }
+        public GlowMonitorTestTool() { InitializeComponent(); this.ResizeRedraw = true; this.KeyPreview = true; }
         // VARIABLES
         // ======================================================================================================
         private readonly Color[] dead_pixel_colors = { Color.Black, Color.White, Color.Red, Color.FromArgb(0, 255, 0), Color.FromArgb(0, 0, 255) };
         private readonly Color[] dynamic_range_colors = { Color.FromArgb(34, 34, 34), Color.FromArgb(85, 85, 85), Color.White, Color.Red, Color.FromArgb(0, 255, 0), Color.FromArgb(0, 0, 255) };
         //
         int size_mode;
-        private bool message_disposed = false;
-        //
+        private bool message_disposed = false;        //
         private int dead_pixel_index = 0;
         private bool dead_pixel_index_changed = false;
         private bool dead_pixel_pause_toggle = false;
         private readonly object dead_pixel_lockobj = new object();
         private Thread dead_pixel_colorChangingThread;
         private readonly int dead_pixel_color_change_interval = 4750; // ms
-        private bool dead_pixel_test_status = true;
+        private volatile bool dead_pixel_test_status = true;
         //
         private int Dynamic_range_color_count => dynamic_range_colors.Length;
         private const int dynamic_range_shade_count = 15;
@@ -86,12 +85,15 @@ namespace Glow.glow_tools{
             DisposeLabel();
         }
         private async void Message_dispose(){
-            await Task.Delay(7000);
-            if (InvokeRequired){
-                Invoke(new MethodInvoker(DisposeLabel));
-            }else{
-                DisposeLabel();
-            }
+            try{
+                await Task.Delay(7000);
+                if (IsDisposed || !IsHandleCreated) return;
+                if (InvokeRequired){
+                    BeginInvoke(new MethodInvoker(DisposeLabel));
+                }else{
+                    DisposeLabel();
+                }
+            }catch { }
         }
         private void DisposeLabel(){
             if (!message_disposed && InfoLabel != null && !InfoLabel.IsDisposed){
@@ -125,7 +127,7 @@ namespace Glow.glow_tools{
                                         dead_pixel_index_changed = false;
                                     }
                                 }
-                                while (dead_pixel_pause_toggle){
+                                while (dead_pixel_pause_toggle && dead_pixel_test_status){
                                     Thread.Sleep(100);
                                 }
                                 if (!dead_pixel_test_status)
@@ -228,6 +230,8 @@ namespace Glow.glow_tools{
                     };
                 }
                 Monitor_dynamic_range_box_resize();
+                if (InfoLabel != null && !InfoLabel.IsDisposed)
+                    InfoLabel.BringToFront();
             }catch (Exception ex){
                 if (GlowMain.debug_status) { TSErrorLog.LogException(ex, "Monitor_dynamic_range_test()"); }
             }
@@ -239,24 +243,28 @@ namespace Glow.glow_tools{
                 if (ClientSize.Width <= 0 || ClientSize.Height <= 0)
                     return;
                 this.SuspendLayout();
-                int totalWidth = ClientSize.Width;
-                int totalHeight = ClientSize.Height;
-                int boxWidth = (int)Math.Ceiling((double)totalWidth / Dynamic_range_color_count);
-                int boxHeight = (int)Math.Ceiling((double)totalHeight / dynamic_range_shade_count);
-                for (int colorIndex = 0; colorIndex < Dynamic_range_color_count; colorIndex++){
-                    for (int shadeIndex = 0; shadeIndex < dynamic_range_shade_count; shadeIndex++){
-                        int index = colorIndex * dynamic_range_shade_count + shadeIndex;
-                        if (index >= 0 && index < dynamic_range_boxs.Length && dynamic_range_boxs[index] != null && !dynamic_range_boxs[index].IsDisposed){
-                            if (dynamic_range_boxs[index].Width != boxWidth || dynamic_range_boxs[index].Height != boxHeight)
-                                dynamic_range_boxs[index].Size = new Size(boxWidth, boxHeight);
-                            Point target = new Point(colorIndex * boxWidth, shadeIndex * boxHeight);
-                            if (dynamic_range_boxs[index].Location != target)
-                                dynamic_range_boxs[index].Location = target;
+                try{
+                    int totalWidth = ClientSize.Width;
+                    int totalHeight = ClientSize.Height;
+                    int boxWidth = (int)Math.Ceiling((double)totalWidth / Dynamic_range_color_count);
+                    int boxHeight = (int)Math.Ceiling((double)totalHeight / dynamic_range_shade_count);
+                    for (int colorIndex = 0; colorIndex < Dynamic_range_color_count; colorIndex++){
+                        for (int shadeIndex = 0; shadeIndex < dynamic_range_shade_count; shadeIndex++){
+                            int index = colorIndex * dynamic_range_shade_count + shadeIndex;
+                            if (index >= 0 && index < dynamic_range_boxs.Length && dynamic_range_boxs[index] != null && !dynamic_range_boxs[index].IsDisposed){
+                                if (dynamic_range_boxs[index].Width != boxWidth || dynamic_range_boxs[index].Height != boxHeight)
+                                    dynamic_range_boxs[index].Size = new Size(boxWidth, boxHeight);
+                                Point target = new Point(colorIndex * boxWidth, shadeIndex * boxHeight);
+                                if (dynamic_range_boxs[index].Location != target)
+                                    dynamic_range_boxs[index].Location = target;
+                            }
                         }
                     }
+                }catch (Exception ex){
+                    if (GlowMain.debug_status) { TSErrorLog.LogException(ex, "Monitor_dynamic_range_box_resize()"); }
+                }finally{
+                    try{ this.ResumeLayout(false); }catch { }
                 }
-
-                this.ResumeLayout(false);
             }catch (Exception ex){
                 if (GlowMain.debug_status) { TSErrorLog.LogException(ex, "Monitor_dynamic_range_box_resize()"); }
             }

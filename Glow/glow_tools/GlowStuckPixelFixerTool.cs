@@ -122,6 +122,7 @@ namespace Glow.glow_tools{
         //
         private Bitmap frame;
         private readonly object frameLock = new object();
+        private Rectangle cachedArea = Rectangle.Empty;
         readonly int fieldLimit = 16;
         //
         private readonly System.Timers.Timer elapsedTimer;
@@ -210,6 +211,7 @@ namespace Glow.glow_tools{
                     headerPanel.Dock = DockStyle.Bottom;
                 else
                     headerPanel.Dock = DockStyle.Top;
+                UpdateCachedArea();
             };
             // ADD
             // ----------------------------
@@ -285,33 +287,40 @@ namespace Glow.glow_tools{
             stopwatch.Start();
             elapsedTimer = new System.Timers.Timer(1000);
             elapsedTimer.Elapsed += (s, e) => {
-                if (timeLabel.IsDisposed || !timeLabel.IsHandleCreated)
-                    return;
-                timeLabel.BeginInvoke((Action)(() => {
-                    if (timeLabel.IsDisposed)
+                try{
+                    if (timeLabel.IsDisposed || !timeLabel.IsHandleCreated)
                         return;
-                    timeLabel.Text = stopwatch.Elapsed.ToString(@"hh\:mm\:ss");
-                }));
+                    timeLabel.BeginInvoke((Action)(() => {
+                        if (timeLabel.IsDisposed)
+                            return;
+                        timeLabel.Text = stopwatch.Elapsed.ToString(@"hh\:mm\:ss");
+                    }));
+                }catch { }
             };
             elapsedTimer.Start();
             // RUN TEST
             // ----------------------------
             renderCts = new CancellationTokenSource();
             var token = renderCts.Token;
+            UpdateCachedArea();
             renderTask = Task.Run(() => {
                 Stopwatch frameTimer = Stopwatch.StartNew();
                 const double targetFrameTime = 1000.0 / 60; // 60 FPS
                 while (!token.IsCancellationRequested && !this.IsDisposed){
-                    UpdateFrame();
-                    if (this.IsHandleCreated && !this.IsDisposed){
-                        this.BeginInvoke(new Action(() => {
-                            if (this.IsDisposed || !this.IsHandleCreated)
-                                return;
-                            int topOffset = headerPanel.Dock == DockStyle.Top ? headerPanel.Height : 0;
-                            int bottomOffset = headerPanel.Dock == DockStyle.Bottom ? headerPanel.Height : 0;
-                            this.Invalidate(new Rectangle(0, topOffset, this.Width, this.Height - topOffset - bottomOffset));
-                        }));
-                    }
+                    try{ UpdateFrame(); }catch { }
+                    try{
+                        if (this.IsHandleCreated && !this.IsDisposed){
+                            this.BeginInvoke(new Action(() => {
+                                if (this.IsDisposed || !this.IsHandleCreated)
+                                    return;
+                                UpdateCachedArea();
+                                Rectangle area;
+                                lock (frameLock){ area = cachedArea; }
+                                if (area.Width > 0 && area.Height > 0)
+                                    this.Invalidate(area);
+                            }));
+                        }
+                    }catch { }
                     double elapsed = frameTimer.Elapsed.TotalMilliseconds;
                     double sleepTime = targetFrameTime - elapsed;
                     if (sleepTime > 0)
@@ -320,12 +329,21 @@ namespace Glow.glow_tools{
                 }
             }, token);
         }
-        // UPDATER FRAME
+        // RENDER AREA (UI THREAD ONLY) + UPDATER FRAME (WORKER THREAD)
         // ======================================================================================================
+        private void UpdateCachedArea(){
+            try{
+                int topOffset = headerPanel.Dock == DockStyle.Top ? headerPanel.Height : 0;
+                int bottomOffset = headerPanel.Dock == DockStyle.Bottom ? headerPanel.Height : 0;
+                Rectangle area = new Rectangle(0, topOffset, this.Width, this.Height - topOffset - bottomOffset);
+                lock (frameLock){
+                    cachedArea = (area.Width > 0 && area.Height > 0) ? area : Rectangle.Empty;
+                }
+            }catch { }
+        }
         private void UpdateFrame(){
-            int topOffset = headerPanel.Dock == DockStyle.Top ? headerPanel.Height : 0;
-            int bottomOffset = headerPanel.Dock == DockStyle.Bottom ? headerPanel.Height : 0;
-            Rectangle area = new Rectangle(0, topOffset, this.Width, this.Height - topOffset - bottomOffset);
+            Rectangle area;
+            lock (frameLock){ area = cachedArea; }
             if (area.Width <= 0 || area.Height <= 0)
                 return;
             lock (frameLock){
@@ -367,11 +385,18 @@ namespace Glow.glow_tools{
         // ALL TEST RENDER CHANGER FUNCTIONS
         // ======================================================================================================
         private void Header_MouseDown(object sender, MouseEventArgs e){
+            if (e.Button != MouseButtons.Left) return;
             dragging = true;
             dragStart = e.Location;
+            try{ headerPanel.Capture = true; }catch { }
         }
         private void Header_MouseMove(object sender, MouseEventArgs e){
             if (dragging){
+                if ((Control.MouseButtons & MouseButtons.Left) == MouseButtons.None){
+                    dragging = false;
+                    try{ headerPanel.Capture = false; }catch { }
+                    return;
+                }
                 var newPos = this.Location;
                 newPos.Offset(e.X - dragStart.X, e.Y - dragStart.Y);
                 if (newPos.X < 0) newPos.X = 0;
@@ -385,6 +410,7 @@ namespace Glow.glow_tools{
         }
         private void Header_MouseUp(object sender, MouseEventArgs e){
             dragging = false;
+            try{ headerPanel.Capture = false; }catch { }
         }
         private void TestBox_MouseDown(object sender, MouseEventArgs e){
             if (e.Button == MouseButtons.Left){
@@ -393,10 +419,19 @@ namespace Glow.glow_tools{
                 else if (IsOnBottomEdge(e.Location)) resizingBottom = true;
                 resizeStart = e.Location;
                 originalSize = this.Size;
+                try{ this.Capture = true; }catch { }
             }
         }
         private void TestBox_MouseMove(object sender, MouseEventArgs e){
             if (resizingRight || resizingBottom || resizingCorner){
+                if ((Control.MouseButtons & MouseButtons.Left) == MouseButtons.None){
+                    resizingRight = false;
+                    resizingBottom = false;
+                    resizingCorner = false;
+                    this.Cursor = Cursors.Default;
+                    try{ this.Capture = false; }catch { }
+                    return;
+                }
                 int newWidth = originalSize.Width;
                 int newHeight = originalSize.Height;
                 float scaleFactor = this.DeviceDpi / 96f;
@@ -409,6 +444,7 @@ namespace Glow.glow_tools{
                 if (this.Top + newHeight > parentForm.ClientSize.Height)
                     newHeight = parentForm.ClientSize.Height - this.Top;
                 this.Size = new Size(newWidth, newHeight);
+                UpdateCachedArea();
             }else{
                 if (IsInCorner(e.Location)) this.Cursor = Cursors.SizeNWSE;
                 else if (IsOnRightEdge(e.Location)) this.Cursor = Cursors.SizeWE;
@@ -421,6 +457,8 @@ namespace Glow.glow_tools{
             resizingBottom = false;
             resizingCorner = false;
             this.Cursor = Cursors.Default;
+            try{ this.Capture = false; }catch { }
+            UpdateCachedArea();
         }
         private bool IsOnRightEdge(Point p) => Math.Abs(p.X - this.Width) <= 6;
         private bool IsOnBottomEdge(Point p) => Math.Abs(p.Y - this.Height) <= 6;
@@ -429,6 +467,9 @@ namespace Glow.glow_tools{
             if (disposing){
                 try{
                     renderCts?.Cancel();
+                }catch (Exception) { }
+                try{
+                    renderCts?.Dispose();
                 }catch (Exception) { }
                 try{
                     elapsedTimer?.Stop();

@@ -18,6 +18,7 @@ namespace Glow.glow_tools{
         private readonly TSGetLangs software_lang = new TSGetLangs(GlowMain.lang_path);
         private string DNSTest_pingSendText, DNSTest_pingSendError;
         private List<DnsTestItem> DNSTest_dnsProviders;
+        private volatile bool DNSTest_isRunning = false;
         public GlowDNSTestTool(){
             InitializeComponent();
             //
@@ -119,16 +120,23 @@ namespace Glow.glow_tools{
                     DNSTable.Rows.Add(item.Provider.Name, software_lang.TSReadLangs("DNSTestTool", "dtt_start_await"));
                 }
                 DNSTable.ClearSelection();
+                this.FormClosing += new FormClosingEventHandler(GlowDNSTestTool_FormClosing);
             }catch (Exception ex){
                 if (GlowMain.debug_status) { TSErrorLog.LogException(ex, "GlowDNSTestTool_Load()"); }
+            }
+        }
+        private void GlowDNSTestTool_FormClosing(object sender, FormClosingEventArgs e){
+            if (DNSTest_isRunning){
+                e.Cancel = true;
             }
         }
         // Async DNS Check
         // ======================================================================================================
         private async Task CheckDnsAsync(DnsTestItem item){
+            string resultText = null;
+            long? best = null;
             try{
                 var sb = new StringBuilder();
-                long? best = null;
                 using (var ping = new Ping()){
                     // ONLY IPv4
                     var ipv4List = item.Provider.IPv4;
@@ -146,62 +154,104 @@ namespace Glow.glow_tools{
                             sb.Append("   |   ");
                     }
                 }
-                Invoke(new Action(() =>{
-                    DNSTable.Rows[item.RowIndex].Cells[1].Value = sb.ToString();
-                    item.BestPing = best;
-                    item.IsCompleted = true;
-                }));
-            }catch{
-                Invoke(new Action(() =>{
-                    item.IsCompleted = true;
-                }));
+                resultText = sb.ToString();
+            }catch (Exception ex){
+                if (GlowMain.debug_status) { TSErrorLog.LogException(ex, "CheckDnsAsync()"); }
+                resultText = DNSTest_pingSendError;
+                best = null;
             }
+            item.BestPing = best;
+            item.IsCompleted = true;
+            try{
+                if (IsDisposed || !IsHandleCreated) return;
+                if (item.RowIndex < 0 || item.RowIndex >= DNSTable.Rows.Count) return;
+                string text = string.IsNullOrEmpty(resultText) ? DNSTest_pingSendError : resultText;
+                if (InvokeRequired){
+                    BeginInvoke(new Action(() => {
+                        try{
+                            if (IsDisposed || !IsHandleCreated) return;
+                            if (item.RowIndex < 0 || item.RowIndex >= DNSTable.Rows.Count) return;
+                            DNSTable.Rows[item.RowIndex].Cells[1].Value = text;
+                        }catch { }
+                    }));
+                }else{
+                    DNSTable.Rows[item.RowIndex].Cells[1].Value = text;
+                }
+            }catch { }
         }
         // START ENGINE
         // ======================================================================================================
         private async void DNS_TestStartBtn_Click(object sender, EventArgs e){
+            if (DNSTest_isRunning) return;
             DNS_TestStartBtn.Enabled = false;
             DNS_TestExportBtn.Enabled = false;
-            // Check network connection
-            if (!await IsNetworkAvailable()){
-                DNS_PerfectResultLabel.Text = software_lang.TSReadLangs("DNSTestTool", "dtt_no_net");
-                TS_MessageBoxEngine.TS_MessageBox(this, 2, software_lang.TSReadLangs("DNSTestTool", "dtt_no_net_no_test"));
-                DNS_TestExportBtn.Enabled = true;
-                DNS_TestStartBtn.Enabled = true;
-                return;
+            try{
+                // Check network connection
+                if (!await IsNetworkAvailable()){
+                    DNS_PerfectResultLabel.Text = software_lang.TSReadLangs("DNSTestTool", "dtt_no_net");
+                    TS_MessageBoxEngine.TS_MessageBox(this, 2, software_lang.TSReadLangs("DNSTestTool", "dtt_no_net_no_test"));
+                    return;
+                }
+                DNSTest_isRunning = true;
+                string BestResultPrefix = software_lang.TSReadLangs("DNSTestTool", "dtt_best_result") + " ";
+                string awaitText = software_lang.TSReadLangs("DNSTestTool", "dtt_start_await");
+                foreach (var item in DNSTest_dnsProviders){
+                    item.BestPing = null;
+                    item.IsCompleted = false;
+                }
+                if (!IsDisposed && IsHandleCreated){
+                    foreach (var item in DNSTest_dnsProviders){
+                        if (item.RowIndex >= 0 && item.RowIndex < DNSTable.Rows.Count)
+                            DNSTable.Rows[item.RowIndex].Cells[1].Value = awaitText;
+                    }
+                    DNS_PerfectResultLabel.Text = "-";
+                }
+                //
+                Text = string.Format(software_lang.TSReadLangs("DNSTestTool", "dtt_title"), Application.ProductName) + " | " + software_lang.TSReadLangs("DNSTestTool", "dtt_title_test_ruining");
+                var tasks = DNSTest_dnsProviders.Select(p => CheckDnsAsync(p)).ToArray();
+                await Task.WhenAll(tasks);
+                var bestTwo = DNSTest_dnsProviders.Where(x => x.BestPing.HasValue).OrderBy(x => x.BestPing.Value).Take(2).ToList();
+                if (bestTwo.Count == 0){
+                    DNS_PerfectResultLabel.Text = "-";
+                }else if (bestTwo.Count == 1){
+                    DNS_PerfectResultLabel.Text = BestResultPrefix +  string.Format("{0} ({1} ms)", bestTwo[0].Provider.Name, bestTwo[0].BestPing.Value);
+                }else{
+                    DNS_PerfectResultLabel.Text = BestResultPrefix + string.Format("{0} ({1} ms)  |  {2} ({3} ms)", bestTwo[0].Provider.Name, bestTwo[0].BestPing.Value, bestTwo[1].Provider.Name, bestTwo[1].BestPing.Value);
+                }
+            }catch (Exception ex){
+                if (GlowMain.debug_status) { TSErrorLog.LogException(ex, "DNS_TestStartBtn_Click()"); }
+            }finally{
+                //
+                Text = string.Format(software_lang.TSReadLangs("DNSTestTool", "dtt_title"), Application.ProductName);
+                DNSTest_isRunning = false;
+                try{
+                    if (!IsDisposed && IsHandleCreated){
+                        DNS_TestExportBtn.Enabled = true;
+                        DNS_TestStartBtn.Enabled = true;
+                    }
+                }catch { }
             }
-            string BestResultPrefix = software_lang.TSReadLangs("DNSTestTool", "dtt_best_result") + " ";
-            //
-            Text = string.Format(software_lang.TSReadLangs("DNSTestTool", "dtt_title"), Application.ProductName) + " | " + software_lang.TSReadLangs("DNSTestTool", "dtt_title_test_ruining");
-            var tasks = DNSTest_dnsProviders.Select(p => CheckDnsAsync(p)).ToArray();
-            await Task.WhenAll(tasks);
-            var bestTwo = DNSTest_dnsProviders.Where(x => x.BestPing.HasValue).OrderBy(x => x.BestPing.Value).Take(2).ToList();
-            if (bestTwo.Count == 0){
-                DNS_PerfectResultLabel.Text = "-";
-            }else if (bestTwo.Count == 1){
-                DNS_PerfectResultLabel.Text = BestResultPrefix +  string.Format("{0} ({1} ms)", bestTwo[0].Provider.Name, bestTwo[0].BestPing.Value);
-            }else{
-                DNS_PerfectResultLabel.Text = BestResultPrefix + string.Format("{0} ({1} ms)  |  {2} ({3} ms)", bestTwo[0].Provider.Name, bestTwo[0].BestPing.Value, bestTwo[1].Provider.Name, bestTwo[1].BestPing.Value);
-            }
-            //
-            Text = string.Format(software_lang.TSReadLangs("DNSTestTool", "dtt_title"), Application.ProductName);
-            DNS_TestExportBtn.Enabled = true;
-            DNS_TestStartBtn.Enabled = true;
         }
         // COPY RESULT
         // ======================================================================================================
         private void DNSTable_CellDoubleClick(object sender, DataGridViewCellEventArgs e){
             try{
+                if (e.RowIndex < 0 || e.RowIndex >= DNSTable.Rows.Count) return;
                 if (DNSTest_dnsProviders.All(p => p.IsCompleted)){
                     if (DNSTable.SelectedRows.Count > 0){
-                        Clipboard.SetText(DNSTable.Rows[e.RowIndex].Cells[0].Value + ": " + DNSTable.Rows[e.RowIndex].Cells[1].Value);
-                        TS_MessageBoxEngine.TS_MessageBox(this, 1, string.Format(software_lang.TSReadLangs("DNSTestTool", "dtt_copy_success"), DNSTable.Rows[e.RowIndex].Cells[0].Value));
+                        string name = Convert.ToString(DNSTable.Rows[e.RowIndex].Cells[0].Value);
+                        string val = Convert.ToString(DNSTable.Rows[e.RowIndex].Cells[1].Value);
+                        Clipboard.SetText(name + ": " + val);
+                        TS_MessageBoxEngine.TS_MessageBox(this, 1, string.Format(software_lang.TSReadLangs("DNSTestTool", "dtt_copy_success"), name));
                     }
                 }else{
                     TS_MessageBoxEngine.TS_MessageBox(this, 2, software_lang.TSReadLangs("DNSTestTool", "dtt_copy_info"));
                 }
             }catch (Exception){
-                TS_MessageBoxEngine.TS_MessageBox(this, 3, string.Format(software_lang.TSReadLangs("DNSTestTool", "dtt_copy_failed"), DNSTable.Rows[e.RowIndex].Cells[0].Value, "\n"));
+                try{
+                    string name = e.RowIndex >= 0 && e.RowIndex < DNSTable.Rows.Count ? Convert.ToString(DNSTable.Rows[e.RowIndex].Cells[0].Value) : string.Empty;
+                    TS_MessageBoxEngine.TS_MessageBox(this, 3, string.Format(software_lang.TSReadLangs("DNSTestTool", "dtt_copy_failed"), name, "\n"));
+                }catch { }
             }
         }
         // PRINT ENGINE

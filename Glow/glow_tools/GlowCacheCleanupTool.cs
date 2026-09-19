@@ -117,48 +117,80 @@ namespace Glow.glow_tools{
         private void Check_folder_sizes(){
             try{
                 CCleanup_pathSizes.Clear();
+                string explorerDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Microsoft", "Windows", "Explorer");
+                string iconCacheDb = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "IconCache.db");
                 foreach (var path in cct_path_list){
-                    long path_size = 0;
-                    try{
-                        string explorerDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Microsoft", "Windows", "Explorer");
-                        string iconCacheDb = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "IconCache.db");
-                        if (string.Equals(path, explorerDir, StringComparison.OrdinalIgnoreCase)){
-                            if (Directory.Exists(explorerDir)){
-                                foreach (var f in Directory.EnumerateFiles(explorerDir, "iconcache*", SearchOption.TopDirectoryOnly)){
-                                    try { path_size += new FileInfo(f).Length; } catch { }
-                                }
-                                foreach (var f in Directory.EnumerateFiles(explorerDir, "thumbcache*", SearchOption.TopDirectoryOnly)){
-                                    try { path_size += new FileInfo(f).Length; } catch { }
-                                }
-                            }
-                            if (File.Exists(iconCacheDb)){
-                                try { path_size += new FileInfo(iconCacheDb).Length; } catch { }
-                            }
-                        }else if (Directory.Exists(path)){
-                            foreach (var f in Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories)){
-                                try { path_size += new FileInfo(f).Length; } catch { }
-                            }
-                        }else if (File.Exists(path)){
-                            path_size = new FileInfo(path).Length;
-                        }
-                    }catch (Exception) { }
-                    CCleanup_pathSizes.Add(path_size);
+                    CCleanup_pathSizes.Add(GetPathSizeSafe(path, explorerDir, iconCacheDb));
                 }
                 for (int i = 0; i < CCleanup_pathSizes.Count && i < CCTTable.Rows.Count; i++){
                     int index = i;
                     long size = CCleanup_pathSizes[i];
-                    if (CCTTable.InvokeRequired){
-                        CCTTable.Invoke(new Action(() =>
-                            CCTTable.Rows[index].Cells[2].Value = TS_FormatSize(size)
-                        ));
-                    }else{
-                        CCTTable.Rows[index].Cells[2].Value = TS_FormatSize(size);
-                    }
+                    try{
+                        if (CCTTable.InvokeRequired){
+                            CCTTable.BeginInvoke(new Action(() => {
+                                try{
+                                    if (IsDisposed || !IsHandleCreated) return;
+                                    if (index < CCTTable.Rows.Count) CCTTable.Rows[index].Cells[2].Value = TS_FormatSize(size);
+                                }catch { }
+                            }));
+                        }else{
+                            CCTTable.Rows[index].Cells[2].Value = TS_FormatSize(size);
+                        }
+                    }catch { }
                 }
             }catch (Exception ex){
                 if (GlowMain.debug_status) { TSErrorLog.LogException(ex, "Check_folder_sizes()"); }
             }
             finally { CCleanup_pathSizes.Clear(); }
+        }
+        private static long GetPathSizeSafe(string path, string explorerDir, string iconCacheDb){
+            long total = 0;
+            try{
+                if (string.Equals(path, explorerDir, StringComparison.OrdinalIgnoreCase)){
+                    if (Directory.Exists(explorerDir)){
+                        try{
+                            foreach (var f in Directory.EnumerateFiles(explorerDir, "iconcache*", SearchOption.TopDirectoryOnly)){
+                                try { total += new FileInfo(f).Length; } catch { }
+                            }
+                        }catch { }
+                        try{
+                            foreach (var f in Directory.EnumerateFiles(explorerDir, "thumbcache*", SearchOption.TopDirectoryOnly)){
+                                try { total += new FileInfo(f).Length; } catch { }
+                            }
+                        }catch { }
+                    }
+                    if (File.Exists(iconCacheDb)){
+                        try { total += new FileInfo(iconCacheDb).Length; } catch { }
+                    }
+                }else if (Directory.Exists(path)){
+                    var stack = new Stack<string>();
+                    stack.Push(path);
+                    while (stack.Count > 0){
+                        string dir = stack.Pop();
+                        string[] files = null;
+                        try{ files = Directory.GetFiles(dir); }catch{ continue; }
+                        if (files != null){
+                            foreach (var f in files){
+                                try { total += new FileInfo(f).Length; } catch { }
+                            }
+                        }
+                        string[] subDirs = null;
+                        try{ subDirs = Directory.GetDirectories(dir); }catch{ continue; }
+                        if (subDirs != null){
+                            foreach (var d in subDirs){
+                                try{
+                                    var di = new DirectoryInfo(d);
+                                    if ((di.Attributes & FileAttributes.ReparsePoint) != 0) continue;
+                                    stack.Push(d);
+                                }catch { }
+                            }
+                        }
+                    }
+                }else if (File.Exists(path)){
+                    try { total = new FileInfo(path).Length; } catch { }
+                }
+            }catch { }
+            return total;
         }
         // SELECT LABEL WRITE PATH
         // ======================================================================================================
@@ -184,9 +216,20 @@ namespace Glow.glow_tools{
             try{
                 TSGetLangs software_lang = new TSGetLangs(GlowMain.lang_path);
                 if (CCTTable.SelectedCells.Count > 0){
-                    DialogResult cct_check_delete_notifi = TS_MessageBoxEngine.TS_MessageBox(this, 6, string.Format(software_lang.TSReadLangs("CacheCleanupTool", "cct_check_delete_notification"), CCTTable.Rows[CCTTable.SelectedCells[0].RowIndex].Cells[1].Value.ToString().Trim(), "\n\n"));
+                    var selectedPaths = new List<string>();
+                    foreach (DataGridViewCell cell in CCTTable.SelectedCells){
+                        try{
+                            string p = CCTTable.Rows[cell.RowIndex].Cells[1].Value.ToString().Trim();
+                            if (!string.IsNullOrWhiteSpace(p) && !selectedPaths.Contains(p)) selectedPaths.Add(p);
+                        }catch { }
+                    }
+                    if (selectedPaths.Count == 0){
+                        TS_MessageBoxEngine.TS_MessageBox(this, 2, software_lang.TSReadLangs("CacheCleanupTool", "cct_check_select_clean_patch_info"));
+                        return;
+                    }
+                    DialogResult cct_check_delete_notifi = TS_MessageBoxEngine.TS_MessageBox(this, 6, string.Format(software_lang.TSReadLangs("CacheCleanupTool", "cct_check_delete_notification"), string.Join("\n", selectedPaths.ToArray()), "\n\n"));
                     if (cct_check_delete_notifi == DialogResult.Yes){
-                        await Cleanup_engine(CCTTable.Rows[CCTTable.SelectedCells[0].RowIndex].Cells[1].Value.ToString().Trim());
+                        await Cleanup_engine(selectedPaths);
                     }
                 }else{
                     TS_MessageBoxEngine.TS_MessageBox(this, 2, software_lang.TSReadLangs("CacheCleanupTool", "cct_check_select_clean_patch_info"));
@@ -197,41 +240,76 @@ namespace Glow.glow_tools{
         }
         // CLEANUP ENGINE
         // ======================================================================================================
-        private async Task Cleanup_engine(string target_path){
+        private async Task Cleanup_engine(List<string> target_paths){
+            int failedFiles = 0;
+            string firstPath = target_paths.Count > 0 ? target_paths[0] : string.Empty;
             try{
                 string explorerDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Microsoft", "Windows", "Explorer");
                 string iconCacheDb = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "IconCache.db");
-                if (string.Equals(target_path, explorerDir, StringComparison.OrdinalIgnoreCase)){
+                bool needExplorerRestart = false;
+                foreach (var tp in target_paths){
+                    if (string.Equals(tp, explorerDir, StringComparison.OrdinalIgnoreCase)){ needExplorerRestart = true; break; }
+                }
+                if (needExplorerRestart){
                     await RestartExplorerForCacheCleanupAsync();
-                    if (Directory.Exists(explorerDir)){
-                        foreach (var f in Directory.EnumerateFiles(explorerDir, "iconcache*", SearchOption.TopDirectoryOnly)){
-                            try { File.Delete(f); } catch { }
+                }
+                foreach (var target_path in target_paths){
+                    try{
+                        if (string.Equals(target_path, explorerDir, StringComparison.OrdinalIgnoreCase)){
+                            if (Directory.Exists(explorerDir)){
+                                foreach (var f in Directory.EnumerateFiles(explorerDir, "iconcache*", SearchOption.TopDirectoryOnly)){
+                                    try { File.Delete(f); } catch { failedFiles++; }
+                                }
+                                foreach (var f in Directory.EnumerateFiles(explorerDir, "thumbcache*", SearchOption.TopDirectoryOnly)){
+                                    try { File.Delete(f); } catch { failedFiles++; }
+                                }
+                            }
+                            if (File.Exists(iconCacheDb)){
+                                try { File.Delete(iconCacheDb); } catch { failedFiles++; }
+                            }
+                        }else if (File.Exists(target_path)){
+                            try { File.Delete(target_path); } catch { failedFiles++; }
+                        }else if (Directory.Exists(target_path)){
+                            DeleteDirContentsSafe(new DirectoryInfo(target_path), ref failedFiles);
                         }
-                        foreach (var f in Directory.EnumerateFiles(explorerDir, "thumbcache*", SearchOption.TopDirectoryOnly)){
-                            try { File.Delete(f); } catch { }
-                        }
+                    }catch (Exception exInner){
+                        failedFiles++;
+                        if (GlowMain.debug_status) { TSErrorLog.LogException(exInner, "Cleanup_engine() - " + target_path); }
                     }
-                    if (File.Exists(iconCacheDb)){
-                        try { File.Delete(iconCacheDb); } catch { }
-                    }
-                }else if (File.Exists(target_path)){
-                    try { File.Delete(target_path); } catch { }
-                }else if (Directory.Exists(target_path)){
-                    DirectoryInfo di = new DirectoryInfo(target_path);
-                    foreach (var f in di.GetFiles()) { try { f.Delete(); } catch { } }
-                    foreach (var d in di.GetDirectories()) { try { d.Delete(true); } catch { } }
                 }
                 CCleanup_aRefreshRepeat = true;
                 await CheckFolderSizesAsync();
                 TSGetLangs software_lang = new TSGetLangs(GlowMain.lang_path);
                 if (!IsDisposed && IsHandleCreated){
+                    int failed = failedFiles;
                     BeginInvoke(new Action(() => {
                         CCTTable.ClearSelection();
-                        TS_MessageBoxEngine.TS_MessageBox(this, 1, string.Format(software_lang.TSReadLangs("CacheCleanupTool", "cct_delete_success_notification"), target_path));
+                        // Same text, warning icon when some locked files were skipped (no new lang keys).
+                        TS_MessageBoxEngine.TS_MessageBox(this, failed == 0 ? 1 : 2, string.Format(software_lang.TSReadLangs("CacheCleanupTool", "cct_delete_success_notification"), firstPath));
                     }));
                 }
             }catch (Exception ex){
                 if (GlowMain.debug_status) { TSErrorLog.LogException(ex, "Cleanup_engine()"); }
+            }
+        }
+        private static void DeleteDirContentsSafe(DirectoryInfo di, ref int failedFiles){
+            FileInfo[] files;
+            try { files = di.GetFiles(); } catch { failedFiles++; return; }
+            if (files != null){
+                foreach (var f in files) { try { f.Delete(); } catch { failedFiles++; } }
+            }
+            DirectoryInfo[] dirs;
+            try { dirs = di.GetDirectories(); } catch { failedFiles++; return; }
+            if (dirs != null){
+                foreach (var d in dirs){
+                    try{
+                        if ((d.Attributes & FileAttributes.ReparsePoint) != 0){
+                            d.Delete();
+                        }else{
+                            d.Delete(true);
+                        }
+                    }catch { failedFiles++; }
+                }
             }
         }
         // SECURE EXPLORER RESET
@@ -258,7 +336,16 @@ namespace Glow.glow_tools{
             _ = Task.Run(async () => {
                 try{
                     await Task.Delay(2500);
-                    try { Process.Start(new ProcessStartInfo(winExplorerPath) { UseShellExecute = true }); } catch { }
+                    // App runs elevated: start explorer unelevated so the shell keeps the user token.
+                    bool started = false;
+                    try{
+                        using (var p = Process.Start(new ProcessStartInfo("runas", "/trustlevel:0x20000 \"" + winExplorerPath + "\"") { UseShellExecute = false, CreateNoWindow = true })){
+                            started = p != null;
+                        }
+                    }catch { started = false; }
+                    if (!started){
+                        try { Process.Start(new ProcessStartInfo(winExplorerPath) { UseShellExecute = true }); } catch { }
+                    }
                 }catch (Exception ex){
                     if (GlowMain.debug_status) { TSErrorLog.LogException(ex, "RestartExplorerForCacheCleanupAsync() - Timer Reset"); }
                 }

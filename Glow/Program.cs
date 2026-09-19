@@ -14,7 +14,7 @@ namespace Glow{
         // ======================================================================================================
         // GLOBAL SYSTEM INFO
         public static int Windows_mode { get; private set; } = 0;
-        public static string Windows_disk { get; private set; } = @"C:\";
+        public static string Windows_disk { get; private set; } = GetWindowsDisk();
         // ======================================================================================================
         // TS UPDATER TEXT
         public static readonly string updater_exe_name = "TSUpdater.exe";
@@ -34,7 +34,7 @@ namespace Glow{
                     string caption = results.Cast<ManagementObject>().Select(mo => mo["Caption"]?.ToString()).FirstOrDefault();
                     Windows_mode = (caption?.IndexOf("Windows 11", StringComparison.OrdinalIgnoreCase) >= 0) ? 1 : 0;
                 }
-                Windows_disk = Path.GetPathRoot(Environment.ExpandEnvironmentVariables("%SystemRoot%"))?.Trim();
+                Windows_disk = GetWindowsDisk();
             }catch (Exception){ }
             // ------------------------------------------------------------------
             Application.EnableVisualStyles();
@@ -46,6 +46,25 @@ namespace Glow{
             }
             // -----------------------------------
             Application.Run(new GlowMain());
+        }
+        // WINDOWS DISK DETECTION
+        // ======================================================================================================
+        private static string GetWindowsDisk(){
+            try{
+                string systemRoot = Environment.ExpandEnvironmentVariables("%SystemRoot%");
+                if (!string.IsNullOrWhiteSpace(systemRoot) && systemRoot.IndexOf('%') == -1){
+                    string root = Path.GetPathRoot(systemRoot);
+                    if (!string.IsNullOrWhiteSpace(root) && Path.IsPathRooted(root))
+                        return root.Trim();
+                }
+                string winDir = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+                if (!string.IsNullOrWhiteSpace(winDir)){
+                    string winRoot = Path.GetPathRoot(winDir);
+                    if (!string.IsNullOrWhiteSpace(winRoot) && Path.IsPathRooted(winRoot))
+                        return winRoot.Trim();
+                }
+            }catch{ }
+            return @"C:\";
         }
         // TS HYPER LOADER WRAPPER
         // ======================================================================================================

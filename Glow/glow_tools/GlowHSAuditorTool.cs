@@ -341,11 +341,14 @@ namespace Glow.glow_tools{
         private void Get_OS_Version(){
             try{
                 string rawOsName = "";
-                using (var searcher = new ManagementObjectSearcher("SELECT Caption FROM Win32_OperatingSystem")){
-                    foreach (ManagementObject os in searcher.Get().Cast<ManagementObject>()){
-                        if (os["Caption"] != null){
-                            rawOsName = os["Caption"].ToString();
-                            break;
+                using (var searcher = new ManagementObjectSearcher("SELECT Caption FROM Win32_OperatingSystem"))
+                using (ManagementObjectCollection osResults = searcher.Get()){
+                    foreach (ManagementObject os in osResults.Cast<ManagementObject>()){
+                        using (os){
+                            if (os["Caption"] != null){
+                                rawOsName = os["Caption"].ToString();
+                                break;
+                            }
                         }
                     }
                 }
@@ -398,19 +401,26 @@ namespace Glow.glow_tools{
                         return;
                     }
                 }
-                using (var searcher = new ManagementObjectSearcher("root\\CIMV2\\Security\\MicrosoftTpm", "SELECT IsActivated_InitialValue, SpecVersion FROM Win32_Tpm")){
-                    var results = searcher.Get().Cast<ManagementObject>().ToList();
-                    foreach (var query in results){
-                        bool isActivated = Convert.ToBoolean(query["IsActivated_InitialValue"]);
-                        string specVersion = Convert.ToString(query["SpecVersion"]) ?? "";
-                        bool isTPM20 = specVersion.Contains("2.0");
-                        if (isActivated && isTPM20){
-                            UpdateUI("TPM", STATUS_ENABLED, "2.0");
-                        }else if (isActivated && !isTPM20){
-                            UpdateUI("TPM", STATUS_DISABLED, "1.2");
-                        }else{
-                            UpdateUI("TPM", STATUS_DISABLED);
+                using (var searcher = new ManagementObjectSearcher("root\\CIMV2\\Security\\MicrosoftTpm", "SELECT IsActivated_InitialValue, SpecVersion FROM Win32_Tpm"))
+                using (ManagementObjectCollection tpmResults = searcher.Get()){
+                    bool tpmFound = false;
+                    foreach (ManagementObject query in tpmResults.Cast<ManagementObject>()){
+                        using (query){
+                            tpmFound = true;
+                            bool isActivated = Convert.ToBoolean(query["IsActivated_InitialValue"]);
+                            string specVersion = Convert.ToString(query["SpecVersion"]) ?? "";
+                            bool isTPM20 = specVersion.Contains("2.0");
+                            if (isActivated && isTPM20){
+                                UpdateUI("TPM", STATUS_ENABLED, "2.0");
+                            }else if (isActivated && !isTPM20){
+                                UpdateUI("TPM", STATUS_DISABLED, "1.2");
+                            }else{
+                                UpdateUI("TPM", STATUS_DISABLED);
+                            }
                         }
+                    }
+                    if (!tpmFound){
+                        UpdateUI("TPM", STATUS_DISABLED);
                     }
                 }
             }catch (Exception ex){
@@ -422,10 +432,10 @@ namespace Glow.glow_tools{
         // ======================================================================================================
         private void Get_VBS_Status(){
             try{
-                using (var searcher = new ManagementObjectSearcher("root\\Microsoft\\Windows\\DeviceGuard", "SELECT VirtualizationBasedSecurityStatus FROM Win32_DeviceGuard")){
-                    var results = searcher.Get().Cast<ManagementObject>().ToList();
-                    if (results.Count > 0){
-                        foreach (var query in results){
+                using (var searcher = new ManagementObjectSearcher("root\\Microsoft\\Windows\\DeviceGuard", "SELECT VirtualizationBasedSecurityStatus FROM Win32_DeviceGuard"))
+                using (ManagementObjectCollection vbsResults = searcher.Get()){
+                    foreach (ManagementObject query in vbsResults.Cast<ManagementObject>()){
+                        using (query){
                             if (query["VirtualizationBasedSecurityStatus"] != null){
                                 int status = Convert.ToInt32(query["VirtualizationBasedSecurityStatus"]);
                                 UpdateUI("VBS", status == 2 ? STATUS_ENABLED : STATUS_DISABLED);
@@ -463,7 +473,7 @@ namespace Glow.glow_tools{
                     UpdateUI("HVCI", enabled ? STATUS_ENABLED : STATUS_DISABLED);
                 }
             }catch (Exception ex){
-                UpdateUI("HVCI", STATUS_UNKNOWN);
+                UpdateUI("HVCI", STATUS_UNKNOWN, HSA_StatusHelper.GetErrorText());
                 if (GlowMain.debug_status) { TSErrorLog.LogException(ex, "Get_HVCI_Status()"); }
             }
         }
@@ -472,12 +482,21 @@ namespace Glow.glow_tools{
         private void Get_IOMMU_Status(){
             try{
                 int status = STATUS_DISABLED;
-                using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(@"root\Microsoft\Windows\DeviceGuard", "SELECT AvailableSecurityProperties FROM Win32_DeviceGuard")){
-                    foreach (ManagementObject queryObj in searcher.Get().Cast<ManagementObject>()){
-                        if (queryObj["AvailableSecurityProperties"] is int[] availableProps){
-                            if (availableProps.Contains(3)){
-                                status = STATUS_ENABLED;
-                                break;
+                using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(@"root\Microsoft\Windows\DeviceGuard", "SELECT AvailableSecurityProperties FROM Win32_DeviceGuard"))
+                using (ManagementObjectCollection iommuResults = searcher.Get()){
+                    foreach (ManagementObject queryObj in iommuResults.Cast<ManagementObject>()){
+                        using (queryObj){
+                            // WMI returns UInt16[], not int[] - check generically.
+                            if (queryObj["AvailableSecurityProperties"] is Array availableProps){
+                                foreach (var prop in availableProps){
+                                    try{
+                                        if (Convert.ToInt32(prop) == 3){
+                                            status = STATUS_ENABLED;
+                                            break;
+                                        }
+                                    }catch { }
+                                }
+                                if (status == STATUS_ENABLED) break;
                             }
                         }
                     }

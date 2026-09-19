@@ -185,6 +185,8 @@ namespace Glow{
             private static StreamWriter _writer;
             private static bool _isClosed = false;
             private static bool _isUnlocked = false;
+            private static bool _hasLogContent = false;
+            private const int MaxLogFileCount = 64;
             public static string LogDirectory{
                 get{
                     lock (_lock)
@@ -270,6 +272,7 @@ namespace Glow{
                     if (!Directory.Exists(_logDir)){
                         Directory.CreateDirectory(_logDir);
                     }
+                    TrimOldLogFiles_NoThrow();
                     string stamp = DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
                     string baseName = $"{Application.ProductName}_{Dns.GetHostName()}_{stamp}";
                     string path;
@@ -283,6 +286,7 @@ namespace Glow{
                             _writer = new StreamWriter(fs, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false)){
                                 AutoFlush = true
                             };
+                            _hasLogContent = false;
                             if (!keepUnlocked){
                                 _isUnlocked = false;
                             }
@@ -318,6 +322,7 @@ namespace Glow{
                     if (File.Exists(_currentLogFile)){
                         try{
                             var fs = new FileStream(_currentLogFile, FileMode.Append, FileAccess.Write, FileShare.Read);
+                            _hasLogContent = fs.Length > 0;
                             _writer = new StreamWriter(fs, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false)){
                                 AutoFlush = true
                             };
@@ -342,6 +347,21 @@ namespace Glow{
                 }catch (ObjectDisposedException) { }
                 catch { }
                 _writer = null;
+            }
+            private static void TrimOldLogFiles_NoThrow(){
+                try{
+                    FileInfo[] oldFiles = new DirectoryInfo(_logDir)
+                        .GetFiles("*.log")
+                        .OrderBy(file => file.CreationTimeUtc)
+                        .ThenBy(file => file.LastWriteTimeUtc)
+                        .ToArray();
+                    int filesToDelete = oldFiles.Length - MaxLogFileCount + 1;
+                    for (int i = 0; i < filesToDelete; i++){
+                        try{
+                            oldFiles[i].Delete();
+                        }catch { }
+                    }
+                }catch { }
             }
             private static void Write_NoLock(string text){
                 if (_isClosed) return;
@@ -369,9 +389,7 @@ namespace Glow{
                         return;
                     }
                     try{
-                        for (int i = 0; i < lines.Length; i++){
-                            _writer.WriteLine(prefix + lines[i]);
-                        }
+                        WriteLines_NoTrailingNewline(prefix, lines);
                         if (_isUnlocked){
                             _writer.Flush();
                             _writer.Dispose();
@@ -382,9 +400,7 @@ namespace Glow{
                         EnsureWriterOpen();
                         if (_writer != null){
                             try{
-                                for (int i = 0; i < lines.Length; i++){
-                                    _writer.WriteLine(prefix + lines[i]);
-                                }
+                                WriteLines_NoTrailingNewline(prefix, lines);
                                 if (_isUnlocked){
                                     _writer.Flush();
                                     _writer.Dispose();
@@ -399,11 +415,26 @@ namespace Glow{
                     }
                 }
             }
+            private static void WriteLines_NoTrailingNewline(string prefix, string[] lines){
+                for (int i = 0; i < lines.Length; i++){
+                    if (_hasLogContent || i > 0)
+                        _writer.WriteLine();
+                    _writer.Write(prefix + lines[i]);
+                }
+                _hasLogContent = true;
+            }
             private static string[] SplitLines(string text){
                 if (string.IsNullOrEmpty(text))
                     return Array.Empty<string>();
                 string normalized = text.Replace("\r\n", "\n").Replace("\r", "\n");
                 string[] parts = normalized.Split(new[] { '\n' }, StringSplitOptions.None);
+                int last = parts.Length - 1;
+                while (last >= 0 && parts[last].Length == 0)
+                    last--;
+                if (last < 0)
+                    return Array.Empty<string>();
+                if (last < parts.Length - 1)
+                    Array.Resize(ref parts, last + 1);
                 for (int i = 0; i < parts.Length; i++){
                     if (parts[i].Length > 0)
                         return parts;

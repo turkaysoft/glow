@@ -1,7 +1,7 @@
 ﻿// ======================================================================================================
 // Türkaysoft - C# Custom Graphics UI Library
-// Library Version: v26.10
-// Compilation Date: 19.08.2026
+// Library Version: v2.0
+// Compilation Date: 10.09.2026
 // © Eray Türkay
 // ======================================================================================================
 
@@ -77,11 +77,12 @@ namespace Glow
         private GraphicsPath GetFigurePath(Rectangle rect, float radius)
         {
             GraphicsPath path = new GraphicsPath();
+            if (rect.Width <= 0 || rect.Height <= 0) return path;
             float curveSize = radius * 2f;
             if (curveSize > rect.Width) curveSize = rect.Width;
             if (curveSize > rect.Height) curveSize = rect.Height;
             if (curveSize <= 0) curveSize = 0.1f;
-            path.StartFigure();
+ 
             path.AddArc(rect.X, rect.Y, curveSize, curveSize, 180, 90);
             path.AddArc(rect.Right - curveSize, rect.Y, curveSize, curveSize, 270, 90);
             path.AddArc(rect.Right - curveSize, rect.Bottom - curveSize, curveSize, curveSize, 0, 90);
@@ -91,11 +92,13 @@ namespace Glow
         }
         private void UpdateRegion()
         {
+            if (Width <= 0 || Height <= 0) return;
             float scale = DeviceDpi / 96f;
             int maxRadius = (int)(Height / scale);
             int safeRadius = Math.Min(borderRadius, maxRadius);
             int scaledBorderRadius = (int)(safeRadius * ScaleFactor);
             Rectangle rectSurface = ClientRectangle;
+            Region oldRegion = this.Region;
             if (scaledBorderRadius > 2)
             {
                 using (GraphicsPath pathSurface = GetFigurePath(rectSurface, scaledBorderRadius))
@@ -107,6 +110,7 @@ namespace Glow
             {
                 this.Region = new Region(rectSurface);
             }
+            oldRegion?.Dispose();
         }
         protected override void OnHandleCreated(EventArgs e)
         {
@@ -122,16 +126,19 @@ namespace Glow
         {
             base.OnPaint(e);
             if (Parent == null) return;
+            if (Width <= 0 || Height <= 0) return;
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.HighQuality;
             g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
             int scaledBorderSize = (int)(borderSize * ScaleFactor);
             float scale = DeviceDpi / 96f;
             int maxRadius = (int)(Height / scale);
             int safeRadius = Math.Min(borderRadius, maxRadius);
             int scaledBorderRadius = (int)(safeRadius * ScaleFactor);
             Rectangle rectSurface = ClientRectangle;
+            int maxBorder = Math.Min(rectSurface.Width, rectSurface.Height) / 2;
+            if (scaledBorderSize > maxBorder) scaledBorderSize = maxBorder;
+            if (scaledBorderSize < 0) scaledBorderSize = 0;
             RectangleF rectBorder = new RectangleF(scaledBorderSize / 2f, scaledBorderSize / 2f, rectSurface.Width - scaledBorderSize, rectSurface.Height - scaledBorderSize);
             int smoothSize = scaledBorderSize > 0 ? scaledBorderSize : 2;
             if (scaledBorderRadius > 2)
@@ -150,7 +157,7 @@ namespace Glow
             }
             else
             {
-                if (scaledBorderSize >= 1)
+                if (scaledBorderSize >= 1 && Width > 1 && Height > 1)
                 {
                     using (Pen penBorder = new Pen(borderColor, scaledBorderSize))
                     {
@@ -192,19 +199,72 @@ namespace Glow
     #region TS Custom CheckBox
     public class TSCustomCheckBox : CheckBox
     {
-        [Category("TS Appearance")] public Color CheckedColor { get; set; } = Color.DodgerBlue;
-        [Category("TS Appearance")] public Color CheckMarkColor { get; set; } = Color.White;
-        [Category("TS Appearance")] public Color UncheckedBackColor { get; set; } = Color.Transparent;
-        [Category("TS Appearance")] public bool DrawUncheckedFill { get; set; } = false;
-        [Category("TS Appearance")] public float BorderThickness { get; set; } = 2f;
-        [Category("TS Appearance")] public Color UncheckedBorderColor { get; set; } = Color.Gray;
-        [Category("TS Appearance")] public float BorderRadius { get; set; } = 2f;
-        [Category("TS Appearance")] public float MaxBorderThickness { get; set; } = 4f;
-        [Category("TS Appearance")] public float MaxBorderRadius { get; set; } = 8f;
+        private Color _checkedColor = Color.DodgerBlue;
+        [Category("TS Appearance")]
+        public Color CheckedColor
+        {
+            get => _checkedColor;
+            set { _checkedColor = value; Invalidate(); }
+        }
+        private Color _checkMarkColor = Color.White;
+        [Category("TS Appearance")]
+        public Color CheckMarkColor
+        {
+            get => _checkMarkColor;
+            set { _checkMarkColor = value; Invalidate(); }
+        }
+        private Color _uncheckedBackColor = Color.Transparent;
+        [Category("TS Appearance")]
+        public Color UncheckedBackColor
+        {
+            get => _uncheckedBackColor;
+            set { _uncheckedBackColor = value; Invalidate(); }
+        }
+        private bool _drawUncheckedFill = false;
+        [Category("TS Appearance")]
+        public bool DrawUncheckedFill
+        {
+            get => _drawUncheckedFill;
+            set { _drawUncheckedFill = value; Invalidate(); }
+        }
+        private float _borderThickness = 2f;
+        [Category("TS Appearance")]
+        public float BorderThickness
+        {
+            get => _borderThickness;
+            set { _borderThickness = Math.Max(0, value); Invalidate(); }
+        }
+        private Color _uncheckedBorderColor = Color.Gray;
+        [Category("TS Appearance")]
+        public Color UncheckedBorderColor
+        {
+            get => _uncheckedBorderColor;
+            set { _uncheckedBorderColor = value; Invalidate(); }
+        }
+        private float _borderRadius = 2f;
+        [Category("TS Appearance")]
+        public float BorderRadius
+        {
+            get => _borderRadius;
+            set { _borderRadius = Math.Max(0, value); Invalidate(); }
+        }
+        private float _maxBorderThickness = 4f;
+        [Category("TS Appearance")]
+        public float MaxBorderThickness
+        {
+            get => _maxBorderThickness;
+            set { _maxBorderThickness = Math.Max(0, value); Invalidate(); }
+        }
+        private float _maxBorderRadius = 8f;
+        [Category("TS Appearance")]
+        public float MaxBorderRadius
+        {
+            get => _maxBorderRadius;
+            set { _maxBorderRadius = Math.Max(0, value); Invalidate(); }
+        }
         public TSCustomCheckBox()
         {
             AutoSize = true;
-            DoubleBuffered = true;
             Cursor = Cursors.Hand;
             SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw | ControlStyles.SupportsTransparentBackColor, true);
         }
@@ -213,6 +273,21 @@ namespace Glow
             base.OnTextChanged(e);
             Invalidate();
             PerformLayout();
+        }
+        protected override void OnCheckedChanged(EventArgs e)
+        {
+            base.OnCheckedChanged(e);
+            Invalidate();
+        }
+        protected override void OnEnabledChanged(EventArgs e)
+        {
+            base.OnEnabledChanged(e);
+            Invalidate();
+        }
+        protected override void OnFontChanged(EventArgs e)
+        {
+            base.OnFontChanged(e);
+            Invalidate();
         }
         public override Size GetPreferredSize(Size proposedSize)
         {
@@ -229,6 +304,7 @@ namespace Glow
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaintBackground(e);
+            if (Width <= 0 || Height <= 0) return;
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.HighQuality;
             g.PixelOffsetMode = PixelOffsetMode.HighQuality;
@@ -279,11 +355,13 @@ namespace Glow
             }
             TextFormatFlags textFlags = TextFormatFlags.SingleLine | TextFormatFlags.NoPadding | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix;
             textFlags |= checkOnRight ? TextFormatFlags.Right : TextFormatFlags.Left;
-            TextRenderer.DrawText(g, Text, Font, textRect, Enabled ? ForeColor : SystemColors.GrayText, textFlags);
+            if (textRect.Width > 0 && textRect.Height > 0)
+                TextRenderer.DrawText(g, Text, Font, textRect, Enabled ? ForeColor : SystemColors.GrayText, textFlags);
         }
         private GraphicsPath GetRoundedRectPath(RectangleF rect, float radius)
         {
             GraphicsPath path = new GraphicsPath();
+            if (rect.Width <= 0 || rect.Height <= 0) return path;
             if (radius <= 0.5f)
             {
                 path.AddRectangle(rect);
@@ -360,14 +438,17 @@ namespace Glow
         public Color HoverForeColor { get => _hoverForeColor; set { _hoverForeColor = value; Invalidate(); } }
         [Category("TS Appearance")]
         public Color HoverButtonColor { get => _hoverButtonColor; set { _hoverButtonColor = value; Invalidate(); } }
+        private Color _selectedBackColor = SystemColors.Highlight;
         [Category("TS Appearance")]
-        public Color SelectedBackColor { get; set; } = SystemColors.Highlight;
+        public Color SelectedBackColor { get => _selectedBackColor; set { _selectedBackColor = value; Invalidate(); } }
+        private Color _selectedForeColor = SystemColors.HighlightText;
         [Category("TS Appearance")]
-        public Color SelectedForeColor { get; set; } = SystemColors.HighlightText;
+        public Color SelectedForeColor { get => _selectedForeColor; set { _selectedForeColor = value; Invalidate(); } }
         protected override void OnPaint(PaintEventArgs e)
         {
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
             Rectangle rect = ClientRectangle;
+            if (rect.Width <= 0 || rect.Height <= 0) return;
             bool rtl = RightToLeft == RightToLeft.Yes;
             float scale = DeviceDpi / 96f;
             int buttonWidth = (int)(20 * scale);
@@ -382,7 +463,8 @@ namespace Glow
                 e.Graphics.FillRectangle(b, rect);
             TextFormatFlags flags = TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix;
             flags |= rtl ? TextFormatFlags.Right : TextFormatFlags.Left;
-            TextRenderer.DrawText(e.Graphics, Text, Font, textRect, fore, flags);
+            if (textRect.Width > 0 && textRect.Height > 0)
+                TextRenderer.DrawText(e.Graphics, Text, Font, textRect, fore, flags);
             using (SolidBrush b = new SolidBrush(button))
                 e.Graphics.FillRectangle(b, buttonRect);
             float aw = 8 * scale;
@@ -396,8 +478,11 @@ namespace Glow
             };
             using (SolidBrush b = new SolidBrush(!Enabled ? _disabledArrowColor : _arrowColor))
                 e.Graphics.FillPolygon(b, arrow);
-            using (Pen p = new Pen(Focused ? _focusedBorderColor : _borderColor))
-                e.Graphics.DrawRectangle(p, 0, 0, rect.Width - 1, rect.Height - 1);
+            if (rect.Width > 1 && rect.Height > 1)
+            {
+                using (Pen p = new Pen(Focused ? _focusedBorderColor : _borderColor))
+                    e.Graphics.DrawRectangle(p, 0, 0, rect.Width - 1, rect.Height - 1);
+            }
         }
         private void TSCustomComboBox_DrawItem(object sender, DrawItemEventArgs e)
         {
@@ -410,20 +495,23 @@ namespace Glow
             TextFormatFlags flags = TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding | TextFormatFlags.NoPrefix;
             flags |= (RightToLeft == RightToLeft.Yes) ? TextFormatFlags.Right : TextFormatFlags.Left;
             Rectangle itemBounds = new Rectangle(e.Bounds.X + 4, e.Bounds.Y, e.Bounds.Width - 8, e.Bounds.Height);
-            TextRenderer.DrawText(e.Graphics, Items[e.Index].ToString(), Font, itemBounds, fore, flags);
+            TextRenderer.DrawText(e.Graphics, Items[e.Index]?.ToString() ?? string.Empty, Font, itemBounds, fore, flags);
         }
         protected override void OnGotFocus(EventArgs e) { base.OnGotFocus(e); Invalidate(); }
         protected override void OnLostFocus(EventArgs e) { base.OnLostFocus(e); Invalidate(); }
         protected override void OnEnabledChanged(EventArgs e) { base.OnEnabledChanged(e); Invalidate(); }
         protected override void OnRightToLeftChanged(EventArgs e) { base.OnRightToLeftChanged(e); Invalidate(); }
-        protected override void OnPaintBackground(PaintEventArgs e) { base.OnPaintBackground(e); }
-        protected override void WndProc(ref Message m)
+        protected override void OnSelectedIndexChanged(EventArgs e) { base.OnSelectedIndexChanged(e); Invalidate(); }
+        protected override void OnTextChanged(EventArgs e) { base.OnTextChanged(e); Invalidate(); }
+        protected override void OnFontChanged(EventArgs e) { base.OnFontChanged(e); Invalidate(); }
+        protected override void OnHandleCreated(EventArgs e) { base.OnHandleCreated(e); Invalidate(); }
+        protected override void Dispose(bool disposing)
         {
-            if (m.Msg == 0x000F)
+            if (disposing)
             {
-                this.Invalidate();
+                DrawItem -= TSCustomComboBox_DrawItem;
             }
-            base.WndProc(ref m);
+            base.Dispose(disposing);
         }
     }
     #endregion
@@ -466,14 +554,26 @@ namespace Glow
         [Browsable(true), Category("TS Appearance")] public Color FocusedBorderColor { get => _focusedBorderColor; set { _focusedBorderColor = value; Invalidate(); } }
         private void UpdateCalendarColors()
         {
-            this.CalendarForeColor = _foreColor;
-            this.CalendarMonthBackground = _backColor;
+            if (IsDisposed || Disposing) return;
+            try
+            {
+                this.CalendarForeColor = _foreColor;
+                this.CalendarMonthBackground = _backColor;
+            }
+            catch { }
+        }
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            base.OnHandleCreated(e);
+            UpdateCalendarColors();
+            Invalidate();
         }
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
             Rectangle rect = this.ClientRectangle;
+            if (rect.Width <= 0 || rect.Height <= 0) return;
             bool rtl = this.RightToLeft == RightToLeft.Yes;
             float scale = this.DeviceDpi / 96f;
             int buttonWidth = (int)(20 * scale);
@@ -486,7 +586,8 @@ namespace Glow
             using (SolidBrush b = new SolidBrush(effectiveBack))
                 e.Graphics.FillRectangle(b, rect);
             TextFormatFlags flags = TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix | (rtl ? TextFormatFlags.Right : TextFormatFlags.Left);
-            TextRenderer.DrawText(e.Graphics, this.Text, this.Font, textRect, effectiveFore, flags);
+            if (textRect.Width > 0 && textRect.Height > 0)
+                TextRenderer.DrawText(e.Graphics, this.Text, this.Font, textRect, effectiveFore, flags);
             using (SolidBrush b = new SolidBrush(effectiveButton))
                 e.Graphics.FillRectangle(b, buttonRect);
             int arrowWidth = (int)(8 * scale);
@@ -499,9 +600,12 @@ namespace Glow
             };
             using (SolidBrush arrowBrush = new SolidBrush(effectiveFore))
                 e.Graphics.FillPolygon(arrowBrush, arrow);
-            using (Pen pen = new Pen(this.Focused ? _focusedBorderColor : _borderColor))
-                e.Graphics.DrawRectangle(pen, 0, 0, rect.Width - 1, rect.Height - 1);
-            if (this.Focused && this.ShowFocusCues && this.Enabled)
+            if (rect.Width > 1 && rect.Height > 1)
+            {
+                using (Pen pen = new Pen(this.Focused ? _focusedBorderColor : _borderColor))
+                    e.Graphics.DrawRectangle(pen, 0, 0, rect.Width - 1, rect.Height - 1);
+            }
+            if (this.Focused && this.ShowFocusCues && this.Enabled && rect.Width > 4 && rect.Height > 4)
             {
                 Rectangle focusRect = new Rectangle(2, 2, rect.Width - 4, rect.Height - 4);
                 ControlPaint.DrawFocusRectangle(e.Graphics, focusRect);
@@ -536,13 +640,19 @@ namespace Glow
         }
         public TSCustomFLP()
         {
-            DoubleBuffered = true;
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.ResizeRedraw | ControlStyles.OptimizedDoubleBuffer | ControlStyles.SupportsTransparentBackColor, true);
+        }
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            base.OnHandleCreated(e);
+            UpdateRegion();
+            Invalidate();
         }
         private void UpdateRegion()
         {
             float scale = DeviceDpi / 96f;
             float radius = _borderRadius * scale;
+            Region oldRegion = this.Region;
             if (radius > 2 && this.Width > 0 && this.Height > 0)
             {
                 Rectangle rect = ClientRectangle;
@@ -555,14 +665,15 @@ namespace Glow
             {
                 this.Region = null;
             }
+            oldRegion?.Dispose();
         }
         protected override void OnPaint(PaintEventArgs e)
         {
             if (Parent == null) return;
+            if (Width <= 0 || Height <= 0) return;
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.HighQuality;
             g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
             float scale = DeviceDpi / 96f;
             float radius = _borderRadius * scale;
             Rectangle rectSurface = ClientRectangle;
@@ -575,7 +686,6 @@ namespace Glow
                 using (GraphicsPath pathSurface = GetRoundedRectangle(new RectangleF(rectSurface.X, rectSurface.Y, rectSurface.Width, rectSurface.Height), radius))
                 using (Pen penSurface = new Pen(Parent.BackColor, 2f))
                 {
-                    penSurface.Alignment = PenAlignment.Center;
                     g.DrawPath(penSurface, pathSurface);
                 }
             }
@@ -588,11 +698,12 @@ namespace Glow
         private GraphicsPath GetRoundedRectangle(RectangleF rect, float radius)
         {
             GraphicsPath path = new GraphicsPath();
+            if (rect.Width <= 0 || rect.Height <= 0) return path;
             float curveSize = radius * 2f;
             if (curveSize > rect.Width) curveSize = rect.Width;
             if (curveSize > rect.Height) curveSize = rect.Height;
             if (curveSize <= 0) curveSize = 0.1f;
-            path.StartFigure();
+ 
             path.AddArc(rect.X, rect.Y, curveSize, curveSize, 180, 90);
             path.AddArc(rect.Right - curveSize, rect.Y, curveSize, curveSize, 270, 90);
             path.AddArc(rect.Right - curveSize, rect.Bottom - curveSize, curveSize, curveSize, 0, 90);
@@ -605,33 +716,36 @@ namespace Glow
             base.OnScroll(se);
             if (!_restoringScroll)
             {
-                float dpiScale = DeviceDpi / 96f;
                 Point p = AutoScrollPosition;
-                _savedScrollPosition = new Point((int)(-p.X / dpiScale), (int)(-p.Y / dpiScale));
+                _savedScrollPosition = new Point(-p.X, -p.Y);
             }
         }
         protected override void OnResize(EventArgs e)
         {
-            float dpiScale = DeviceDpi / 96f;
             Point p = AutoScrollPosition;
-            _savedScrollPosition = new Point((int)(-p.X / dpiScale), (int)(-p.Y / dpiScale));
+            _savedScrollPosition = new Point(-p.X, -p.Y);
             base.OnResize(e);
             UpdateRegion();
             Invalidate();
             if (!IsHandleCreated || DesignMode) return;
-            BeginInvoke((MethodInvoker)delegate
+            try
             {
-                try
+                BeginInvoke((MethodInvoker)delegate
                 {
-                    _restoringScroll = true;
-                    float restoreDpiScale = DeviceDpi / 96f;
-                    AutoScrollPosition = new Point((int)(_savedScrollPosition.X * restoreDpiScale), (int)(_savedScrollPosition.Y * restoreDpiScale));
-                }
-                finally
-                {
-                    _restoringScroll = false;
-                }
-            });
+                    if (IsDisposed || Disposing || !IsHandleCreated) return;
+                    try
+                    {
+                        _restoringScroll = true;
+                        AutoScrollPosition = _savedScrollPosition;
+                    }
+                    catch { }
+                    finally
+                    {
+                        _restoringScroll = false;
+                    }
+                });
+            }
+            catch { }
         }
         protected override void OnParentChanged(EventArgs e)
         {
@@ -680,13 +794,19 @@ namespace Glow
         }
         public TSCustomLabel()
         {
-            DoubleBuffered = true;
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.ResizeRedraw | ControlStyles.OptimizedDoubleBuffer | ControlStyles.SupportsTransparentBackColor, true);
+        }
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            base.OnHandleCreated(e);
+            UpdateRegion();
+            Invalidate();
         }
         private void UpdateRegion()
         {
             float scale = DeviceDpi / 96f;
             float radius = _borderRadius * scale;
+            Region oldRegion = this.Region;
             if (radius > 2 && this.Width > 0 && this.Height > 0)
             {
                 Rectangle rect = ClientRectangle;
@@ -699,6 +819,7 @@ namespace Glow
             {
                 this.Region = null;
             }
+            oldRegion?.Dispose();
         }
         protected override void OnSizeChanged(EventArgs e)
         {
@@ -708,10 +829,10 @@ namespace Glow
         protected override void OnPaint(PaintEventArgs e)
         {
             if (Parent == null) return;
+            if (Width <= 0 || Height <= 0) return;
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.HighQuality;
             g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
             float scale = DeviceDpi / 96f;
             float radius = _borderRadius * scale;
             Rectangle rectSurface = ClientRectangle;
@@ -724,19 +845,20 @@ namespace Glow
                 using (GraphicsPath pathSurface = GetRoundedRectangle(new RectangleF(rectSurface.X, rectSurface.Y, rectSurface.Width, rectSurface.Height), radius))
                 using (Pen penSurface = new Pen(Parent.BackColor, 2f))
                 {
-                    penSurface.Alignment = PenAlignment.Center;
                     g.DrawPath(penSurface, pathSurface);
                 }
                 TextFormatFlags flags = GetTextFormatFlags();
                 Rectangle textRect = new Rectangle(this.Padding.Left, this.Padding.Top, this.Width - this.Padding.Horizontal, this.Height - this.Padding.Vertical);
-                TextRenderer.DrawText(g, Text, Font, textRect, ForeColor, flags);
+                if (textRect.Width > 0 && textRect.Height > 0)
+                    TextRenderer.DrawText(g, Text, Font, textRect, ForeColor, flags);
             }
             else
             {
                 using (SolidBrush brush = new SolidBrush(BackColor))
                     g.FillRectangle(brush, rectSurface);
                 TextFormatFlags flags = GetTextFormatFlags();
-                TextRenderer.DrawText(g, Text, Font, rectSurface, ForeColor, flags);
+                if (rectSurface.Width > 0 && rectSurface.Height > 0)
+                    TextRenderer.DrawText(g, Text, Font, rectSurface, ForeColor, flags);
             }
         }
         private TextFormatFlags GetTextFormatFlags()
@@ -769,11 +891,12 @@ namespace Glow
         private GraphicsPath GetRoundedRectangle(RectangleF rect, float radius)
         {
             GraphicsPath path = new GraphicsPath();
+            if (rect.Width <= 0 || rect.Height <= 0) return path;
             float curveSize = radius * 2f;
             if (curveSize > rect.Width) curveSize = rect.Width;
             if (curveSize > rect.Height) curveSize = rect.Height;
             if (curveSize <= 0) curveSize = 0.1f;
-            path.StartFigure();
+ 
             path.AddArc(rect.X, rect.Y, curveSize, curveSize, 180, 90);
             path.AddArc(rect.Right - curveSize, rect.Y, curveSize, curveSize, 270, 90);
             path.AddArc(rect.Right - curveSize, rect.Bottom - curveSize, curveSize, curveSize, 0, 90);
@@ -813,8 +936,26 @@ namespace Glow
     #region TS Custom ListBox
     public class TSCustomListBox : ListBox
     {
-        [Category("TS Appearance")] public Color SelectedBackColor { get; set; } = Color.DodgerBlue;
-        [Category("TS Appearance")] public Color SelectedForeColor { get; set; } = Color.White;
+        private const int LB_ADDSTRING = 0x180;
+        private const int LB_INSERTSTRING = 0x181;
+        private const int LB_DELETESTRING = 0x182;
+        private const int LB_RESETCONTENT = 0x184;
+        private const int LB_DIR = 0x18D;
+        private const int LB_ADDFILE = 0x196;
+        private Color _selectedBackColor = Color.DodgerBlue;
+        [Category("TS Appearance")]
+        public Color SelectedBackColor
+        {
+            get => _selectedBackColor;
+            set { _selectedBackColor = value; Invalidate(); }
+        }
+        private Color _selectedForeColor = Color.White;
+        [Category("TS Appearance")]
+        public Color SelectedForeColor
+        {
+            get => _selectedForeColor;
+            set { _selectedForeColor = value; Invalidate(); }
+        }
         public TSCustomListBox()
         {
             this.DrawMode = DrawMode.OwnerDrawFixed;
@@ -830,12 +971,24 @@ namespace Glow
         {
             base.OnHandleCreated(e);
             UpdateItemHeight();
+            UpdateHorizontalExtent();
         }
         protected override void OnFontChanged(EventArgs e)
         {
             base.OnFontChanged(e);
             UpdateItemHeight();
             UpdateHorizontalExtent();
+        }
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+            if (m.Msg == LB_ADDSTRING || m.Msg == LB_INSERTSTRING || m.Msg == LB_DELETESTRING || m.Msg == LB_RESETCONTENT || m.Msg == LB_DIR || m.Msg == LB_ADDFILE)
+            {
+                if (!IsDisposed && !Disposing && IsHandleCreated)
+                {
+                    UpdateHorizontalExtent();
+                }
+            }
         }
         protected override void OnDrawItem(DrawItemEventArgs e)
         {
@@ -850,7 +1003,8 @@ namespace Glow
             }
             Rectangle textBounds = new Rectangle(e.Bounds.X + 3, e.Bounds.Y, e.Bounds.Width - 3, e.Bounds.Height);
             TextFormatFlags flags = TextFormatFlags.VerticalCenter | TextFormatFlags.Left | TextFormatFlags.NoPrefix;
-            TextRenderer.DrawText(e.Graphics, this.Items[e.Index].ToString(), this.Font, textBounds, foreColor, flags);
+            if (textBounds.Width > 0 && textBounds.Height > 0)
+                TextRenderer.DrawText(e.Graphics, this.Items[e.Index]?.ToString() ?? string.Empty, this.Font, textBounds, foreColor, flags);
             if ((e.State & DrawItemState.Focus) != 0)
             {
                 e.DrawFocusRectangle();
@@ -858,6 +1012,7 @@ namespace Glow
         }
         public void UpdateHorizontalExtent()
         {
+            if (IsDisposed || Disposing) return;
             int maxExtent = 0;
             foreach (var item in this.Items)
             {
@@ -903,7 +1058,6 @@ namespace Glow
         }
         public TSCustomPanel()
         {
-            this.DoubleBuffered = true;
             this.BackColor = Color.White;
             this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.ResizeRedraw | ControlStyles.OptimizedDoubleBuffer | ControlStyles.SupportsTransparentBackColor, true);
         }
@@ -915,25 +1069,38 @@ namespace Glow
         }
         private void RecreatePaths()
         {
-            if (this.Width <= 0 || this.Height <= 0) return;
             pathSurface?.Dispose();
             pathBorder?.Dispose();
             pathSurface = null;
             pathBorder = null;
+            if (this.Width <= 0 || this.Height <= 0) return;
             float scale = this.DeviceDpi / 96f;
             float scaledBorderSize = borderSize * scale;
             float scaledRadius = borderRadius * scale;
+            float maxDim = Math.Min(this.Width, this.Height);
+            if (scaledBorderSize > maxDim) scaledBorderSize = maxDim;
+            if (scaledBorderSize < 0) scaledBorderSize = 0;
             RectangleF rectSurface = new RectangleF(0, 0, this.Width, this.Height);
             RectangleF rectBorder = new RectangleF(scaledBorderSize / 2f, scaledBorderSize / 2f, this.Width - scaledBorderSize, this.Height - scaledBorderSize);
+            if (rectBorder.Width <= 0 || rectBorder.Height <= 0)
+            {
+                if (scaledRadius > 2)
+                {
+                    pathSurface = GetRoundedRectangle(rectSurface, scaledRadius);
+                }
+                pathBorder = null;
+                return;
+            }
             if (scaledRadius > 2)
             {
                 pathSurface = GetRoundedRectangle(rectSurface, scaledRadius);
-                pathBorder = GetRoundedRectangle(rectBorder, scaledRadius - (scaledBorderSize / 2f));
+                pathBorder = GetRoundedRectangle(rectBorder, Math.Max(0, scaledRadius - (scaledBorderSize / 2f)));
             }
         }
         private void UpdateControlRegion()
         {
             float scale = this.DeviceDpi / 96f;
+            Region oldRegion = this.Region;
             if (pathSurface != null && (borderRadius * scale) > 2)
             {
                 this.Region = new Region(pathSurface);
@@ -942,13 +1109,14 @@ namespace Glow
             {
                 this.Region = null;
             }
+            oldRegion?.Dispose();
         }
         protected override void OnPaint(PaintEventArgs e)
         {
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.HighQuality;
             g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            if (Width <= 0 || Height <= 0) return;
             if (this.Parent != null)
             {
                 using (SolidBrush parentBrush = new SolidBrush(this.Parent.BackColor))
@@ -966,7 +1134,6 @@ namespace Glow
                 {
                     using (Pen penAntiAlias = new Pen(this.Parent.BackColor, 2f))
                     {
-                        penAntiAlias.Alignment = PenAlignment.Center;
                         g.DrawPath(penAntiAlias, pathSurface);
                     }
                 }
@@ -974,32 +1141,36 @@ namespace Glow
                 {
                     using (Pen penBorder = new Pen(borderColor, borderSize * scale))
                     {
-                        penBorder.Alignment = PenAlignment.Center;
                         g.DrawPath(penBorder, pathBorder);
                     }
                 }
             }
             else
             {
-                this.Region = null;
                 using (SolidBrush brush = new SolidBrush(this.BackColor))
                     g.FillRectangle(brush, this.ClientRectangle);
-                if (borderSize > 0)
+                if (borderSize > 0 && Width > 0 && Height > 0)
                 {
                     float scaledBorderSize = borderSize * scale;
-                    using (Pen penBorder = new Pen(borderColor, scaledBorderSize))
-                        g.DrawRectangle(penBorder, scaledBorderSize / 2f, scaledBorderSize / 2f, this.Width - scaledBorderSize, this.Height - scaledBorderSize);
+                    float maxDimElse = Math.Min(Width, Height);
+                    if (scaledBorderSize > maxDimElse) scaledBorderSize = maxDimElse;
+                    if (this.Width - scaledBorderSize > 0 && this.Height - scaledBorderSize > 0)
+                    {
+                        using (Pen penBorder = new Pen(borderColor, scaledBorderSize))
+                            g.DrawRectangle(penBorder, scaledBorderSize / 2f, scaledBorderSize / 2f, this.Width - scaledBorderSize, this.Height - scaledBorderSize);
+                    }
                 }
             }
         }
         private GraphicsPath GetRoundedRectangle(RectangleF rect, float radius)
         {
             GraphicsPath path = new GraphicsPath();
+            if (rect.Width <= 0 || rect.Height <= 0) return path;
             float curveSize = radius * 2f;
             if (curveSize > rect.Width) curveSize = rect.Width;
             if (curveSize > rect.Height) curveSize = rect.Height;
             if (curveSize <= 0) curveSize = 0.1f;
-            path.StartFigure();
+ 
             path.AddArc(rect.X, rect.Y, curveSize, curveSize, 180, 90);
             path.AddArc(rect.Right - curveSize, rect.Y, curveSize, curveSize, 270, 90);
             path.AddArc(rect.Right - curveSize, rect.Bottom - curveSize, curveSize, curveSize, 0, 90);
@@ -1034,16 +1205,30 @@ namespace Glow
     #region TS Custom RadioButton
     public class TSCustomRadioButton : RadioButton
     {
-        [Category("TS Appearance")] public Color CheckedColor { get; set; } = Color.DodgerBlue;
-        [Category("TS Appearance")] public Color UnCheckedColor { get; set; } = Color.Gray;
+        private Color _checkedColor = Color.DodgerBlue;
+        [Category("TS Appearance")]
+        public Color CheckedColor
+        {
+            get => _checkedColor;
+            set { _checkedColor = value; Invalidate(); }
+        }
+        private Color _unCheckedColor = Color.Gray;
+        [Category("TS Appearance")]
+        public Color UnCheckedColor
+        {
+            get => _unCheckedColor;
+            set { _unCheckedColor = value; Invalidate(); }
+        }
         public TSCustomRadioButton()
         {
             AutoSize = true;
-            DoubleBuffered = true;
             Cursor = Cursors.Hand;
             SetStyle(ControlStyles.UserPaint | ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw | ControlStyles.SupportsTransparentBackColor, true);
         }
         protected override void OnTextChanged(EventArgs e) { base.OnTextChanged(e); Invalidate(); PerformLayout(); }
+        protected override void OnCheckedChanged(EventArgs e) { base.OnCheckedChanged(e); Invalidate(); }
+        protected override void OnEnabledChanged(EventArgs e) { base.OnEnabledChanged(e); Invalidate(); }
+        protected override void OnFontChanged(EventArgs e) { base.OnFontChanged(e); Invalidate(); }
         public override Size GetPreferredSize(Size proposedSize)
         {
             float dpi = DeviceDpi / 96f;
@@ -1059,6 +1244,7 @@ namespace Glow
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaintBackground(e);
+            if (Width <= 0 || Height <= 0) return;
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.HighQuality;
             g.PixelOffsetMode = PixelOffsetMode.HighQuality;
@@ -1081,7 +1267,8 @@ namespace Glow
             }
             TextFormatFlags textFlags = TextFormatFlags.SingleLine | TextFormatFlags.NoPadding | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPrefix;
             textFlags |= rightAligned ? TextFormatFlags.Right : TextFormatFlags.Left;
-            TextRenderer.DrawText(g, Text, Font, textRect, Enabled ? ForeColor : SystemColors.GrayText, textFlags);
+            if (textRect.Width > 0 && textRect.Height > 0)
+                TextRenderer.DrawText(g, Text, Font, textRect, Enabled ? ForeColor : SystemColors.GrayText, textFlags);
         }
     }
     #endregion
@@ -1102,16 +1289,46 @@ namespace Glow
                 Invalidate();
             }
         }
-        [Category("TS Appearance")] public Color TrackColor { get; set; } = Color.LightGray;
-        [Category("TS Appearance")] public Color TrackFillColor { get; set; } = Color.DodgerBlue;
-        [Category("TS Appearance")] public float TrackHeight { get; set; } = 8f;
-        [Category("TS Appearance")] public float TrackRadius { get; set; } = 5f;
-        [Category("TS Appearance")] public Color ThumbColor { get; set; } = Color.DodgerBlue;
-        [Category("TS Appearance")] public Color ThumbHoverColor { get; set; } = Color.DodgerBlue;
-        [Category("TS Appearance")] public Color ThumbPressedColor { get; set; } = Color.DodgerBlue;
-        [Category("TS Appearance")] public Color ThumbBorderColor { get; set; } = Color.DimGray;
-        [Category("TS Appearance")] public float ThumbRadius { get; set; } = 10f;
-        [Category("TS Appearance")] public float ThumbBorderThickness { get; set; } = 0f;
+        private Color _trackColor = Color.LightGray;
+        [Category("TS Appearance")] public Color TrackColor { get => _trackColor; set { _trackColor = value; Invalidate(); } }
+        private Color _trackFillColor = Color.DodgerBlue;
+        [Category("TS Appearance")] public Color TrackFillColor { get => _trackFillColor; set { _trackFillColor = value; Invalidate(); } }
+        private float _trackHeight = 8f;
+        [Category("TS Appearance")]
+        public float TrackHeight
+        {
+            get => _trackHeight;
+            set { _trackHeight = Math.Max(0, value); Invalidate(); }
+        }
+        private float _trackRadius = 5f;
+        [Category("TS Appearance")]
+        public float TrackRadius
+        {
+            get => _trackRadius;
+            set { _trackRadius = Math.Max(0, value); Invalidate(); }
+        }
+        private Color _thumbColor = Color.DodgerBlue;
+        [Category("TS Appearance")] public Color ThumbColor { get => _thumbColor; set { _thumbColor = value; Invalidate(); } }
+        private Color _thumbHoverColor = Color.DodgerBlue;
+        [Category("TS Appearance")] public Color ThumbHoverColor { get => _thumbHoverColor; set { _thumbHoverColor = value; Invalidate(); } }
+        private Color _thumbPressedColor = Color.DodgerBlue;
+        [Category("TS Appearance")] public Color ThumbPressedColor { get => _thumbPressedColor; set { _thumbPressedColor = value; Invalidate(); } }
+        private Color _thumbBorderColor = Color.DimGray;
+        [Category("TS Appearance")] public Color ThumbBorderColor { get => _thumbBorderColor; set { _thumbBorderColor = value; Invalidate(); } }
+        private float _thumbRadius = 10f;
+        [Category("TS Appearance")]
+        public float ThumbRadius
+        {
+            get => _thumbRadius;
+            set { _thumbRadius = Math.Max(0, value); Invalidate(); }
+        }
+        private float _thumbBorderThickness = 0f;
+        [Category("TS Appearance")]
+        public float ThumbBorderThickness
+        {
+            get => _thumbBorderThickness;
+            set { _thumbBorderThickness = Math.Max(0, value); Invalidate(); }
+        }
         private int _minimum = 0;
         private int _maximum = 100;
         private int _value = 0;
@@ -1124,6 +1341,8 @@ namespace Glow
             set
             {
                 _minimum = value;
+                if (_maximum < _minimum)
+                    _maximum = _minimum;
                 if (_value < _minimum)
                 {
                     _value = _minimum;
@@ -1139,6 +1358,8 @@ namespace Glow
             set
             {
                 _maximum = value;
+                if (_minimum > _maximum)
+                    _minimum = _maximum;
                 if (_value > _maximum)
                 {
                     _value = _maximum;
@@ -1160,11 +1381,16 @@ namespace Glow
                 ValueChanged?.Invoke(this, EventArgs.Empty);
             }
         }
-        [Category("TS Appearance")] public bool Vertical { get; set; } = false;
+        private bool _vertical = false;
+        [Category("TS Appearance")]
+        public bool Vertical
+        {
+            get => _vertical;
+            set { _vertical = value; Invalidate(); }
+        }
         public event EventHandler ValueChanged;
         public TSCustomTrackBar()
         {
-            DoubleBuffered = true;
             this.Cursor = Cursors.Hand;
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.ResizeRedraw | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.SupportsTransparentBackColor, true);
         }
@@ -1172,6 +1398,7 @@ namespace Glow
         {
             float scale = DeviceDpi / 96f;
             float radius = _borderRadius * scale;
+            Region oldRegion = this.Region;
             if (radius > 2 && this.Width > 0 && this.Height > 0)
             {
                 Rectangle rect = ClientRectangle;
@@ -1184,6 +1411,7 @@ namespace Glow
             {
                 this.Region = null;
             }
+            oldRegion?.Dispose();
         }
         protected override void OnSizeChanged(EventArgs e)
         {
@@ -1223,7 +1451,7 @@ namespace Glow
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.HighQuality;
             g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            if (Width <= 0 || Height <= 0) return;
             float dpiScale = DeviceDpi / 96f;
             float radius = _borderRadius * dpiScale;
             Rectangle rectSurface = ClientRectangle;
@@ -1236,7 +1464,6 @@ namespace Glow
                 using (GraphicsPath pathSurface = GetRoundedRectPath(new RectangleF(rectSurface.X, rectSurface.Y, rectSurface.Width, rectSurface.Height), radius))
                 using (Pen penSurface = new Pen(Parent.BackColor, 2f))
                 {
-                    penSurface.Alignment = PenAlignment.Center;
                     g.DrawPath(penSurface, pathSurface);
                 }
             }
@@ -1251,6 +1478,7 @@ namespace Glow
             float trackRad = TrackRadius * dpiScale;
             float margin = thumbR + (bThick / 2f) + 2f;
             RectangleF trackRect = Vertical ? new RectangleF((Width - trackH) / 2f, margin, trackH, Height - (2 * margin)) : new RectangleF(margin, (Height - trackH) / 2f, Width - (2 * margin), trackH);
+            if (trackRect.Width <= 0 || trackRect.Height <= 0) return;
             using (GraphicsPath trackPath = GetRoundedRectPath(trackRect, trackRad))
             using (SolidBrush br = new SolidBrush(TrackColor))
                 g.FillPath(br, trackPath);
@@ -1264,6 +1492,7 @@ namespace Glow
             }
             PointF thumbCenter = Vertical ? new PointF(Width / 2f, trackRect.Bottom - (trackRect.Height * ratio)) : new PointF(trackRect.X + (trackRect.Width * ratio), Height / 2f);
             RectangleF thumbRect = new RectangleF(thumbCenter.X - thumbR, thumbCenter.Y - thumbR, thumbR * 2, thumbR * 2);
+            if (thumbRect.Width <= 0 || thumbRect.Height <= 0) return;
             Color activeThumbColor = _pressed ? ThumbPressedColor : (_hover ? ThumbHoverColor : ThumbColor);
             using (SolidBrush br = new SolidBrush(activeThumbColor))
                 g.FillEllipse(br, thumbRect);
@@ -1279,6 +1508,7 @@ namespace Glow
         private GraphicsPath GetRoundedRectPath(RectangleF rect, float radius)
         {
             GraphicsPath path = new GraphicsPath();
+            if (rect.Width <= 0 || rect.Height <= 0) return path;
             if (radius <= 0.1f) { path.AddRectangle(rect); return path; }
             float d = radius * 2;
             if (d > rect.Width) d = rect.Width;

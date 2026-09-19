@@ -76,8 +76,17 @@ namespace Glow.glow_tools{
         }
         private void AsyncLoadWallpaper(){
             try{
-                if (!File.Exists(GlowMain.wp_rotate))
+                if (string.IsNullOrWhiteSpace(GlowMain.wp_rotate) || !File.Exists(GlowMain.wp_rotate)){
+                    if (!IsDisposed && IsHandleCreated){
+                        BeginInvoke(new Action(() => {
+                            if (IsDisposed || !IsHandleCreated) return;
+                            TSGetLangs software_lang = new TSGetLangs(GlowMain.lang_path);
+                            TS_MessageBoxEngine.TS_MessageBox(this, 2, software_lang.TSReadLangs("Os_Content", "os_c_wallpaper_open_error"));
+                            Close();
+                        }));
+                    }
                     return;
+                }
                 GetWallpaperInfo(GlowMain.wp_rotate);
                 byte[] bytes = File.ReadAllBytes(GlowMain.wp_rotate);
                 Image img;
@@ -87,7 +96,12 @@ namespace Glow.glow_tools{
                 }
                 if (WPImage.IsHandleCreated && !WPImage.IsDisposed){
                     WPImage.BeginInvoke(new Action(() =>{
-                        SetPictureBoxImage(WPImage, img);
+                        try{
+                            if (WPImage.IsDisposed || !WPImage.IsHandleCreated){ img.Dispose(); return; }
+                            SetPictureBoxImage(WPImage, img);
+                        }finally{
+                            try{ img.Dispose(); }catch { }
+                        }
                     }));
                 }else{
                     img.Dispose();
@@ -100,7 +114,7 @@ namespace Glow.glow_tools{
             if (!File.Exists(path)) return;
             string res = "-";
             try{
-                using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+                using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 using (var img = Image.FromStream(fs, false, false)){
                     res = $"{img.Width}x{img.Height}";
                 }

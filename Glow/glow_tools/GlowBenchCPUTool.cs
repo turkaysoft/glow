@@ -3,6 +3,7 @@ using System.Linq;
 using System.Drawing;
 using System.Management;
 using System.Diagnostics;
+using System.Threading;
 using System.Windows.Forms;
 using System.Threading.Tasks;
 //
@@ -144,15 +145,23 @@ namespace Glow.glow_tools{
                     Bench_CPUCores.Text = software_lang.TSReadLangs("Cpu_Content", "cpu_c_loading");
                 }));
                 using (var searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT Name, NumberOfCores, ThreadCount FROM Win32_Processor")){
-                    foreach (ManagementObject queryObj in searcher.Get().Cast<ManagementObject>()){
-                        string cpuName = Convert.ToString(queryObj["Name"]).Trim();
-                        string cpuCores = string.Format(software_lang.TSReadLangs("BenchCPU", "bc_core_thread"), queryObj["NumberOfCores"], queryObj["ThreadCount"]);
-                        if (IsDisposed || !IsHandleCreated)
-                            return;
-                        BeginInvoke(new Action(() => {
-                            Bench_CPUName.Text = cpuName;
-                            Bench_CPUCores.Text = cpuCores;
-                        }));
+                    ManagementObjectCollection results = null;
+                    try{
+                        results = searcher.Get();
+                        foreach (ManagementObject queryObj in results.Cast<ManagementObject>()){
+                            using (queryObj){
+                                string cpuName = Convert.ToString(queryObj["Name"]).Trim();
+                                string cpuCores = string.Format(software_lang.TSReadLangs("BenchCPU", "bc_core_thread"), queryObj["NumberOfCores"], queryObj["ThreadCount"]);
+                                if (IsDisposed || !IsHandleCreated)
+                                    return;
+                                BeginInvoke(new Action(() => {
+                                    Bench_CPUName.Text = cpuName;
+                                    Bench_CPUCores.Text = cpuCores;
+                                }));
+                            }
+                        }
+                    }finally{
+                        try{ results?.Dispose(); }catch { }
                     }
                 }
             }catch (Exception ex){
@@ -252,15 +261,6 @@ namespace Glow.glow_tools{
             }catch (Exception ex){
                 if (GlowMain.debug_status) { TSErrorLog.LogException(ex, "BenchTimerAsync() - Timer"); }
             }
-            try{
-                if (IsDisposed || !IsHandleCreated)
-                    return;
-                BeginInvoke(new Action(() => {
-                    Text = string.Format(software_lang.TSReadLangs("BenchCPU", "bc_title"), Application.ProductName);
-                }));
-            }catch (Exception ex){
-                if (GlowMain.debug_status) { TSErrorLog.LogException(ex, "BenchTimerAsync()"); }
-            }
         }
         // CPU BENCHMARK ENGINE
         // ======================================================================================================
@@ -275,8 +275,6 @@ namespace Glow.glow_tools{
                 Bench_TimeSelector_List.Enabled = false;
                 Bench_TimeCustom.Enabled = false;
                 // CPU SYSTEM
-                double[] coreSpeeds = GetCoreSpeeds();
-                double averageSpeed = CalculateAverageSpeed(coreSpeeds);
                 int coreCount = Environment.ProcessorCount;
                 if (Bench_ModeSelector_List.SelectedIndex == 0)
                     coreCount /= 3;
@@ -286,23 +284,49 @@ namespace Glow.glow_tools{
                     coreCount -= 1;
                 if (coreCount < 1)
                     coreCount = 1;
-                // CPU SCORE
-                var updateScoreTask = Task.Run(async () => {
-                    while (CPUBench_isRunning && GlowMain.CPUbenchMode){
-                        CPUBench_singleThreadScore = CalculateSingleThreadScore(coreCount, averageSpeed);
-                        CPUBench_multiThreadScore = CalculateMultiThreadScore(coreCount, averageSpeed);
-                        if (IsDisposed || !IsHandleCreated)
-                            break;
-                        BeginInvoke(new Action(() => {
-                            Bench_Label_RSingleResult.Text = CPUBench_singleThreadScore.ToString("N0");
-                            Bench_Label_RMultiResult.Text = CPUBench_multiThreadScore.ToString("N0");
-                        }));
-                        await Task.Delay(100);
-                    }
-                });
                 // ENGINE STARTER
                 CPUBench_stopWatch = new Stopwatch();
                 CPUBench_collector = new double[coreCount];
+                // REAL SCORE SAMPLER (measures actual throughput, not a static formula)
+                var updateScoreTask = Task.Run(async () => {
+                    double prevTotal = 0;
+                    bool firstSample = true;
+                    DateTime prevTime = DateTime.UtcNow;
+                    while (CPUBench_isRunning && GlowMain.CPUbenchMode){
+                        await Task.Delay(500);
+                        if (!CPUBench_isRunning || !GlowMain.CPUbenchMode)
+                            break;
+                        double total = 0;
+                        try{
+                            double[] snapshot = CPUBench_collector;
+                            if (snapshot == null)
+                                continue;
+                            for (int k = 0; k < snapshot.Length; k++)
+                                total += snapshot[k];
+                        }catch { continue; }
+                        DateTime now = DateTime.UtcNow;
+                        double secs = (now - prevTime).TotalSeconds;
+                        prevTime = now;
+                        if (firstSample || secs <= 0){ prevTotal = total; firstSample = false; continue; }
+                        double delta = total - prevTotal;
+                        prevTotal = total;
+                        if (delta < 0) delta = 0;
+                        double multiOps = delta / secs;
+                        double singleOps = coreCount > 0 ? multiOps / coreCount : multiOps;
+                        int singleScore = singleOps > int.MaxValue ? int.MaxValue : (int)Math.Round(singleOps);
+                        int multiScore = multiOps > int.MaxValue ? int.MaxValue : (int)Math.Round(multiOps);
+                        CPUBench_singleThreadScore = singleScore;
+                        CPUBench_multiThreadScore = multiScore;
+                        if (IsDisposed || !IsHandleCreated)
+                            break;
+                        try{
+                            BeginInvoke(new Action(() => {
+                                Bench_Label_RSingleResult.Text = singleScore.ToString("N0");
+                                Bench_Label_RMultiResult.Text = multiScore.ToString("N0");
+                            }));
+                        }catch { }
+                    }
+                });
                 //
                 TimeSpan benchDuration = TimeSpan.FromMinutes(1);
                 if (Bench_TimeSelector_List.SelectedIndex == 0)
@@ -317,6 +341,7 @@ namespace Glow.glow_tools{
                     benchDuration = TimeSpan.FromHours(1);
                 else if (!string.IsNullOrEmpty(Bench_TimeCustom.Text)){
                     if (double.TryParse(Bench_TimeCustom.Text.Trim(), out double customMinutes) && customMinutes > 0){
+                        if (customMinutes > 180) customMinutes = 180;
                         benchDuration = TimeSpan.FromMinutes(customMinutes);
                     }
                 }
@@ -331,7 +356,7 @@ namespace Glow.glow_tools{
                     int coreIndex = i;
                     CPUBench_taskList[i] = Task.Run(() => {
                         // ENGINE MODE
-                        Random random = new Random(unchecked(Environment.TickCount * 31 + coreIndex));
+                        Random random = new Random(unchecked(Guid.NewGuid().GetHashCode() ^ (coreIndex * 997) ^ Thread.CurrentThread.ManagedThreadId));
                         while (CPUBench_isRunning && DateTime.Now < endTime){
                             double number = random.NextDouble();
                             double result = Math.Sqrt(number);
@@ -347,6 +372,7 @@ namespace Glow.glow_tools{
                 }
                 //
                 CPUBench_stopWatch.Stop();
+                bool stoppedEarly = !CPUBench_isRunning || DateTime.Now < endTime;
                 CPUBench_isRunning = false;
                 GlowMain.CPUbenchMode = false;
                 //
@@ -361,7 +387,7 @@ namespace Glow.glow_tools{
                     if (GlowMain.debug_status) { TSErrorLog.LogException(ex, "CPUBench - timerTask"); }
                 }
                 //
-                if (!IsDisposed && IsHandleCreated){
+                if (!IsDisposed && IsHandleCreated && !stoppedEarly){
                     BeginInvoke(new Action(() => {
                         Bench_Start.Enabled = true;
                         Bench_Stop.Enabled = false;
@@ -373,49 +399,6 @@ namespace Glow.glow_tools{
                     }));
                 }
             }
-        }
-        // SINGLE THREAD SCORE
-        // ======================================================================================================
-        private int CalculateSingleThreadScore(int coreCount, double averageSpeed){
-            double singleThreadPerformance = averageSpeed;
-            double referencePerformance = coreCount * 2.0;
-            int singleThreadScore = (int)((singleThreadPerformance / referencePerformance) * 1000);
-            return singleThreadScore;
-        }
-        // MULTI THREAD SCORE
-        // ======================================================================================================
-        private int CalculateMultiThreadScore(int coreCount, double averageSpeed){
-            double multiThreadPerformance = averageSpeed * coreCount;
-            double referencePerformance = coreCount * 2.0;
-            int multiThreadScore = (int)((multiThreadPerformance / referencePerformance) * 1000);
-            return multiThreadScore;
-        }
-        // CPU SPEED
-        // ======================================================================================================
-        private double[] GetCoreSpeeds(){
-            double[] speeds = new double[Environment.ProcessorCount];
-            double cpuSpeed = 0;
-            int count = 0;
-            ManagementObjectSearcher ts_search = new ManagementObjectSearcher("SELECT CurrentClockSpeed FROM Win32_Processor");
-            foreach (ManagementObject ts_obj in ts_search.Get().Cast<ManagementObject>()){
-                cpuSpeed += Convert.ToDouble(ts_obj["CurrentClockSpeed"]);
-                count++;
-            }
-            if (count > 0)
-                cpuSpeed /= count;
-            for (int i = 0; i < speeds.Length; i++){
-                speeds[i] = cpuSpeed;
-            }
-            return speeds;
-        }
-        // AVERAGE SPEED
-        // ======================================================================================================
-        private double CalculateAverageSpeed(double[] speeds){
-            double sum = 0;
-            foreach (double speed in speeds){
-                sum += speed;
-            }
-            return speeds.Length > 0 ? sum / speeds.Length : 0;
         }
         // ENGINE STOP BTN
         // ======================================================================================================
@@ -431,6 +414,9 @@ namespace Glow.glow_tools{
                 //
                 Bench_Start.Enabled = true;
                 Bench_Stop.Enabled = false;
+                Bench_ModeSelector_List.Enabled = true;
+                Bench_TimeSelector_List.Enabled = true;
+                Bench_TimeCustom.Enabled = true;
                 //
                 try{
                     if (CPUBench_taskList != null){
@@ -445,18 +431,16 @@ namespace Glow.glow_tools{
                 TSGetLangs software_lang = new TSGetLangs(GlowMain.lang_path);
                 Text = $"{string.Format(software_lang.TSReadLangs("BenchCPU", "bc_title"), Application.ProductName)} | {software_lang.TSReadLangs("BenchCPU", "bc_stop_engine_message")}";
                 //
-                // Console.WriteLine($"Hesaplama süresi: {stopwatch.Elapsed.Seconds} saniye");
+                // Console.WriteLine($"Computation time: {stopwatch.Elapsed.Seconds} seconds");
             }
         }
         // EXIT
         // ======================================================================================================
         private void GlowBenchCPU_FormClosing(object sender, FormClosingEventArgs e){
-            if (GlowMain.CPUbenchMode){
+            if (GlowMain.CPUbenchMode || CPUBench_isRunning){
                 e.Cancel = true;
                 TSGetLangs software_lang = new TSGetLangs(GlowMain.lang_path);
                 TS_MessageBoxEngine.TS_MessageBox(this, 2, software_lang.TSReadLangs("GToolsMessage", "gtm_benchmark_cpu_prs_msg"));
-            }else{
-                Bench_stop_engine();
             }
         }
     }

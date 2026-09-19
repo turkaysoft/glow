@@ -16,6 +16,7 @@ namespace Glow.glow_tools{
         // ======================================================================================================
         private Task DISKBench_benchmarkTask;
         private bool DISKBench_isBenchmarking = false, DISKBench_speedMode = true, DISKBench_stopMode = false;
+        private ulong DISKBench_maxReadSpeed = 0, DISKBench_maxWriteSpeed = 0;
         private string DISKBench_benchmarkFilePath, DISKBench_selectDisk, DISKBench_globalTimer;
         private readonly int[] DISKBench_sizesInGB = { 1, 5, 10, 15, 20, 25, 32, 64, 128 }, DISKBench_bufferSizesInKB = { 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096 };
         private readonly List<string> DISKBench_benchmarkDiskList = new List<string>();
@@ -190,20 +191,31 @@ namespace Glow.glow_tools{
             try{
                 DriveInfo[] drives = DriveInfo.GetDrives();
                 foreach (DriveInfo drive in drives){
-                    string driveInfo;
-                    if (string.IsNullOrWhiteSpace(drive.VolumeLabel)){
-                        driveInfo = $"{software_lang.TSReadLangs("BenchDisk", "bd_select_local_disk")} ({drive.Name.Replace("\\", string.Empty)}) - {TS_FormatSize(drive.TotalSize)}";
-                    }else{
-                        driveInfo = $"{drive.VolumeLabel} ({drive.Name.Replace("\\", string.Empty)}) - {TS_FormatSize(drive.TotalSize)}";
-                    }
-                    items.Add(driveInfo);
-                    diskNames.Add(drive.Name);
-                    double freeSpace = 0;
                     try{
-                        freeSpace = drive.IsReady ? (drive.TotalFreeSpace / 1024.0 / 1024.0 / 1024.0) : 0;
-                    }catch { freeSpace = 0; }
-                    diskFree.Add(freeSpace);
-                    diskTypes.Add(drive.DriveType.ToString().ToLower().Trim());
+                        string vol = string.Empty;
+                        try{ vol = drive.VolumeLabel; }catch { vol = string.Empty; }
+                        string totalText;
+                        try{ totalText = TS_FormatSize(drive.TotalSize); }
+                        catch{ totalText = "?"; }
+                        string driveInfo;
+                        if (string.IsNullOrWhiteSpace(vol)){
+                            driveInfo = $"{software_lang.TSReadLangs("BenchDisk", "bd_select_local_disk")} ({drive.Name.Replace("\\", string.Empty)}) - {totalText}";
+                        }else{
+                            driveInfo = $"{vol} ({drive.Name.Replace("\\", string.Empty)}) - {totalText}";
+                        }
+                        items.Add(driveInfo);
+                        diskNames.Add(drive.Name);
+                        double freeSpace = 0;
+                        try{
+                            freeSpace = drive.IsReady ? (drive.TotalFreeSpace / 1024.0 / 1024.0 / 1024.0) : 0;
+                        }catch { freeSpace = 0; }
+                        diskFree.Add(freeSpace);
+                        string dtype = "unknown";
+                        try{ dtype = drive.DriveType.ToString().ToLower().Trim(); }catch { dtype = "unknown"; }
+                        diskTypes.Add(dtype);
+                    }catch (Exception exInner){
+                        TSErrorLog.LogException(exInner, "RefreshDriveList - single drive");
+                    }
                 }
             }catch (Exception ex){
                 TSErrorLog.LogException(ex, "RefreshDriveList - DriveInfo");
@@ -234,11 +246,26 @@ namespace Glow.glow_tools{
                 Bench_DiskSelector_List.SelectedIndexChanged += Bench_DiskSelector_List_SelectedIndexChanged;
             }catch { }
         }
+        private void RefreshFreeSpaceSnapshot(){
+            try{
+                for (int i = 0; i < DISKBench_benchmarkDiskList.Count; i++){
+                    try{
+                        var di = new DriveInfo(DISKBench_benchmarkDiskList[i]);
+                        if (i < DISKBench_benchmarkDiskListFreeSpace.Count){
+                            DISKBench_benchmarkDiskListFreeSpace[i] = di.IsReady ? (di.TotalFreeSpace / 1024.0 / 1024.0 / 1024.0) : 0;
+                        }
+                    }catch { }
+                }
+            }catch (Exception ex){
+                TSErrorLog.LogException(ex, "RefreshFreeSpaceSnapshot()");
+            }
+        }
         // START BTN
         // ======================================================================================================
         private void Bench_Start_Click(object sender, EventArgs e){
             try{
                 TSGetLangs software_lang = new TSGetLangs(GlowMain.lang_path);
+                RefreshFreeSpaceSnapshot();
                 if (Bench_DiskSelector_List.SelectedIndex < 0 || Bench_DiskSelector_List.SelectedIndex >= DISKBench_benchmarkDiskList.Count){
                     TS_MessageBoxEngine.TS_MessageBox(this, 2, software_lang.TSReadLangs("BenchDisk", "bd_select_disk"));
                     return;
@@ -301,11 +328,12 @@ namespace Glow.glow_tools{
                 if (Bench_DiskSelector_List.SelectedItem != null){
                     caption += " " + Bench_DiskSelector_List.SelectedItem.ToString().Trim();
                 }
-                success_warning = TS_MessageBoxEngine.TS_MessageBox(this, 6, message, caption);
                 if (!startEngine){
-                    success_warning = TS_MessageBoxEngine.TS_MessageBox(this, 1, message, caption);
+                    TS_MessageBoxEngine.TS_MessageBox(this, 1, message, caption);
+                    return;
                 }
-                if (startEngine && success_warning == DialogResult.Yes){
+                success_warning = TS_MessageBoxEngine.TS_MessageBox(this, 6, message, caption);
+                if (success_warning == DialogResult.Yes){
                     Start_engine();
                 }
             }catch (Exception ex){
@@ -355,6 +383,14 @@ namespace Glow.glow_tools{
                 string selectedDrive = DISKBench_benchmarkDiskList[Bench_DiskSelector_List.SelectedIndex];
                 DISKBench_speedMode = true;
                 DISKBench_isBenchmarking = true;
+                DISKBench_maxReadSpeed = 0;
+                DISKBench_maxWriteSpeed = 0;
+                TSGetLangs speedLang = new TSGetLangs(GlowMain.lang_path);
+                string awaitText = speedLang.TSReadLangs("BenchDisk", "bd_start_test_await");
+                Bench_L_WriteSpeed_V.SetTextSafe(awaitText);
+                Bench_L_Max_WriteSpeed_V.SetTextSafe(awaitText);
+                Bench_R_ReadSpeed_V.SetTextSafe(awaitText);
+                Bench_R_Max_ReadSpeed_V.SetTextSafe(awaitText);
                 try{
                     int selSizeIndex = Bench_SizeSelector_List.SelectedIndex;
                     string customSizeText = Bench_SizeCustom.Text ?? string.Empty;
@@ -399,6 +435,24 @@ namespace Glow.glow_tools{
                 TSErrorLog.LogException(ex, "UpdateProgress()");
             }
         }
+        private void ResetBenchUiAfterEarlyExit(){
+            try{
+                DISKBench_isBenchmarking = false;
+                GlowMain.DISKbenchMode = false;
+                if (!IsDisposed && IsHandleCreated){
+                    this.ExecuteSafe(() =>{
+                        Bench_Start.SetEnabledSafe(true);
+                        Bench_Stop.SetEnabledSafe(false);
+                        Bench_DiskSelector_List.SetEnabledSafe(true);
+                        Bench_SizeSelector_List.SetEnabledSafe(true);
+                        Bench_SizeCustom.SetEnabledSafe(true);
+                        Bench_BufferSelector_List.SetEnabledSafe(true);
+                    });
+                }
+            }catch (Exception ex){
+                TSErrorLog.LogException(ex, "ResetBenchUiAfterEarlyExit()");
+            }
+        }
         // DISK BENCHMARK
         // ======================================================================================================
         private async Task RunBenchmarkAsync(string selectedDrive, int selSizeIndex, string customSizeText, int bufferIndex){
@@ -411,14 +465,16 @@ namespace Glow.glow_tools{
                 if (selSizeIndex >= 0 && selSizeIndex < DISKBench_sizesInGB.Length){
                     fileSizeInBytes = GigabytesToBytes(DISKBench_sizesInGB[selSizeIndex]);
                 }else if (selSizeIndex == customIndex){
-                    if (!int.TryParse(customSizeText.Trim(), out int parsed) || parsed <= 0){
-                        TS_MessageBoxEngine.TS_MessageBox(this, 2, string.Format(software_lang.TSReadLangs("BenchDisk", "bd_test_custom_invalid_size")));
+                    if (!double.TryParse(customSizeText.Trim(), out double parsed) || parsed < 10 || parsed > 256){
+                        ResetBenchUiAfterEarlyExit();
+                        TS_MessageBoxEngine.TS_MessageBox(this, 2, software_lang.TSReadLangs("BenchDisk", "bd_test_custom_invalid_size"));
                         return;
                     }
                     fileSizeInBytes = GigabytesToBytes(parsed);
                 }
                 if (fileSizeInBytes <= 0){
-                    TS_MessageBoxEngine.TS_MessageBox(this, 2, string.Format(software_lang.TSReadLangs("BenchDisk", "bd_test_file_size_not_calc")));
+                    ResetBenchUiAfterEarlyExit();
+                    TS_MessageBoxEngine.TS_MessageBox(this, 2, software_lang.TSReadLangs("BenchDisk", "bd_test_file_size_not_calc"));
                     return;
                 }
                 if (bufferIndex >= 0 && bufferIndex < DISKBench_bufferSizesInKB.Length){
@@ -427,11 +483,15 @@ namespace Glow.glow_tools{
                 if (global_buffer <= 0) global_buffer = 1024;
                 byte[] buffer = KilobytesToBytes(global_buffer);
                 var timerTask = BenchTimerAsync();
+                this.ExecuteSafe(() =>{ Bench_R_ReadSpeed_V.Text = "0.0 MB/s"; });
                 // WRITE
+                long bytesWrittenTotal = 0;
                 Stopwatch swWrite = Stopwatch.StartNew();
                 using (FileStream fs = new FileStream(DISKBench_benchmarkFilePath, FileMode.Create, FileAccess.Write, FileShare.None, buffer.Length, FileOptions.WriteThrough)){
                     long bytesWritten = 0;
                     double lastProgress = 0;
+                    long lastUiBytes = 0;
+                    TimeSpan lastUiTime = TimeSpan.Zero;
                     while (bytesWritten < fileSizeInBytes && DISKBench_isBenchmarking){
                         int bufferSize = (int)Math.Min(buffer.Length, fileSizeInBytes - bytesWritten);
                         fs.Write(buffer, 0, bufferSize);
@@ -441,31 +501,64 @@ namespace Glow.glow_tools{
                             UpdateProgress(progress);
                             lastProgress = progress;
                         }
-                        if (!GlowMain.DISKbenchMode) break;
-                    }
-                    fs.Flush();
-                }
-                swWrite.Stop();
-                double writeMBps = (fileSizeInBytes / (1024.0 * 1024.0)) / Math.Max(0.0001, swWrite.Elapsed.TotalSeconds);
-                await Task.Delay(1000);
-                // READ
-                Stopwatch swRead = Stopwatch.StartNew();
-                long totalBytesRead = 0;
-                double lastProgressRead = 0;
-                using (FileStream fs = new FileStream(DISKBench_benchmarkFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, buffer.Length, FileOptions.WriteThrough | FileOptions.SequentialScan)){
-                    int bytesRead;
-                    while ((bytesRead = fs.Read(buffer, 0, buffer.Length)) > 0 && DISKBench_isBenchmarking){
-                        totalBytesRead += bytesRead;
-                        double progress = (double)totalBytesRead / fileSizeInBytes * 100;
-                        if (progress - lastProgressRead >= 1){
-                            UpdateProgress(progress);
-                            lastProgressRead = progress;
+                        TimeSpan nowW = swWrite.Elapsed;
+                        if ((nowW - lastUiTime).TotalSeconds >= 1){
+                            double instSec = Math.Max(0.001, (nowW - lastUiTime).TotalSeconds);
+                            double instW = ((bytesWritten - lastUiBytes) / (1024.0 * 1024.0)) / instSec;
+                            lastUiBytes = bytesWritten;
+                            lastUiTime = nowW;
+                            ulong instWb = (ulong)(instW * 1024 * 1024);
+                            if (instWb > DISKBench_maxWriteSpeed) DISKBench_maxWriteSpeed = instWb;
+                            this.ExecuteSafe(() =>{
+                                Bench_L_WriteSpeed_V.Text = string.Format("{0:F1} MB/s", instW);
+                                Bench_L_Max_WriteSpeed_V.Text = string.Format("{0:F1} MB/s", DISKBench_maxWriteSpeed / (1024.0 * 1024.0));
+                            });
                         }
                         if (!GlowMain.DISKbenchMode) break;
                     }
+                    fs.Flush();
+                    bytesWrittenTotal = bytesWritten;
                 }
-                swRead.Stop();
-                double readMBps = (totalBytesRead / (1024.0 * 1024.0)) / Math.Max(0.0001, swRead.Elapsed.TotalSeconds);
+                swWrite.Stop();
+                double writeMBps = (bytesWrittenTotal / (1024.0 * 1024.0)) / Math.Max(0.0001, swWrite.Elapsed.TotalSeconds);
+                await Task.Delay(1000);
+                // READ (skip if user stopped during the pause)
+                long totalBytesRead = 0;
+                double readMBps = 0;
+                if (DISKBench_isBenchmarking && GlowMain.DISKbenchMode && File.Exists(DISKBench_benchmarkFilePath)){
+                    this.ExecuteSafe(() =>{ Bench_L_WriteSpeed_V.Text = "0.0 MB/s"; });
+                    Stopwatch swRead = Stopwatch.StartNew();
+                    double lastProgressRead = 0;
+                    long lastUiReadBytes = 0;
+                    TimeSpan lastUiReadTime = TimeSpan.Zero;
+                    using (FileStream fs = new FileStream(DISKBench_benchmarkFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, buffer.Length, FileOptions.SequentialScan)){
+                        int bytesRead;
+                        while ((bytesRead = fs.Read(buffer, 0, buffer.Length)) > 0 && DISKBench_isBenchmarking){
+                            totalBytesRead += bytesRead;
+                            double progress = fileSizeInBytes > 0 ? (double)totalBytesRead / fileSizeInBytes * 100 : 0;
+                            if (progress - lastProgressRead >= 1){
+                                UpdateProgress(progress);
+                                lastProgressRead = progress;
+                            }
+                            TimeSpan nowR = swRead.Elapsed;
+                            if ((nowR - lastUiReadTime).TotalSeconds >= 1){
+                                double instSec = Math.Max(0.001, (nowR - lastUiReadTime).TotalSeconds);
+                                double instR = ((totalBytesRead - lastUiReadBytes) / (1024.0 * 1024.0)) / instSec;
+                                lastUiReadBytes = totalBytesRead;
+                                lastUiReadTime = nowR;
+                                ulong instRb = (ulong)(instR * 1024 * 1024);
+                                if (instRb > DISKBench_maxReadSpeed) DISKBench_maxReadSpeed = instRb;
+                                this.ExecuteSafe(() =>{
+                                    Bench_R_ReadSpeed_V.Text = string.Format("{0:F1} MB/s", instR);
+                                    Bench_R_Max_ReadSpeed_V.Text = string.Format("{0:F1} MB/s", DISKBench_maxReadSpeed / (1024.0 * 1024.0));
+                                });
+                            }
+                            if (!GlowMain.DISKbenchMode) break;
+                        }
+                    }
+                    swRead.Stop();
+                    readMBps = (totalBytesRead / (1024.0 * 1024.0)) / Math.Max(0.0001, swRead.Elapsed.TotalSeconds);
+                }
                 if (File.Exists(DISKBench_benchmarkFilePath)){
                     try { File.Delete(DISKBench_benchmarkFilePath); }catch { }
                 }
@@ -473,8 +566,24 @@ namespace Glow.glow_tools{
                     this.ExecuteSafe(() =>{
                         Text = string.Format(software_lang.TSReadLangs("BenchDisk", "bd_title"), Application.ProductName);
                         GlowMain.DISKbenchMode = false;
+                        double finalWrite = writeMBps;
+                        double finalRead = readMBps;
                         if (!DISKBench_stopMode){
-                            TS_MessageBoxEngine.TS_MessageBox(this, 1, software_lang.TSReadLangs("BenchDisk", "bd_result_success"));
+                            string resultMsg = software_lang.TSReadLangs("BenchDisk", "bd_result_success");
+                            resultMsg += "\n\n" + Bench_L_WriteSpeed.Text + " " + string.Format("{0:F1} MB/s", finalWrite);
+                            resultMsg += "\n" + Bench_R_ReadSpeed.Text + " " + string.Format("{0:F1} MB/s", finalRead);
+                            if ((ulong)(finalRead * 1024 * 1024) > DISKBench_maxReadSpeed) DISKBench_maxReadSpeed = (ulong)(finalRead * 1024 * 1024);
+                            if ((ulong)(finalWrite * 1024 * 1024) > DISKBench_maxWriteSpeed) DISKBench_maxWriteSpeed = (ulong)(finalWrite * 1024 * 1024);
+                            Bench_L_WriteSpeed_V.SetTextSafe(string.Format("{0:F1} MB/s", finalWrite));
+                            Bench_R_ReadSpeed_V.SetTextSafe(string.Format("{0:F1} MB/s", finalRead));
+                            Bench_L_Max_WriteSpeed_V.SetTextSafe(string.Format("{0:F1} MB/s", DISKBench_maxWriteSpeed / (1024.0 * 1024.0)));
+                            Bench_R_Max_ReadSpeed_V.SetTextSafe(string.Format("{0:F1} MB/s", DISKBench_maxReadSpeed / (1024.0 * 1024.0)));
+                            TS_MessageBoxEngine.TS_MessageBox(this, 1, resultMsg);
+                            string awaitText = software_lang.TSReadLangs("BenchDisk", "bd_start_test_await");
+                            Bench_L_WriteSpeed_V.SetTextSafe(awaitText);
+                            Bench_L_Max_WriteSpeed_V.SetTextSafe(awaitText);
+                            Bench_R_ReadSpeed_V.SetTextSafe(awaitText);
+                            Bench_R_Max_ReadSpeed_V.SetTextSafe(awaitText);
                         }else{
                             DISKBench_stopMode = false;
                             TS_MessageBoxEngine.TS_MessageBox(this, 1, software_lang.TSReadLangs("BenchDisk", "bd_result_exit"));
@@ -520,40 +629,45 @@ namespace Glow.glow_tools{
         // ======================================================================================================
         private async void Disk_engine(){
             try{
-                ulong maxReadSpeed = 0;
-                ulong maxWriteSpeed = 0;
                 while (DISKBench_speedMode){
+                    if (IsDisposed || !IsHandleCreated)
+                        break;
                     try{
-                        ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT Name, DiskReadBytesPersec, DiskWriteBytesPersec FROM Win32_PerfFormattedData_PerfDisk_PhysicalDisk");
-                        ManagementObjectCollection results = searcher.Get();
-                        Dictionary<string, (ulong readSpeed, ulong writeSpeed)> diskData = new Dictionary<string, (ulong, ulong)>();
-                        foreach (ManagementObject obj in results.Cast<ManagementObject>()){
-                            string diskName = (string)obj["Name"];
-                            if (string.IsNullOrWhiteSpace(diskName)) continue;
-                            ulong diskReadSpeed = 0;
-                            ulong diskWriteSpeed = 0;
-                            try{
-                                diskReadSpeed = Convert.ToUInt64(obj["DiskReadBytesPersec"]);
-                                diskWriteSpeed = Convert.ToUInt64(obj["DiskWriteBytesPersec"]);
-                            }catch { }
-                            if (diskName.Trim() != "_Total"){
-                                diskData[diskName] = (diskReadSpeed, diskWriteSpeed);
+                        using (ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT Name, DiskReadBytesPersec, DiskWriteBytesPersec FROM Win32_PerfFormattedData_PerfDisk_PhysicalDisk"))
+                        using (ManagementObjectCollection results = searcher.Get()){
+                            Dictionary<string, (ulong readSpeed, ulong writeSpeed)> diskData = new Dictionary<string, (ulong, ulong)>();
+                            foreach (ManagementObject obj in results.Cast<ManagementObject>()){
+                                using (obj){
+                                    string diskName = (string)obj["Name"];
+                                    if (string.IsNullOrWhiteSpace(diskName)) continue;
+                                    ulong diskReadSpeed = 0;
+                                    ulong diskWriteSpeed = 0;
+                                    try{
+                                        diskReadSpeed = Convert.ToUInt64(obj["DiskReadBytesPersec"]);
+                                        diskWriteSpeed = Convert.ToUInt64(obj["DiskWriteBytesPersec"]);
+                                    }catch { }
+                                    if (diskName.Trim() != "_Total"){
+                                        diskData[diskName] = (diskReadSpeed, diskWriteSpeed);
+                                    }
+                                }
                             }
-                        }
-                        if (!string.IsNullOrEmpty(DISKBench_selectDisk)){
-                            var selectedDisks = diskData.Where(kvp => kvp.Key.EndsWith(DISKBench_selectDisk));
-                            foreach (var diskEntry in selectedDisks){
-                                var (readSpeed, writeSpeed) = diskEntry.Value;
-                                float diskReadSpeedMB = (float)readSpeed / (1024f * 1024f);
-                                float diskWriteSpeedMB = (float)writeSpeed / (1024f * 1024f);
-                                this.ExecuteSafe(() =>{
-                                    if (readSpeed > maxReadSpeed) maxReadSpeed = readSpeed;
-                                    if (writeSpeed > maxWriteSpeed) maxWriteSpeed = writeSpeed;
-                                    Bench_R_ReadSpeed_V.Text = $"{diskReadSpeedMB:F1} MB/s";
-                                    Bench_R_Max_ReadSpeed_V.Text = $"{(maxReadSpeed / (1024f * 1024f)):F1} MB/s";
-                                    Bench_L_WriteSpeed_V.Text = $"{diskWriteSpeedMB:F1} MB/s";
-                                    Bench_L_Max_WriteSpeed_V.Text = $"{(maxWriteSpeed / (1024f * 1024f)):F1} MB/s";
-                                });
+                            if (!string.IsNullOrEmpty(DISKBench_selectDisk) && GlowMain.DISKbenchMode){
+                                string wanted = " " + DISKBench_selectDisk.Trim();
+                                var selectedDisks = diskData.Where(kvp => (" " + kvp.Key).IndexOf(wanted, StringComparison.OrdinalIgnoreCase) >= 0);
+                                foreach (var diskEntry in selectedDisks){
+                                    var (readSpeed, writeSpeed) = diskEntry.Value;
+                                    float diskReadSpeedMB = (float)readSpeed / (1024f * 1024f);
+                                    float diskWriteSpeedMB = (float)writeSpeed / (1024f * 1024f);
+                                    if (IsDisposed || !IsHandleCreated) break;
+                                    this.ExecuteSafe(() =>{
+                                        if (readSpeed > DISKBench_maxReadSpeed) DISKBench_maxReadSpeed = readSpeed;
+                                        if (writeSpeed > DISKBench_maxWriteSpeed) DISKBench_maxWriteSpeed = writeSpeed;
+                                        Bench_R_ReadSpeed_V.Text = $"{diskReadSpeedMB:F1} MB/s";
+                                        Bench_R_Max_ReadSpeed_V.Text = $"{(DISKBench_maxReadSpeed / (1024f * 1024f)):F1} MB/s";
+                                        Bench_L_WriteSpeed_V.Text = $"{diskWriteSpeedMB:F1} MB/s";
+                                        Bench_L_Max_WriteSpeed_V.Text = $"{(DISKBench_maxWriteSpeed / (1024f * 1024f)):F1} MB/s";
+                                    });
+                                }
                             }
                         }
                     }catch (Exception ex){
@@ -629,6 +743,7 @@ namespace Glow.glow_tools{
                     TSGetLangs software_lang = new TSGetLangs(GlowMain.lang_path);
                     TS_MessageBoxEngine.TS_MessageBox(this, 2, software_lang.TSReadLangs("GToolsMessage", "gtm_benchmark_disk_prs_msg"));
                 }else{
+                    DISKBench_speedMode = false;
                     Stop_engine();
                 }
             }catch (Exception ex){
