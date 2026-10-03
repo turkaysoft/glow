@@ -56,6 +56,7 @@ jobs:
 
     # 4. Prepare outputs (signed or unsigned)
     - name: Prepare Final Binaries
+      id: prepare
       shell: powershell
       run: |
         New-Item -ItemType Directory -Force -Path "final_dist"
@@ -71,8 +72,22 @@ jobs:
           Copy-Item "Glow/bin/arm64/Release/Glow.exe" -Destination "final_dist/Glow_ARM64.exe"
         }
 
-    # 5. Upload as artifact
-    - name: Upload Executables
+        if ((Test-Path "signed/x64/Glow.exe") -or (Test-Path "signed/arm64/Glow.exe")) {
+          "signed=true" >> $env:GITHUB_OUTPUT
+        } else {
+          "signed=false" >> $env:GITHUB_OUTPUT
+        }
+
+    # 5. Upload as artifact (name changes if signed)
+    - name: Upload Signed Executables
+      if: steps.prepare.outputs.signed == 'true'
+      uses: actions/upload-artifact@v5
+      with:
+        name: Glow-Executables-Signed
+        path: final_dist/
+
+    - name: Upload Unsigned Executables
+      if: steps.prepare.outputs.signed != 'true'
       uses: actions/upload-artifact@v5
       with:
         name: Glow-Executables
