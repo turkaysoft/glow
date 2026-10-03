@@ -1,23 +1,78 @@
-name: TS Build App (.NET Framework 4.8.1)
-
-permissions:
-  contents: read
-  pull-requests: write
+name: Build and Sign Glow
 
 on:
+  push:
+    branches: [ "main" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
+  workflow_dispatch: # Actions sekmesinden elle tetiklemek için
 
 jobs:
-  build:
+  build-and-sign:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout Code
+      uses: actions/checkout@v4
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
+    # 1. MSBuild Ortamını Hazırlama
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
 
-      - name: Build solution
-        run: msbuild Glow/Glow.sln /p:Configuration=Release /p:Platform=x64
+    # 2.1 x64 Derlemesi
+    - name: Build Glow (x64)
+      run: |
+        msbuild Glow/Glow.sln /p:Configuration=Release /p:Platform="x64" /p:TargetFrameworkVersion="v4.8.1" /p:OutputPath="${{ github.workspace }}\Glow\bin\x64\Release"
+
+    # 2.2 ARM64 Derlemesi
+    - name: Build Glow (ARM64)
+      run: |
+        msbuild Glow/Glow.sln /p:Configuration=Release /p:Platform="ARM64" /p:TargetFrameworkVersion="v4.8.1" /p:OutputPath="${{ github.workspace }}\Glow\bin\arm64\Release"
+
+    # 3.1 SignPath x64 İmzalama (Token tanımlıysa çalışır)
+    - name: Sign x64 Executable
+      if: secrets.SIGNPATH_API_TOKEN != ''
+      uses: SignPath/github-action-submit-signing-request@v2
+      with:
+        api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+        organization-id: '${{ vars.SIGNPATH_ORGANIZATION_ID }}'
+        project-slug: 'glow'
+        signing-policy-slug: 'release-signing'
+        artifact-path: 'Glow/bin/x64/Release/Glow.exe'
+        output-artifact-directory: 'signed/x64'
+
+    # 3.2 SignPath ARM64 İmzalama (Token tanımlıysa çalışır)
+    - name: Sign ARM64 Executable
+      if: secrets.SIGNPATH_API_TOKEN != ''
+      uses: SignPath/github-action-submit-signing-request@v2
+      with:
+        api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+        organization-id: '${{ vars.SIGNPATH_ORGANIZATION_ID }}'
+        project-slug: 'glow'
+        signing-policy-slug: 'release-signing'
+        artifact-path: 'Glow/bin/arm64/Release/Glow.exe'
+        output-artifact-directory: 'signed/arm64'
+
+    # 4. Çıktıları Hazırlama (İmzalı veya İmzasız)
+    - name: Prepare Final Binaries
+      shell: powershell
+      run: |
+        New-Item -ItemType Directory -Force -Path "final_dist"
+        if (Test-Path "signed/x64/Glow.exe") {
+          Copy-Item "signed/x64/Glow.exe" -Destination "final_dist/Glow_x64.exe"
+        } else {
+          Copy-Item "Glow/bin/x64/Release/Glow.exe" -Destination "final_dist/Glow_x64.exe"
+        }
+        
+        if (Test-Path "signed/arm64/Glow.exe") {
+          Copy-Item "signed/arm64/Glow.exe" -Destination "final_dist/Glow_ARM64.exe"
+        } else {
+          Copy-Item "Glow/bin/arm64/Release/Glow.exe" -Destination "final_dist/Glow_ARM64.exe"
+        }
+
+    # 5. Artifact Olarak Yükleme
+    - name: Upload Executables
+      uses: actions/upload-artifact@v4
+      with:
+        name: Glow-Executables
+        path: final_dist/
