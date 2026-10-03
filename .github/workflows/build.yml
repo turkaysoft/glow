@@ -3,6 +3,9 @@ name: Build and Sign Glow
 on:
   workflow_dispatch: # Trigger manually only from the Actions tab
 
+permissions:
+  contents: read
+
 jobs:
   build-and-sign:
     runs-on: windows-latest
