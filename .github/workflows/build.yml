@@ -67,9 +67,9 @@ jobs:
         }
 
         if (Test-Path "signed/arm64/Glow.exe") {
-          Copy-Item "signed/arm64/Glow.exe" -Destination "final_dist/Glow_ARM64.exe"
+          Copy-Item "signed/arm64/Glow.exe" -Destination "final_dist/Glow_arm64.exe"
         } else {
-          Copy-Item "Glow/bin/arm64/Release/Glow.exe" -Destination "final_dist/Glow_ARM64.exe"
+          Copy-Item "Glow/bin/arm64/Release/Glow.exe" -Destination "final_dist/Glow_arm64.exe"
         }
 
         if ((Test-Path "signed/x64/Glow.exe") -or (Test-Path "signed/arm64/Glow.exe")) {
