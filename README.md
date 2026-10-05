@@ -79,6 +79,7 @@ Glow includes a built-in suite for system maintenance:
 * **DNS Test Tool:** Network suite tool for analyzing and testing DNS performance.
 * **Network Troubleshooting Tool:** Diagnostic suite for resolving connectivity issues.
 * **Wi-Fi Password Showing Tool:** Instantly display saved Wi-Fi networks and security keys.
+* **Port Scanner Tool:** Analyze TCP/UDP ports and network listeners, view connected processes and risk levels, and scan local or remote hosts.
 * **Monitor Test Tools:**
     * **Dead Pixel Test:** Identify faulty pixels across various color ranges.
     * **Dynamic Color Range Test:** Test your monitor's color depth and accuracy.
@@ -142,6 +143,7 @@ Glow includes a built-in suite for system maintenance:
 | `CTRL + Shift + D` | DNS Test Tool |
 | `CTRL + Shift + N` | Network Troubleshooting Tool |
 | `CTRL + Shift + W` | Wi-Fi Password Showing Tool |
+| `CTRL + Shift + P` | Port Scanner Tool |
 | `CTRL + Shift + M` | Dead Pixel Test |
 | `CTRL + Alt + M` | Dynamic Color Range Test |
 | `CTRL + Alt + Shift + M` | Stuck Pixel Repair Tool |
