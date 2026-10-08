@@ -28,7 +28,7 @@ jobs:
 
     - name: Upload unsigned
       id: upload-unsigned
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: unsigned-glow
         path: unsigned/
@@ -47,7 +47,7 @@ jobs:
         output-artifact-directory: signed
 
     - name: Publish signed
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: Glow-Executables-Signed
         path: signed/
