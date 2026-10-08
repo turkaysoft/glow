@@ -158,19 +158,6 @@ Glow includes a built-in suite for system maintenance:
 
 ---
 
-## Code signing policy
-
-Free code signing provided by [SignPath.io](https://about.signpath.io), certificate by [SignPath Foundation](https://signpath.org)
-
-Release binaries are built from this repository via GitHub Actions on GitHub-hosted runners and signed after manual approval. A valid signature confirms the binary is an automated build from the source code in this repository.
-
-* Committers and reviewers: [turkaysoft](https://github.com/turkaysoft)
-* Approvers: [turkaysoft](https://github.com/turkaysoft)
-
-Privacy policy: This program will not transfer any information to other networked systems unless specifically requested by the user or the person installing or operating it.
-
----
-
 ## License
 
 This software is offered free of charge as part of the **Türkaysoft solutions package** and is protected under the [**MIT License**](https://github.com/turkaysoft/glow?tab=MIT-1-ov-file).
