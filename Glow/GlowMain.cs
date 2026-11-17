@@ -7788,34 +7788,38 @@ namespace Glow
                                         {
                                             if (debug_status) { TSErrorLog.LogException(ex, "Network() -> DHCP Lease Expires"); }
                                         }
-                                        try
-                                        {
-                                            // IP SUBNET MASK
-                                            string unknownMask = software_lang.TSReadLangs("Network_Content", "nk_c_unknown");
-                                            var subnetMasks = new List<string>();
-                                            if (query_nac_rotate["IPSubnet"] is string[] ipSubnets)
+                                            try
                                             {
-                                                foreach (string subnet in ipSubnets)
+                                                // IP SUBNET MASK
+                                                string unknownMask = software_lang.TSReadLangs("Network_Content", "nk_c_unknown");
+                                                var subnetMasks = new List<string>();
+                                                if (query_nac_rotate["IPSubnet"] is string[] ipSubnets)
                                                 {
-                                                    if (IPAddress.TryParse(subnet, out IPAddress parsedSubnet) && IsValidIPv4SubnetMask(parsedSubnet) && !subnetMasks.Contains(parsedSubnet.ToString()))
-                                                        subnetMasks.Add(parsedSubnet.ToString());
+                                                    foreach (string subnet in ipSubnets)
+                                                    {
+                                                        if (IPAddress.TryParse(subnet, out IPAddress parsedSubnet) && IsValidIPv4SubnetMask(parsedSubnet) && !subnetMasks.Contains(parsedSubnet.ToString()))
+                                                            subnetMasks.Add(parsedSubnet.ToString());
+                                                    }
                                                 }
-                                            }
-                                                if (stealth_status != 1)
+                                                if (subnetMasks.Count == 0)
                                                 {
-                                                    network_subnet_mask_list.Add(subnetMasks.Count > 0 ? string.Join(", ", subnetMasks) : unknownMask);
+                                                    network_subnet_mask_list.Add(unknownMask);
                                                 }
-                                                else
+                                                else if (stealth_status == 1)
                                                 {
                                                     network_subnet_mask_list.Add(sm_text);
                                                 }
+                                                else
+                                                {
+                                                    network_subnet_mask_list.Add(string.Join(", ", subnetMasks));
+                                                }
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                network_subnet_mask_list.Add(software_lang.TSReadLangs("Network_Content", "nk_c_unknown"));
+                                                if (debug_status) { TSErrorLog.LogException(ex, "Network() -> Subnet Mask"); }
+                                            }
                                         }
-                                        catch (Exception ex)
-                                        {
-                                            network_subnet_mask_list.Add(software_lang.TSReadLangs("Network_Content", "nk_c_unknown"));
-                                            if (debug_status) { TSErrorLog.LogException(ex, "Network() -> Subnet Mask"); }
-                                        }
-                                    }
                                 }
                             }
                         }
