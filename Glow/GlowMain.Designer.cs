@@ -85,6 +85,7 @@
             this.russianToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.spanishToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.turkishToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.slovenianToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.windowedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.fullScreenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -530,6 +531,8 @@
             this.NET_Selector_List = new Glow.TSCustomComboBox();
             this.NET_DNS_v4_2_V = new System.Windows.Forms.Label();
             this.NET_IPv6Adress_V = new System.Windows.Forms.Label();
+            this.NET_SubnetMask = new System.Windows.Forms.Label();
+            this.NET_SubnetMask_V = new System.Windows.Forms.Label();
             this.NET_DNS_v4_1 = new System.Windows.Forms.Label();
             this.NET_DNS_v4_2 = new System.Windows.Forms.Label();
             this.NET_Physical_V = new System.Windows.Forms.Label();
@@ -1291,6 +1294,7 @@
             this.polishToolStripMenuItem,
             this.portugueseToolStripMenuItem,
             this.russianToolStripMenuItem,
+            this.slovenianToolStripMenuItem,
             this.spanishToolStripMenuItem,
             this.turkishToolStripMenuItem});
             this.languageToolStripMenuItem.Name = "languageToolStripMenuItem";
@@ -1302,21 +1306,21 @@
             // 
             this.arabicToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.arabicToolStripMenuItem.Name = "arabicToolStripMenuItem";
-            this.arabicToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.arabicToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.arabicToolStripMenuItem.Text = "Arabic";
             // 
             // chineseToolStripMenuItem
             // 
             this.chineseToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.chineseToolStripMenuItem.Name = "chineseToolStripMenuItem";
-            this.chineseToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.chineseToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.chineseToolStripMenuItem.Text = "Chinese";
             // 
             // chineseTaiwanToolStripMenuItem
             // 
             this.chineseTaiwanToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.chineseTaiwanToolStripMenuItem.Name = "chineseTaiwanToolStripMenuItem";
-            this.chineseTaiwanToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.chineseTaiwanToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.chineseTaiwanToolStripMenuItem.Text = "Chinese Taiwan";
             // 
             // englishToolStripMenuItem
@@ -1324,84 +1328,84 @@
             this.englishToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.englishToolStripMenuItem.Name = "englishToolStripMenuItem";
             this.englishToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this.englishToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.englishToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.englishToolStripMenuItem.Text = "English";
             // 
             // dutchToolStripMenuItem
             // 
             this.dutchToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.dutchToolStripMenuItem.Name = "dutchToolStripMenuItem";
-            this.dutchToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.dutchToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.dutchToolStripMenuItem.Text = "Dutch";
             // 
             // frenchToolStripMenuItem
             // 
             this.frenchToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.frenchToolStripMenuItem.Name = "frenchToolStripMenuItem";
-            this.frenchToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.frenchToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.frenchToolStripMenuItem.Text = "French";
             // 
             // germanToolStripMenuItem
             // 
             this.germanToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.germanToolStripMenuItem.Name = "germanToolStripMenuItem";
-            this.germanToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.germanToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.germanToolStripMenuItem.Text = "German";
             // 
             // hindiToolStripMenuItem
             // 
             this.hindiToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.hindiToolStripMenuItem.Name = "hindiToolStripMenuItem";
-            this.hindiToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.hindiToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.hindiToolStripMenuItem.Text = "Hindi";
             // 
             // italianToolStripMenuItem
             // 
             this.italianToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.italianToolStripMenuItem.Name = "italianToolStripMenuItem";
-            this.italianToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.italianToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.italianToolStripMenuItem.Text = "Italian";
             // 
             // japaneseToolStripMenuItem
             // 
             this.japaneseToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.japaneseToolStripMenuItem.Name = "japaneseToolStripMenuItem";
-            this.japaneseToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.japaneseToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.japaneseToolStripMenuItem.Text = "Japanese";
             // 
             // koreanToolStripMenuItem
             // 
             this.koreanToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.koreanToolStripMenuItem.Name = "koreanToolStripMenuItem";
-            this.koreanToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.koreanToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.koreanToolStripMenuItem.Text = "Korean";
             // 
             // polishToolStripMenuItem
             // 
             this.polishToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.polishToolStripMenuItem.Name = "polishToolStripMenuItem";
-            this.polishToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.polishToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.polishToolStripMenuItem.Text = "Polish";
             // 
             // portugueseToolStripMenuItem
             // 
             this.portugueseToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.portugueseToolStripMenuItem.Name = "portugueseToolStripMenuItem";
-            this.portugueseToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.portugueseToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.portugueseToolStripMenuItem.Text = "Portuguese";
             // 
             // russianToolStripMenuItem
             // 
             this.russianToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.russianToolStripMenuItem.Name = "russianToolStripMenuItem";
-            this.russianToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.russianToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.russianToolStripMenuItem.Text = "Russian";
             // 
             // spanishToolStripMenuItem
             // 
             this.spanishToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.spanishToolStripMenuItem.Name = "spanishToolStripMenuItem";
-            this.spanishToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.spanishToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.spanishToolStripMenuItem.Text = "Spanish";
             // 
             // turkishToolStripMenuItem
@@ -1409,8 +1413,15 @@
             this.turkishToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.turkishToolStripMenuItem.Name = "turkishToolStripMenuItem";
             this.turkishToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this.turkishToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.turkishToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.turkishToolStripMenuItem.Text = "Turkish";
+            // 
+            // slovenianToolStripMenuItem
+            // 
+            this.slovenianToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+            this.slovenianToolStripMenuItem.Name = "slovenianToolStripMenuItem";
+            this.slovenianToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.slovenianToolStripMenuItem.Text = "Slovenian";
             // 
             // startupToolStripMenuItem
             // 
@@ -7545,7 +7556,7 @@
             this.NET_TLP.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.NET_TLP.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.NET_TLP.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.NET_TLP.Size = new System.Drawing.Size(792, 1327);
+            this.NET_TLP.Size = new System.Drawing.Size(792, 1372);
             this.NET_TLP.TabIndex = 0;
             // 
             // network_panel_1
@@ -7567,6 +7578,8 @@
             this.network_panel_1.Controls.Add(this.NET_Selector_List);
             this.network_panel_1.Controls.Add(this.NET_DNS_v4_2_V);
             this.network_panel_1.Controls.Add(this.NET_IPv6Adress_V);
+            this.network_panel_1.Controls.Add(this.NET_SubnetMask_V);
+            this.network_panel_1.Controls.Add(this.NET_SubnetMask);
             this.network_panel_1.Controls.Add(this.NET_DNS_v4_1);
             this.network_panel_1.Controls.Add(this.NET_DNS_v4_2);
             this.network_panel_1.Controls.Add(this.NET_Physical_V);
@@ -7600,7 +7613,7 @@
             this.network_panel_1.Location = new System.Drawing.Point(4, 236);
             this.network_panel_1.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.network_panel_1.Name = "network_panel_1";
-            this.network_panel_1.Size = new System.Drawing.Size(784, 995);
+            this.network_panel_1.Size = new System.Drawing.Size(784, 1040);
             this.network_panel_1.TabIndex = 0;
             // 
             // NET_DHCPLastIpTime_V
@@ -7677,11 +7690,11 @@
             this.NET_DNS_v6_2_V.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
             this.NET_DNS_v6_2_V.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(95)))), ((int)(((byte)(146)))));
             this.NET_DNS_v6_2_V.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.NET_DNS_v6_2_V.Location = new System.Drawing.Point(382, 958);
+            this.NET_DNS_v6_2_V.Location = new System.Drawing.Point(382, 1003);
             this.NET_DNS_v6_2_V.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
             this.NET_DNS_v6_2_V.Name = "NET_DNS_v6_2_V";
             this.NET_DNS_v6_2_V.Size = new System.Drawing.Size(37, 20);
-            this.NET_DNS_v6_2_V.TabIndex = 43;
+            this.NET_DNS_v6_2_V.TabIndex = 45;
             this.NET_DNS_v6_2_V.Text = "N/A";
             // 
             // NET_DriverDate_V
@@ -7704,11 +7717,11 @@
             this.NET_DNS_v6_1.BackColor = System.Drawing.Color.Transparent;
             this.NET_DNS_v6_1.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
             this.NET_DNS_v6_1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.NET_DNS_v6_1.Location = new System.Drawing.Point(10, 913);
+            this.NET_DNS_v6_1.Location = new System.Drawing.Point(10, 958);
             this.NET_DNS_v6_1.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
             this.NET_DNS_v6_1.Name = "NET_DNS_v6_1";
             this.NET_DNS_v6_1.Size = new System.Drawing.Size(146, 20);
-            this.NET_DNS_v6_1.TabIndex = 40;
+            this.NET_DNS_v6_1.TabIndex = 42;
             this.NET_DNS_v6_1.Text = "Kullanılan v6 DNS 1:";
             // 
             // NET_DriverVersion
@@ -7730,11 +7743,11 @@
             this.NET_DNS_v6_2.BackColor = System.Drawing.Color.Transparent;
             this.NET_DNS_v6_2.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
             this.NET_DNS_v6_2.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.NET_DNS_v6_2.Location = new System.Drawing.Point(10, 958);
+            this.NET_DNS_v6_2.Location = new System.Drawing.Point(10, 1003);
             this.NET_DNS_v6_2.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
             this.NET_DNS_v6_2.Name = "NET_DNS_v6_2";
             this.NET_DNS_v6_2.Size = new System.Drawing.Size(148, 20);
-            this.NET_DNS_v6_2.TabIndex = 42;
+            this.NET_DNS_v6_2.TabIndex = 44;
             this.NET_DNS_v6_2.Text = "Kullanılan v6 DNS 2:";
             // 
             // NET_DriverVersion_V
@@ -7758,11 +7771,11 @@
             this.NET_DNS_v6_1_V.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
             this.NET_DNS_v6_1_V.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(95)))), ((int)(((byte)(146)))));
             this.NET_DNS_v6_1_V.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.NET_DNS_v6_1_V.Location = new System.Drawing.Point(382, 913);
+            this.NET_DNS_v6_1_V.Location = new System.Drawing.Point(382, 958);
             this.NET_DNS_v6_1_V.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
             this.NET_DNS_v6_1_V.Name = "NET_DNS_v6_1_V";
             this.NET_DNS_v6_1_V.Size = new System.Drawing.Size(37, 20);
-            this.NET_DNS_v6_1_V.TabIndex = 41;
+            this.NET_DNS_v6_1_V.TabIndex = 43;
             this.NET_DNS_v6_1_V.Text = "N/A";
             // 
             // NET_Selector_List
@@ -7787,11 +7800,11 @@
             this.NET_DNS_v4_2_V.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
             this.NET_DNS_v4_2_V.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(95)))), ((int)(((byte)(146)))));
             this.NET_DNS_v4_2_V.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.NET_DNS_v4_2_V.Location = new System.Drawing.Point(382, 868);
+            this.NET_DNS_v4_2_V.Location = new System.Drawing.Point(382, 913);
             this.NET_DNS_v4_2_V.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
             this.NET_DNS_v4_2_V.Name = "NET_DNS_v4_2_V";
             this.NET_DNS_v4_2_V.Size = new System.Drawing.Size(37, 20);
-            this.NET_DNS_v4_2_V.TabIndex = 39;
+            this.NET_DNS_v4_2_V.TabIndex = 41;
             this.NET_DNS_v4_2_V.Text = "N/A";
             // 
             // NET_IPv6Adress_V
@@ -7809,16 +7822,44 @@
             this.NET_IPv6Adress_V.Text = "N/A";
             // 
             // NET_DNS_v4_1
+            // NET_SubnetMask
+            this.NET_SubnetMask.AutoSize = true;
+            this.NET_SubnetMask.BackColor = System.Drawing.Color.Transparent;
+            this.NET_SubnetMask.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
+            this.NET_SubnetMask.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.NET_SubnetMask.Location = new System.Drawing.Point(10, 823);
+            this.NET_SubnetMask.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
+            this.NET_SubnetMask.Name = "NET_SubnetMask";
+            this.NET_SubnetMask.Size = new System.Drawing.Size(132, 20);
+            this.NET_SubnetMask.TabIndex = 36;
+            this.NET_SubnetMask.Text = "Alt Ağ Maskesi:";
+            // 
+            // NET_SubnetMask_V
+            // 
+            this.NET_SubnetMask_V.AutoSize = true;
+            this.NET_SubnetMask_V.BackColor = System.Drawing.Color.Transparent;
+            this.NET_SubnetMask_V.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
+            this.NET_SubnetMask_V.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(95)))), ((int)(((byte)(146)))));
+            this.NET_SubnetMask_V.ImeMode = System.Windows.Forms.ImeMode.NoControl;
+            this.NET_SubnetMask_V.Location = new System.Drawing.Point(382, 823);
+            this.NET_SubnetMask_V.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
+            this.NET_SubnetMask_V.Name = "NET_SubnetMask_V";
+            this.NET_SubnetMask_V.Size = new System.Drawing.Size(37, 20);
+            this.NET_SubnetMask_V.TabIndex = 37;
+            this.NET_SubnetMask_V.Text = "N/A";
+            // 
+            // NET_DNS_v4_1
+            // 
             // 
             this.NET_DNS_v4_1.AutoSize = true;
             this.NET_DNS_v4_1.BackColor = System.Drawing.Color.Transparent;
             this.NET_DNS_v4_1.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
             this.NET_DNS_v4_1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.NET_DNS_v4_1.Location = new System.Drawing.Point(10, 823);
+            this.NET_DNS_v4_1.Location = new System.Drawing.Point(10, 868);
             this.NET_DNS_v4_1.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
             this.NET_DNS_v4_1.Name = "NET_DNS_v4_1";
             this.NET_DNS_v4_1.Size = new System.Drawing.Size(147, 20);
-            this.NET_DNS_v4_1.TabIndex = 36;
+            this.NET_DNS_v4_1.TabIndex = 38;
             this.NET_DNS_v4_1.Text = "Kullanılan v4 DNS 1:";
             // 
             // NET_DNS_v4_2
@@ -7827,11 +7868,11 @@
             this.NET_DNS_v4_2.BackColor = System.Drawing.Color.Transparent;
             this.NET_DNS_v4_2.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
             this.NET_DNS_v4_2.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.NET_DNS_v4_2.Location = new System.Drawing.Point(10, 868);
+            this.NET_DNS_v4_2.Location = new System.Drawing.Point(10, 913);
             this.NET_DNS_v4_2.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
             this.NET_DNS_v4_2.Name = "NET_DNS_v4_2";
             this.NET_DNS_v4_2.Size = new System.Drawing.Size(149, 20);
-            this.NET_DNS_v4_2.TabIndex = 38;
+            this.NET_DNS_v4_2.TabIndex = 40;
             this.NET_DNS_v4_2.Text = "Kullanılan v4 DNS 2:";
             // 
             // NET_Physical_V
@@ -7855,11 +7896,11 @@
             this.NET_DNS_v4_1_V.Font = new System.Drawing.Font("Segoe UI Semibold", 10.75F, System.Drawing.FontStyle.Bold);
             this.NET_DNS_v4_1_V.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(95)))), ((int)(((byte)(146)))));
             this.NET_DNS_v4_1_V.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.NET_DNS_v4_1_V.Location = new System.Drawing.Point(382, 823);
+            this.NET_DNS_v4_1_V.Location = new System.Drawing.Point(382, 868);
             this.NET_DNS_v4_1_V.Margin = new System.Windows.Forms.Padding(3, 0, 3, 25);
             this.NET_DNS_v4_1_V.Name = "NET_DNS_v4_1_V";
             this.NET_DNS_v4_1_V.Size = new System.Drawing.Size(37, 20);
-            this.NET_DNS_v4_1_V.TabIndex = 37;
+            this.NET_DNS_v4_1_V.TabIndex = 39;
             this.NET_DNS_v4_1_V.Text = "N/A";
             // 
             // NET_IPv4Adress
@@ -9816,7 +9857,7 @@
             this.osd_panel_1.Location = new System.Drawing.Point(4, 4);
             this.osd_panel_1.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.osd_panel_1.Name = "osd_panel_1";
-            this.osd_panel_1.Size = new System.Drawing.Size(801, 570);
+            this.osd_panel_1.Size = new System.Drawing.Size(801, 542);
             this.osd_panel_1.TabIndex = 0;
             // 
             // OSD_TextBoxClearBtn
@@ -9942,7 +9983,7 @@
             this.OSD_DataMainTable.RowHeadersVisible = false;
             this.OSD_DataMainTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.OSD_DataMainTable.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.OSD_DataMainTable.Size = new System.Drawing.Size(777, 471);
+            this.OSD_DataMainTable.Size = new System.Drawing.Size(777, 443);
             this.OSD_DataMainTable.TabIndex = 6;
             this.OSD_DataMainTable.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.OSD_DataMainTable_CellDoubleClick);
             this.OSD_DataMainTable.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.OSD_DataMainTable_ColumnHeaderMouseClick);
@@ -10017,7 +10058,7 @@
             this.service_panel_1.Location = new System.Drawing.Point(4, 4);
             this.service_panel_1.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.service_panel_1.Name = "service_panel_1";
-            this.service_panel_1.Size = new System.Drawing.Size(801, 570);
+            this.service_panel_1.Size = new System.Drawing.Size(801, 542);
             this.service_panel_1.TabIndex = 0;
             // 
             // SERVICE_TextBoxClearBtn
@@ -10143,7 +10184,7 @@
             this.SERVICE_DataMainTable.RowHeadersVisible = false;
             this.SERVICE_DataMainTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.SERVICE_DataMainTable.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.SERVICE_DataMainTable.Size = new System.Drawing.Size(777, 471);
+            this.SERVICE_DataMainTable.Size = new System.Drawing.Size(777, 443);
             this.SERVICE_DataMainTable.TabIndex = 6;
             this.SERVICE_DataMainTable.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.SERVICE_DataMainTable_CellDoubleClick);
             this.SERVICE_DataMainTable.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.SERVICE_DataMainTable_ColumnHeaderMouseClick);
@@ -10218,7 +10259,7 @@
             this.instapps_panel_1.Location = new System.Drawing.Point(4, 4);
             this.instapps_panel_1.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.instapps_panel_1.Name = "instapps_panel_1";
-            this.instapps_panel_1.Size = new System.Drawing.Size(801, 570);
+            this.instapps_panel_1.Size = new System.Drawing.Size(801, 542);
             this.instapps_panel_1.TabIndex = 0;
             // 
             // INSTAPPS_TextBoxClearBtn
@@ -10344,7 +10385,7 @@
             this.INSTAPPS_DataMainTable.RowHeadersVisible = false;
             this.INSTAPPS_DataMainTable.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.INSTAPPS_DataMainTable.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.INSTAPPS_DataMainTable.Size = new System.Drawing.Size(777, 471);
+            this.INSTAPPS_DataMainTable.Size = new System.Drawing.Size(777, 443);
             this.INSTAPPS_DataMainTable.TabIndex = 6;
             this.INSTAPPS_DataMainTable.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.INSTAPPS_DataMainTable_CellDoubleClick);
             this.INSTAPPS_DataMainTable.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.INSTAPPS_DataMainTable_CellPainting);
@@ -11582,6 +11623,8 @@
         internal System.Windows.Forms.Label NET_IPv4Adress;
         internal System.Windows.Forms.Label NET_IPv6Adress;
         internal System.Windows.Forms.Label NET_IPv4Adress_V;
+        internal System.Windows.Forms.Label NET_SubnetMask;
+        internal System.Windows.Forms.Label NET_SubnetMask_V;
         private System.Windows.Forms.Panel network_panel_3;
         internal System.Windows.Forms.Label NET_DNS_v4_2_V;
         internal System.Windows.Forms.Label NET_DNS_v4_1;
@@ -11852,6 +11895,7 @@
         internal System.Windows.Forms.Label OS_WinMachineID;
         internal System.Windows.Forms.Label OS_WinMachineID_V;
         internal System.Windows.Forms.Label CPU_Features_V;
+        private System.Windows.Forms.ToolStripMenuItem slovenianToolStripMenuItem;
     }
 }
 

@@ -61,6 +61,7 @@ namespace Glow
             polishToolStripMenuItem.Tag = "pl";
             portugueseToolStripMenuItem.Tag = "pt";
             russianToolStripMenuItem.Tag = "ru";
+            slovenianToolStripMenuItem.Tag = "sl";
             spanishToolStripMenuItem.Tag = "es";
             turkishToolStripMenuItem.Tag = "tr";
             // LANGUAGE SET EVENTS
@@ -79,6 +80,7 @@ namespace Glow
             polishToolStripMenuItem.Click += LanguageToolStripMenuItem_Click;
             portugueseToolStripMenuItem.Click += LanguageToolStripMenuItem_Click;
             russianToolStripMenuItem.Click += LanguageToolStripMenuItem_Click;
+            slovenianToolStripMenuItem.Click += LanguageToolStripMenuItem_Click;
             spanishToolStripMenuItem.Click += LanguageToolStripMenuItem_Click;
             turkishToolStripMenuItem.Click += LanguageToolStripMenuItem_Click;
             // DYNAMIC THEME LISTENER
@@ -223,7 +225,7 @@ namespace Glow
                 var USBLabels = new Label[] { USB_ConName_V, USB_ConMan_V, USB_ConDeviceID_V, USB_ConPNPDeviceID_V, USB_ConDeviceStatus_V, USB_DeviceName_V, USB_DeviceMan_V, USB_DriverVersion_V, USB_DriverDate_V, USB_InfFile_V, USB_DeviceID_V, USB_HardwareID_V };
                 var SOUNDLabels = new Label[] { SOUND_DeviceName_V, SOUND_DeviceManufacturer_V, SOUND_DriverVersion_V, SOUND_DriverDate_V, SOUND_DeviceID_V, SOUND_PNPDeviceID_V, SOUND_DeviceStatus_V };
                 var BATTERYLabels = new Label[] { BATTERY_Status_V, BATTERY_Model_V, BATTERY_Chemistry_V, BATTERY_DesignCapacity_V, BATTERY_FullChargeCapacity_V, BATTERY_RemainingChargeCapacity_V, BATTERY_Voltage_V, BATTERY_ChargePower_V, BATTERY_ChargeCurrent_V, BATTERY_DeChargePower_V, BATTERY_DeChargeCurrent_V };
-                var STEALTHLabels = new Label[] { OS_SystemUser_V, OS_ComputerName_V, OS_SavedUser_V, OS_DeviceID_V, OS_Serial_V, OS_WinMachineID_V, OS_WinKey_V, OS_WinLicenseURL_V, OS_WinLicenseVerifiURL_V, OS_Wallpaper_V, MB_DeviceSerialNumber_V, MB_MotherBoardSerial_V, MB_SystemSKU_V, MB_TPMManID_V, CPU_SerialName_V, RAM_Serial_V, RAM_PartNumber_V, GPU_MonitorSerialNumberID_V, DISK_Serial_V, DISK_VolumeSerial_V, NET_MacAdress_V, NET_Guid_V, NET_IPv4Adress_V, NET_IPv6Adress_V, NET_P_IP_Adress_V, NET_P_ISP_V, NET_DNS_v4_1_V, NET_DNS_v4_2_V, NET_DNS_v6_1_V, NET_DNS_v6_2_V, NET_LT_LocalIP_V, NET_LT_GatewayIP_V, NET_Dhcp_server_V, USB_DeviceGUID_V, BATTERY_Serial_V };
+                var STEALTHLabels = new Label[] { OS_SystemUser_V, OS_ComputerName_V, OS_SavedUser_V, OS_DeviceID_V, OS_Serial_V, OS_WinMachineID_V, OS_WinKey_V, OS_WinLicenseURL_V, OS_WinLicenseVerifiURL_V, OS_Wallpaper_V, MB_DeviceSerialNumber_V, MB_MotherBoardSerial_V, MB_SystemSKU_V, MB_TPMManID_V, CPU_SerialName_V, RAM_Serial_V, RAM_PartNumber_V, GPU_MonitorSerialNumberID_V, DISK_Serial_V, DISK_VolumeSerial_V, NET_MacAdress_V, NET_Guid_V, NET_IPv4Adress_V, NET_IPv6Adress_V, NET_SubnetMask_V, NET_P_IP_Adress_V, NET_P_ISP_V, NET_DNS_v4_1_V, NET_DNS_v4_2_V, NET_DNS_v6_1_V, NET_DNS_v6_2_V, NET_LT_LocalIP_V, NET_LT_GatewayIP_V, NET_Dhcp_server_V, USB_DeviceGUID_V, BATTERY_Serial_V };
                 //
                 allCopyableLabels.Clear();
                 allCopyableLabels.AddRange(OSLabels);
@@ -423,6 +425,7 @@ namespace Glow
                 { "pl", (ts_lang_pl, polishToolStripMenuItem, File.Exists(ts_lang_pl)) },
                 { "pt", (ts_lang_pt, portugueseToolStripMenuItem, File.Exists(ts_lang_pt)) },
                 { "ru", (ts_lang_ru, russianToolStripMenuItem, File.Exists(ts_lang_ru)) },
+                { "sl", (ts_lang_sl, slovenianToolStripMenuItem, File.Exists(ts_lang_sl)) },
                 { "es", (ts_lang_es, spanishToolStripMenuItem, File.Exists(ts_lang_es)) },
                 { "tr", (ts_lang_tr, turkishToolStripMenuItem, File.Exists(ts_lang_tr)) },
             };
@@ -612,10 +615,11 @@ namespace Glow
         private void Os()
         {
             TSGetLangs software_lang = new TSGetLangs(lang_path);
-            ManagementObjectSearcher search_os = new ManagementObjectSearcher("root\\CIMV2", "SELECT RegisteredUser, Caption, Manufacturer, OSArchitecture, SerialNumber, EncryptionLevel, LastBootUpTime, Primary, PortableOperatingSystem FROM Win32_OperatingSystem");
-            ManagementObjectSearcher search_av = new ManagementObjectSearcher("root\\SecurityCenter2", "SELECT displayName, pathToSignedProductExe, pathToSignedReportingExe FROM AntiVirusProduct");
-            ManagementObjectSearcher search_fw = new ManagementObjectSearcher("root\\SecurityCenter2", "SELECT displayName, pathToSignedProductExe, pathToSignedReportingExe FROM FirewallProduct");
-            ManagementObjectSearcher search_as = new ManagementObjectSearcher("root\\SecurityCenter2", "SELECT displayName, pathToSignedProductExe, pathToSignedReportingExe FROM AntiSpywareProduct");
+            using (ManagementObjectSearcher search_os = new ManagementObjectSearcher("root\\CIMV2", "SELECT RegisteredUser, Caption, Manufacturer, OSArchitecture, SerialNumber, LastBootUpTime, Primary, PortableOperatingSystem FROM Win32_OperatingSystem"))
+            using (ManagementObjectSearcher search_av = new ManagementObjectSearcher("root\\SecurityCenter2", "SELECT displayName, pathToSignedProductExe, pathToSignedReportingExe FROM AntiVirusProduct"))
+            using (ManagementObjectSearcher search_fw = new ManagementObjectSearcher("root\\SecurityCenter2", "SELECT displayName, pathToSignedProductExe, pathToSignedReportingExe FROM FirewallProduct"))
+            using (ManagementObjectSearcher search_as = new ManagementObjectSearcher("root\\SecurityCenter2", "SELECT displayName, pathToSignedProductExe, pathToSignedReportingExe FROM AntiSpywareProduct"))
+            {
             try
             {
                 // SYSTEM USER
@@ -1477,10 +1481,7 @@ namespace Glow
             // OS PROCESS END ENABLED
             OS_RotateBtn.SetEnabledSafe(true);
             OS.SetEnabledSafe(true);
-            try { search_os.Dispose(); } catch { }
-            try { search_av.Dispose(); } catch { }
-            try { search_fw.Dispose(); } catch { }
-            try { search_as.Dispose(); } catch { }
+            }
             if (debug_status)
             {
                 TSLogger.Log("<--- Operating System Section Loaded --->");
@@ -2489,10 +2490,11 @@ namespace Glow
         private void Mb()
         {
             TSGetLangs software_lang = new TSGetLangs(lang_path);
-            ManagementObjectSearcher search_bb = new ManagementObjectSearcher("root\\CIMV2", "SELECT Product, Manufacturer, SerialNumber FROM Win32_BaseBoard");
-            ManagementObjectSearcher search_cs = new ManagementObjectSearcher("root\\CIMV2", "SELECT SystemFamily, SystemSKUNumber FROM Win32_ComputerSystem");
-            ManagementObjectSearcher search_bios = new ManagementObjectSearcher("root\\CIMV2", "SELECT Manufacturer, ReleaseDate, Caption, SMBIOSMajorVersion, SMBIOSMinorVersion, SerialNumber FROM Win32_BIOS");
-            ManagementObjectSearcher search_tpm = new ManagementObjectSearcher("root\\CIMV2\\Security\\MicrosoftTpm", "SELECT IsActivated_InitialValue, SpecVersion, PhysicalPresenceVersionInfo, ManufacturerIdTxt, ManufacturerId, ManufacturerVersion, ManufacturerVersionFull20, ManufacturerVersionInfo FROM Win32_Tpm");
+            using (ManagementObjectSearcher search_bb = new ManagementObjectSearcher("root\\CIMV2", "SELECT Product, Manufacturer, SerialNumber FROM Win32_BaseBoard"))
+            using (ManagementObjectSearcher search_cs = new ManagementObjectSearcher("root\\CIMV2", "SELECT SystemFamily, SystemSKUNumber FROM Win32_ComputerSystem"))
+            using (ManagementObjectSearcher search_bios = new ManagementObjectSearcher("root\\CIMV2", "SELECT Manufacturer, ReleaseDate, Caption, SMBIOSMajorVersion, SMBIOSMinorVersion, SerialNumber FROM Win32_BIOS"))
+            using (ManagementObjectSearcher search_tpm = new ManagementObjectSearcher("root\\CIMV2\\Security\\MicrosoftTpm", "SELECT IsActivated_InitialValue, SpecVersion, PhysicalPresenceVersionInfo, ManufacturerIdTxt, ManufacturerId, ManufacturerVersion, ManufacturerVersionFull20, ManufacturerVersionInfo FROM Win32_Tpm"))
+            {
             using (var bbCol = search_bb.Get())
             {
                 foreach (ManagementObject query_bb_rotate in bbCol.Cast<ManagementObject>())
@@ -3002,10 +3004,7 @@ namespace Glow
             MB_RotateBtn.SetEnabledSafe(true);
             MB.SetEnabledSafe(true);
             MB_BIOSUpdateBtn.SetEnabledSafe(true);
-            try { search_bb.Dispose(); } catch { }
-            try { search_cs.Dispose(); } catch { }
-            try { search_bios.Dispose(); } catch { }
-            try { search_tpm.Dispose(); } catch { }
+            }
             if (debug_status)
             {
                 TSLogger.Log("<--- Motherboard Section Loaded --->");
@@ -3352,8 +3351,9 @@ namespace Glow
         private void Cpu()
         {
             TSGetLangs software_lang = new TSGetLangs(lang_path);
-            ManagementObjectSearcher search_process = new ManagementObjectSearcher("root\\CIMV2", "SELECT Name, Manufacturer, Architecture, MaxClockSpeed, CurrentClockSpeed, NumberOfCores, NumberOfEnabledCore, ThreadCount, DeviceID, L2CacheSize, L3CacheSize, ProcessorId, Description, SocketDesignation, UpgradeMethod, VirtualizationFirmwareEnabled FROM Win32_Processor");
-            ManagementObjectSearcher search_cs = new ManagementObjectSearcher("root\\CIMV2", "SELECT HypervisorPresent FROM Win32_ComputerSystem");
+            using (ManagementObjectSearcher search_process = new ManagementObjectSearcher("root\\CIMV2", "SELECT Name, Manufacturer, Architecture, MaxClockSpeed, CurrentClockSpeed, NumberOfCores, NumberOfEnabledCore, ThreadCount, DeviceID, L2CacheSize, L3CacheSize, ProcessorId, Description, SocketDesignation, UpgradeMethod, VirtualizationFirmwareEnabled FROM Win32_Processor"))
+            using (ManagementObjectSearcher search_cs = new ManagementObjectSearcher("root\\CIMV2", "SELECT HypervisorPresent FROM Win32_ComputerSystem"))
+            {
             bool hvPresent = false;
             try
             {
@@ -4067,8 +4067,7 @@ namespace Glow
             // CPU PROCESS END ENABLED
             CPU_RotateBtn.SetEnabledSafe(true);
             CPU.SetEnabledSafe(true);
-            try { search_process.Dispose(); } catch { }
-            try { search_cs.Dispose(); } catch { }
+            }
             if (debug_status)
             {
                 TSLogger.Log("<--- Processor Section Loaded --->");
@@ -4316,8 +4315,11 @@ namespace Glow
         private void Ram()
         {
             TSGetLangs software_lang = new TSGetLangs(lang_path);
-            ManagementObjectSearcher search_os = new ManagementObjectSearcher("root\\CIMV2", "SELECT TotalVisibleMemorySize, TotalVirtualMemorySize FROM Win32_OperatingSystem");
-            ManagementObjectSearcher search_pm = new ManagementObjectSearcher("root\\CIMV2", "SELECT BankLabel, Capacity, SMBIOSMemoryType, MemoryType, Speed, ConfiguredClockSpeed, ConfiguredVoltage, MinVoltage, MaxVoltage, FormFactor, SerialNumber, Manufacturer, TotalWidth, DeviceLocator, PartNumber FROM Win32_PhysicalMemory");
+            double usableRamBytes = 0;
+            double physicalRamBytes = 0;
+            using (ManagementObjectSearcher search_os = new ManagementObjectSearcher("root\\CIMV2", "SELECT TotalVisibleMemorySize, TotalVirtualMemorySize FROM Win32_OperatingSystem"))
+            using (ManagementObjectSearcher search_pm = new ManagementObjectSearcher("root\\CIMV2", "SELECT BankLabel, Capacity, SMBIOSMemoryType, MemoryType, Speed, ConfiguredClockSpeed, ConfiguredVoltage, MinVoltage, MaxVoltage, FormFactor, SerialNumber, Manufacturer, TotalWidth, DeviceLocator, PartNumber FROM Win32_PhysicalMemory"))
+            {
             using (var ramOsCol = search_os.Get())
             {
                 foreach (ManagementObject query_os_rotate in ramOsCol.Cast<ManagementObject>())
@@ -4328,16 +4330,13 @@ namespace Glow
                         {
                             // TOTAL RAM
                             double total_bytes = Convert.ToDouble(query_os_rotate["TotalVisibleMemorySize"]) * 1024;
+                            usableRamBytes = total_bytes;
                             //
                             string usableStr = TS_FormatSize(total_bytes);
-                            double totalGB = total_bytes / (1024 * 1024 * 1024);
-                            double installedGBValue = Math.Pow(2, Math.Round(Math.Log(totalGB, 2)));
-                            double installedBytes = installedGBValue * 1024 * 1024 * 1024;
-                            string installedStr = TS_FormatSize(installedBytes);
                             //
                             string avabilable_string = software_lang.TSReadLangs("Ram_Content", "ram_c_available");
 
-                            RAM_TotalRAM_V.SetTextSafe(string.Format("{0} ({1} {2})", installedStr, avabilable_string, usableStr));
+                            RAM_TotalRAM_V.SetTextSafe(string.Format("{0} {1}", avabilable_string, usableStr));
                         }
                         catch (Exception ex)
                         {
@@ -4407,6 +4406,7 @@ namespace Glow
                         {
                             // RAM CAPACITY
                             double ram_amount = Convert.ToDouble(queryObj["Capacity"]);
+                            physicalRamBytes += ram_amount;
                             ram_amount_list.Add(TS_FormatSize(ram_amount));
                             RAM_Amount_V.SetTextSafe(ram_amount_list[0]);
                         }
@@ -4794,6 +4794,12 @@ namespace Glow
                     }
                 }
             }
+            if (physicalRamBytes > 0)
+            {
+                string availableText = software_lang.TSReadLangs("Ram_Content", "ram_c_available");
+                string usableText = usableRamBytes > 0 ? TS_FormatSize(usableRamBytes) : software_lang.TSReadLangs("Ram_Content", "ram_c_unknown");
+                RAM_TotalRAM_V.SetTextSafe(string.Format("{0} ({1} {2})", TS_FormatSize(physicalRamBytes), availableText, usableText));
+            }
             // RAM SELECT
             try
             {
@@ -4820,8 +4826,7 @@ namespace Glow
             // RAM PROCESS END ENABLED
             RAM_RotateBtn.SetEnabledSafe(true);
             RAM.SetEnabledSafe(true);
-            try { search_os.Dispose(); } catch { }
-            try { search_pm.Dispose(); } catch { }
+            }
             if (debug_status)
             {
                 TSLogger.Log("<--- RAM Section Loaded --->");
@@ -4944,9 +4949,10 @@ namespace Glow
         readonly List<string> gpu_monitor_refresh_rate_list = new List<string>();
         readonly List<string> gpu_monitor_bit_deep_list = new List<string>();
         readonly List<string> gpu_monitor_primary_list = new List<string>();
-        private void Gpu()
+        private async Task Gpu()
         {
             TSGetLangs software_lang = new TSGetLangs(lang_path);
+            var gpuSelectorItems = new List<string>();
             using (ManagementObjectSearcher search_vc = new ManagementObjectSearcher("root\\CIMV2", "SELECT Name, AdapterCompatibility, DriverVersion, DriverDate, Availability, PNPDeviceID, AdapterDACType, InstalledDisplayDrivers, InfFilename, InfSection, CurrentNumberOfColors FROM Win32_VideoController"))
             {
                 using (var collection = search_vc.Get())
@@ -4971,10 +4977,21 @@ namespace Glow
                                 gpuNameCounters[gpu_name] = count;
                                 if (count == 1)
                                 {
+                                    gpuSelectorItems.Add(gpu_name);
                                     GPU_Selector_List.AddItemSafe(gpu_name);
                                 }
                                 else if (count == 2)
                                 {
+                                    int existingIndex = gpuSelectorItems.FindIndex(item => string.Equals(item, gpu_name, StringComparison.OrdinalIgnoreCase));
+                                    if (existingIndex >= 0)
+                                    {
+                                        gpuSelectorItems[existingIndex] = gpu_name + " #1";
+                                    }
+                                    else
+                                    {
+                                        gpuSelectorItems.Add(gpu_name + " #1");
+                                    }
+                                    gpuSelectorItems.Add(gpu_name + " #2");
                                     bool found = false;
                                     GPU_Selector_List.ExecuteSafe(() =>
                                     {
@@ -4996,6 +5013,7 @@ namespace Glow
                                 }
                                 else
                                 {
+                                    gpuSelectorItems.Add(gpu_name + " #" + count);
                                     GPU_Selector_List.AddItemSafe(gpu_name + " #" + count);
                                 }
                             }
@@ -5445,13 +5463,14 @@ namespace Glow
             {
                 if (debug_status) { TSErrorLog.LogException(ex, "Gpu()"); }
             }
+            Task directXGpuInfoTask = Task.CompletedTask;
             try
             {
                 // GET DIRECTX GPU INFO
                 gpu_vram_list.Clear();
                 gpu_dxfl_list.Clear();
                 gpu_dxfl_max_list.Clear();
-                _ = LoadDirectXGPUInfo();
+                directXGpuInfoTask = LoadDirectXGPUInfo(gpuSelectorItems.ToArray());
             }
             catch (Exception ex)
             {
@@ -5472,9 +5491,17 @@ namespace Glow
             {
                 if (debug_status) { TSErrorLog.LogException(ex, "Gpu()"); }
             }
-            // GPU PROCESS END ENABLED
+            // GPU NAVIGATION AND PAGE ENABLED WHILE DIRECTX INFO LOADS
             GPU_RotateBtn.SetEnabledSafe(true);
             GPU.SetEnabledSafe(true);
+            try
+            {
+                await directXGpuInfoTask;
+            }
+            catch (Exception ex)
+            {
+                if (debug_status) { TSErrorLog.LogException(ex, "Gpu()"); }
+            }
             if (debug_status)
             {
                 TSLogger.Log("<--- GPU Section Loaded --->");
@@ -5482,11 +5509,11 @@ namespace Glow
         }
         // GPU VRAM
         // ======================================================================================================
-        private async Task LoadDirectXGPUInfo()
+        private async Task LoadDirectXGPUInfo(IReadOnlyList<string> gpuSelectorItems)
         {
             TSGetLangs software_lang = new TSGetLangs(lang_path);
             //
-            int n = GPU_Selector_List.Items.Count;
+            int n = gpuSelectorItems?.Count ?? 0;
             while (gpu_vram_list.Count < n) gpu_vram_list.Add(string.Empty);
             while (gpu_dxfl_list.Count < n) gpu_dxfl_list.Add(string.Empty);
             while (gpu_dxfl_max_list.Count < n) gpu_dxfl_max_list.Add(string.Empty);
@@ -5596,7 +5623,7 @@ namespace Glow
                         }
                         gpuAgg[gpuKey] = agg;
                     }
-                    int currentCount = GPU_Selector_List.Items.Count;
+                    int currentCount = gpuSelectorItems?.Count ?? 0;
                     while (gpu_vram_list.Count < currentCount) gpu_vram_list.Add(string.Empty);
                     while (gpu_dxfl_list.Count < currentCount) gpu_dxfl_list.Add(string.Empty);
                     while (gpu_dxfl_max_list.Count < currentCount) gpu_dxfl_max_list.Add(string.Empty);
@@ -5616,9 +5643,9 @@ namespace Glow
                         int bestScore = int.MaxValue;
                         //
                         var candidateIndices = new List<int>();
-                        for (int i = 0; i < GPU_Selector_List.Items.Count; i++)
+                        for (int i = 0; i < currentCount; i++)
                         {
-                            string itemNameRaw = GPU_Selector_List.Items[i]?.ToString() ?? "";
+                            string itemNameRaw = gpuSelectorItems[i] ?? "";
                             string itemBase = StripGpuIndexSuffix(itemNameRaw);
                             if (itemBase.Equals(gpuName, StringComparison.OrdinalIgnoreCase))
                                 candidateIndices.Add(i);
@@ -5670,7 +5697,7 @@ namespace Glow
                                 for (int k = 0; k < candidateIndices.Count; k++)
                                 {
                                     int i = candidateIndices[k];
-                                    string itemNameRaw = GPU_Selector_List.Items[i]?.ToString() ?? "";
+                                    string itemNameRaw = gpuSelectorItems[i] ?? "";
                                     string itemLower = itemNameRaw.ToLowerInvariant();
                                     if (Math.Abs(a.Length - itemLower.Length) >= bestScore) continue;
                                     int score = LevenshteinDistance(a, itemLower);
@@ -5685,9 +5712,9 @@ namespace Glow
                         else
                         {
                             string a = gpuName.ToLowerInvariant();
-                            for (int i = 0; i < GPU_Selector_List.Items.Count; i++)
+                            for (int i = 0; i < currentCount; i++)
                             {
-                                string itemName = GPU_Selector_List.Items[i]?.ToString() ?? "";
+                                string itemName = gpuSelectorItems[i] ?? "";
                                 string itemLower = itemName.ToLowerInvariant();
                                 if (Math.Abs(a.Length - itemLower.Length) >= bestScore) continue;
                                 int score = LevenshteinDistance(a, itemLower);
@@ -7343,10 +7370,22 @@ namespace Glow
         readonly List<string> network_connection_speed_list = new List<string>();
         readonly List<string> network_ipv4_list = new List<string>();
         readonly List<string> network_ipv6_list = new List<string>();
+        readonly List<string> network_subnet_mask_list = new List<string>();
         readonly List<string> network_dns_v4_1_list = new List<string>();
         readonly List<string> network_dns_v4_2_list = new List<string>();
         readonly List<string> network_dns_v6_1_list = new List<string>();
         readonly List<string> network_dns_v6_2_list = new List<string>();
+        private static bool IsValidIPv4SubnetMask(IPAddress address)
+        {
+            if (address == null || address.AddressFamily != AddressFamily.InterNetwork) return false;
+
+            byte[] bytes = address.GetAddressBytes();
+            uint mask = ((uint)bytes[0] << 24) | ((uint)bytes[1] << 16) | ((uint)bytes[2] << 8) | bytes[3];
+            if (mask == 0 || mask == uint.MaxValue) return mask == uint.MaxValue;
+
+            uint inverted = ~mask;
+            return (inverted & (inverted + 1)) == 0;
+        }
         // DNS PROVIDER CLASS
         // -----------------------------------------
         public class DnsProvider
@@ -7427,8 +7466,9 @@ namespace Glow
         {
             TSGetLangs software_lang = new TSGetLangs(lang_path);
             EnumerationOptions queryOptions = new EnumerationOptions { ReturnImmediately = true, Rewindable = false, DirectRead = true };
-            ManagementObjectSearcher search_na = new ManagementObjectSearcher("root\\CIMV2", "SELECT Name, MACAddress, Manufacturer, ServiceName, AdapterType, PhysicalAdapter, PNPDeviceID, GUID, NetConnectionID, Index, Speed FROM Win32_NetworkAdapter", queryOptions);
-            var searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT DeviceName, DriverVersion, DriverDate FROM Win32_PnPSignedDriver WHERE DeviceClass='Net'", queryOptions);
+            using (ManagementObjectSearcher search_na = new ManagementObjectSearcher("root\\CIMV2", "SELECT Name, MACAddress, Manufacturer, ServiceName, AdapterType, PhysicalAdapter, PNPDeviceID, GUID, NetConnectionID, Index, Speed FROM Win32_NetworkAdapter", queryOptions))
+            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT DeviceName, DriverVersion, DriverDate FROM Win32_PnPSignedDriver WHERE DeviceClass='Net'", queryOptions))
+            {
             var driverDict = new Dictionary<string, ManagementObject>(StringComparer.OrdinalIgnoreCase);
             using (var results = searcher.Get())
             {
@@ -7667,8 +7707,7 @@ namespace Glow
                         try
                         {
                             var get_na_index = query_na_rotate["Index"];
-                            ManagementObjectSearcher search_nac = new ManagementObjectSearcher("root\\CIMV2", $"SELECT DHCPEnabled, DHCPServer, DHCPLeaseObtained, DHCPLeaseExpires, IPAddress FROM Win32_NetworkAdapterConfiguration WHERE Index={get_na_index}");
-                            using (search_nac)
+                            using (ManagementObjectSearcher search_nac = new ManagementObjectSearcher("root\\CIMV2", $"SELECT DHCPEnabled, DHCPServer, DHCPLeaseObtained, DHCPLeaseExpires, IPAddress, IPSubnet FROM Win32_NetworkAdapterConfiguration WHERE Index={get_na_index}"))
                             using (var nacCol = search_nac.Get())
                             {
                                 foreach (ManagementObject query_nac_rotate in nacCol.Cast<ManagementObject>())
@@ -7749,6 +7788,26 @@ namespace Glow
                                         {
                                             if (debug_status) { TSErrorLog.LogException(ex, "Network() -> DHCP Lease Expires"); }
                                         }
+                                        try
+                                        {
+                                            // IP SUBNET MASK
+                                            string unknownMask = software_lang.TSReadLangs("Network_Content", "nk_c_unknown");
+                                            var subnetMasks = new List<string>();
+                                            if (query_nac_rotate["IPSubnet"] is string[] ipSubnets)
+                                            {
+                                                foreach (string subnet in ipSubnets)
+                                                {
+                                                    if (IPAddress.TryParse(subnet, out IPAddress parsedSubnet) && IsValidIPv4SubnetMask(parsedSubnet) && !subnetMasks.Contains(parsedSubnet.ToString()))
+                                                        subnetMasks.Add(parsedSubnet.ToString());
+                                                }
+                                            }
+                                            network_subnet_mask_list.Add(subnetMasks.Count > 0 ? string.Join(", ", subnetMasks) : unknownMask);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            network_subnet_mask_list.Add(software_lang.TSReadLangs("Network_Content", "nk_c_unknown"));
+                                            if (debug_status) { TSErrorLog.LogException(ex, "Network() -> Subnet Mask"); }
+                                        }
                                     }
                                 }
                             }
@@ -7789,9 +7848,8 @@ namespace Glow
                         try
                         {
                             var get_na_index = query_na_rotate["Index"];
-                            ManagementObjectSearcher query_na_ip = new ManagementObjectSearcher("root\\CIMV2", $"SELECT * FROM Win32_NetworkAdapterConfiguration WHERE Index={get_na_index}");
                             string unknownIp = software_lang.TSReadLangs("Network_Content", "nk_c_unknown");
-                            using (query_na_ip)
+                            using (ManagementObjectSearcher query_na_ip = new ManagementObjectSearcher("root\\CIMV2", $"SELECT * FROM Win32_NetworkAdapterConfiguration WHERE Index={get_na_index}"))
                             using (var ipCol = query_na_ip.Get())
                             {
                                 foreach (ManagementObject search_ip in ipCol.Cast<ManagementObject>())
@@ -8009,8 +8067,7 @@ namespace Glow
             NET_RotateBtn.SetEnabledSafe(true);
             NETWORK.SetEnabledSafe(true);
             try { foreach (var kv in driverDict) { try { kv.Value?.Dispose(); } catch { } } driverDict.Clear(); } catch { }
-            try { search_na.Dispose(); } catch { }
-            try { searcher.Dispose(); } catch { }
+            }
             if (debug_status)
             {
                 TSLogger.Log("<--- Network Section Loaded --->");
@@ -8040,6 +8097,7 @@ namespace Glow
                 try { NET_LocalConSpeed_V.Text = network_connection_speed_list[network_select]; } catch (Exception ex) { if (debug_status) TSErrorLog.LogException(ex, "NET_Selector_List_SelectedIndexChanged()"); }
                 try { NET_IPv4Adress_V.Text = network_ipv4_list[network_select]; } catch (Exception ex) { if (debug_status) TSErrorLog.LogException(ex, "NET_Selector_List_SelectedIndexChanged()"); }
                 try { NET_IPv6Adress_V.Text = network_ipv6_list[network_select]; } catch (Exception ex) { if (debug_status) TSErrorLog.LogException(ex, "NET_Selector_List_SelectedIndexChanged()"); }
+                try { NET_SubnetMask_V.Text = network_subnet_mask_list[network_select]; } catch (Exception ex) { if (debug_status) TSErrorLog.LogException(ex, "NET_Selector_List_SelectedIndexChanged()"); }
                 try { SetDnsLabel(NET_DNS_v4_1_V, network_select < network_dns_v4_1_list.Count ? network_dns_v4_1_list[network_select] : "", net_lang); } catch (Exception ex) { if (debug_status) TSErrorLog.LogException(ex, "NET_Selector_List_SelectedIndexChanged()"); }
                 try { SetDnsLabel(NET_DNS_v4_2_V, network_select < network_dns_v4_2_list.Count ? network_dns_v4_2_list[network_select] : "", net_lang); } catch (Exception ex) { if (debug_status) TSErrorLog.LogException(ex, "NET_Selector_List_SelectedIndexChanged()"); }
                 try { SetDnsLabel(NET_DNS_v6_1_V, network_select < network_dns_v6_1_list.Count ? network_dns_v6_1_list[network_select] : "", net_lang); } catch (Exception ex) { if (debug_status) TSErrorLog.LogException(ex, "NET_Selector_List_SelectedIndexChanged()"); }
@@ -8416,8 +8474,9 @@ namespace Glow
             usb_device_hardware_id_list.Clear();
             usb_device_guid_list.Clear();
             EnumerationOptions queryOptions = new EnumerationOptions { ReturnImmediately = true, Rewindable = false, DirectRead = true };
-            ManagementObjectSearcher search_usb_controller = new ManagementObjectSearcher("root\\CIMV2", "SELECT Caption, Name, Manufacturer, DeviceID, PNPDeviceID, Status FROM Win32_USBController", queryOptions);
-            ManagementObjectSearcher search_usb_device = new ManagementObjectSearcher("root\\CIMV2", "SELECT FriendlyName, DeviceName, Manufacturer, DriverVersion, DriverDate, InfName, DeviceID, HardWareID, ClassGuid FROM Win32_PnPSignedDriver WHERE DeviceID LIKE 'USB%'", queryOptions);
+            using (ManagementObjectSearcher search_usb_controller = new ManagementObjectSearcher("root\\CIMV2", "SELECT Caption, Name, Manufacturer, DeviceID, PNPDeviceID, Status FROM Win32_USBController", queryOptions))
+            using (ManagementObjectSearcher search_usb_device = new ManagementObjectSearcher("root\\CIMV2", "SELECT FriendlyName, DeviceName, Manufacturer, DriverVersion, DriverDate, InfName, DeviceID, HardWareID, ClassGuid FROM Win32_PnPSignedDriver WHERE DeviceID LIKE 'USB%'", queryOptions))
+            {
             using (var usbConCol = search_usb_controller.Get())
             {
                 foreach (ManagementObject query_usb_con in usbConCol.Cast<ManagementObject>())
@@ -8833,8 +8892,7 @@ namespace Glow
             // USB PROCESS END ENABLED
             USB_RotateBtn.SetEnabledSafe(true);
             USB.SetEnabledSafe(true);
-            try { search_usb_controller.Dispose(); } catch { }
-            try { search_usb_device.Dispose(); } catch { }
+            }
             if (debug_status)
             {
                 TSLogger.Log("<--- USB Section Loaded --->");
@@ -8896,8 +8954,9 @@ namespace Glow
             sound_pnp_device_id_list.Clear();
             sound_device_status_list.Clear();
             EnumerationOptions queryOptions = new EnumerationOptions { ReturnImmediately = true, Rewindable = false, DirectRead = true };
-            ManagementObjectSearcher search_sound = new ManagementObjectSearcher("root\\CIMV2", "SELECT Caption, Name, Manufacturer, PNPDeviceID, DeviceID, Status FROM Win32_SoundDevice", queryOptions);
-            var soundSearcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT DeviceID, DriverVersion, DriverDate FROM Win32_PnPSignedDriver", queryOptions);
+            using (ManagementObjectSearcher search_sound = new ManagementObjectSearcher("root\\CIMV2", "SELECT Caption, Name, Manufacturer, PNPDeviceID, DeviceID, Status FROM Win32_SoundDevice", queryOptions))
+            using (ManagementObjectSearcher soundSearcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT DeviceID, DriverVersion, DriverDate FROM Win32_PnPSignedDriver", queryOptions))
+            {
             var soundDriversDict = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
             using (var results = soundSearcher.Get())
             {
@@ -9120,8 +9179,7 @@ namespace Glow
             // SOUND PROCESS END ENABLED
             SOUND_RotateBtn.SetEnabledSafe(true);
             SOUND.SetEnabledSafe(true);
-            try { search_sound.Dispose(); } catch { }
-            try { soundSearcher.Dispose(); } catch { }
+            }
             if (debug_status)
             {
                 TSLogger.Log("<--- Sound Section Loaded --->");
@@ -9150,11 +9208,11 @@ namespace Glow
         // ======================================================================================================
         private void Battery()
         {
-            ManagementObjectSearcher get_battery_static_data = null;
             try
             {
                 TSGetLangs software_lang = new TSGetLangs(lang_path);
-                get_battery_static_data = new ManagementObjectSearcher("root\\WMI", "SELECT DeviceName, SerialNumber, Chemistry, DesignedCapacity FROM BatteryStaticData");
+                using (ManagementObjectSearcher get_battery_static_data = new ManagementObjectSearcher("root\\WMI", "SELECT DeviceName, SerialNumber, Chemistry, DesignedCapacity FROM BatteryStaticData"))
+                {
                 bool chemFound = false;
                 using (var battStatCol = get_battery_static_data.Get())
                 {
@@ -9343,9 +9401,9 @@ namespace Glow
                 {
                     // BATTERY FULL CHARGE CAPACITY (ham deger mWh)
                     battery_fullChargedCapacity_mWh = 0;
-                    ManagementObjectSearcher get_battery_full_charge_capacity = new ManagementObjectSearcher("root\\WMI", "SELECT FullChargedCapacity FROM BatteryFullChargedCapacity");
+                    using (ManagementObjectSearcher get_battery_full_charge_capacity = new ManagementObjectSearcher("root\\WMI", "SELECT FullChargedCapacity FROM BatteryFullChargedCapacity"))
+                    {
                     bool fullFound = false;
-                    using (get_battery_full_charge_capacity)
                     using (var fullCol = get_battery_full_charge_capacity.Get())
                     {
                         foreach (ManagementObject batteryFullCharge in fullCol.Cast<ManagementObject>())
@@ -9368,12 +9426,14 @@ namespace Glow
                         battery_fullChargedCapacity_mWh = 0;
                         BATTERY_FullChargeCapacity_V.SetTextSafe(software_lang.TSReadLangs("Battery_Content", "by_c_unknown"));
                     }
+                    }
                 }
                 catch (Exception ex)
                 {
                     battery_fullChargedCapacity_mWh = 0;
                     BATTERY_FullChargeCapacity_V.SetTextSafe(software_lang.TSReadLangs("Battery_Content", "by_c_unknown"));
                     if (debug_status) { TSErrorLog.LogException(ex, "Battery() -> FullChargeCapacity"); }
+                }
                 }
             }
             catch (Exception ex)
@@ -9382,7 +9442,6 @@ namespace Glow
             }
             BATTERY_RotateBtn.SetEnabledSafe(true);
             BATTERY.SetEnabledSafe(true);
-            try { get_battery_static_data.Dispose(); } catch { }
             if (debug_status)
             {
                 TSLogger.Log("<--- Battery Section Loaded --->");
@@ -11490,6 +11549,7 @@ namespace Glow
                 polishToolStripMenuItem.Text = software_lang.TSReadLangs("HeaderLangs", "lang_pl");
                 portugueseToolStripMenuItem.Text = software_lang.TSReadLangs("HeaderLangs", "lang_pt");
                 russianToolStripMenuItem.Text = software_lang.TSReadLangs("HeaderLangs", "lang_ru");
+                slovenianToolStripMenuItem.Text = software_lang.TSReadLangs("HeaderLangs", "lang_sl");
                 spanishToolStripMenuItem.Text = software_lang.TSReadLangs("HeaderLangs", "lang_es");
                 turkishToolStripMenuItem.Text = software_lang.TSReadLangs("HeaderLangs", "lang_tr");
                 // STARTUP VIEW
@@ -11783,6 +11843,7 @@ namespace Glow
                 NET_LocalConSpeed.Text = software_lang.TSReadLangs("Network", "nk_connection_speed");
                 NET_IPv4Adress.Text = software_lang.TSReadLangs("Network", "nk_appointed_ipv4_adress");
                 NET_IPv6Adress.Text = software_lang.TSReadLangs("Network", "nk_appointed_ipv6_adress");
+                NET_SubnetMask.Text = software_lang.TSReadLangs("Network", "nk_subnet_mask");
                 NET_DNS_v4_1.Text = software_lang.TSReadLangs("Network", "nk_v4_dns1");
                 NET_DNS_v4_2.Text = software_lang.TSReadLangs("Network", "nk_v4_dns2");
                 NET_DNS_v6_1.Text = software_lang.TSReadLangs("Network", "nk_v6_dns1");
@@ -12909,6 +12970,8 @@ namespace Glow
                 NET_IPv4Adress_V.ForeColor = TS_ThemeEngine.ColorMode(theme, "TSBT_AccentColor");
                 NET_IPv6Adress.ForeColor = TS_ThemeEngine.ColorMode(theme, "TSBT_LabelColor1");
                 NET_IPv6Adress_V.ForeColor = TS_ThemeEngine.ColorMode(theme, "TSBT_AccentColor");
+                NET_SubnetMask.ForeColor = TS_ThemeEngine.ColorMode(theme, "TSBT_LabelColor1");
+                NET_SubnetMask_V.ForeColor = TS_ThemeEngine.ColorMode(theme, "TSBT_AccentColor");
                 NET_DNS_v4_1.ForeColor = TS_ThemeEngine.ColorMode(theme, "TSBT_LabelColor1");
                 NET_DNS_v4_1_V.ForeColor = TS_ThemeEngine.ColorMode(theme, "TSBT_AccentColor");
                 NET_DNS_v4_2.ForeColor = TS_ThemeEngine.ColorMode(theme, "TSBT_LabelColor1");
@@ -14930,6 +14993,7 @@ namespace Glow
                             KV(NET_LocalConSpeed.Text, NET_LocalConSpeed_V.Text),
                             KV(NET_IPv4Adress.Text, NET_IPv4Adress_V.Text),
                             KV(NET_IPv6Adress.Text, NET_IPv6Adress_V.Text),
+                    KV(NET_SubnetMask.Text, NET_SubnetMask_V.Text),
                             KV(NET_DNS_v4_1.Text, NET_DNS_v4_1_V.Text),
                             KV(NET_DNS_v4_2.Text, NET_DNS_v4_2_V.Text),
                             KV(NET_DNS_v6_1.Text, NET_DNS_v6_1_V.Text),
@@ -15967,7 +16031,6 @@ namespace Glow
             catch { }
             loop_status = false;
             try { _shutdownCts.Cancel(); } catch { }
-            CancelAllTasks();
             try { Enabled = false; } catch { }
             try
             {

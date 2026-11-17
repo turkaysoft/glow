@@ -1009,6 +1009,7 @@ namespace Glow
         public static readonly string ts_lang_pl = ts_lf + @"\Polish.ini";              // Polish       | pl
         public static readonly string ts_lang_pt = ts_lf + @"\Portuguese.ini";          // Portuguese   | pt
         public static readonly string ts_lang_ru = ts_lf + @"\Russian.ini";             // Russian      | ru
+        public static readonly string ts_lang_sl = ts_lf + @"\Slovenian.ini";           // Slovenian    | sl
         public static readonly string ts_lang_es = ts_lf + @"\Spanish.ini";             // Spanish      | es
         public static readonly string ts_lang_tr = ts_lf + @"\Turkish.ini";             // Turkish      | tr
         // LANGUAGE MANAGE FUNCTIONS
@@ -1028,6 +1029,7 @@ namespace Glow
             { "pl", ts_lang_pl },
             { "pt", ts_lang_pt },
             { "ru", ts_lang_ru },
+            { "sl", ts_lang_sl },
             { "es", ts_lang_es },
             { "tr", ts_lang_tr },
         };
