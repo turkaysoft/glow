@@ -7801,7 +7801,14 @@ namespace Glow
                                                         subnetMasks.Add(parsedSubnet.ToString());
                                                 }
                                             }
-                                            network_subnet_mask_list.Add(subnetMasks.Count > 0 ? string.Join(", ", subnetMasks) : unknownMask);
+                                                if (stealth_status != 1)
+                                                {
+                                                    network_subnet_mask_list.Add(subnetMasks.Count > 0 ? string.Join(", ", subnetMasks) : unknownMask);
+                                                }
+                                                else
+                                                {
+                                                    network_subnet_mask_list.Add(sm_text);
+                                                }
                                         }
                                         catch (Exception ex)
                                         {
@@ -14993,7 +15000,7 @@ namespace Glow
                             KV(NET_LocalConSpeed.Text, NET_LocalConSpeed_V.Text),
                             KV(NET_IPv4Adress.Text, NET_IPv4Adress_V.Text),
                             KV(NET_IPv6Adress.Text, NET_IPv6Adress_V.Text),
-                    KV(NET_SubnetMask.Text, NET_SubnetMask_V.Text),
+                            KV(NET_SubnetMask.Text, NET_SubnetMask_V.Text),
                             KV(NET_DNS_v4_1.Text, NET_DNS_v4_1_V.Text),
                             KV(NET_DNS_v4_2.Text, NET_DNS_v4_2_V.Text),
                             KV(NET_DNS_v6_1.Text, NET_DNS_v6_1_V.Text),
